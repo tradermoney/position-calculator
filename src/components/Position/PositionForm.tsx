@@ -12,9 +12,33 @@ import {
   Alert,
   InputAdornment,
 } from '@mui/material';
-import { Position, PositionSide } from '../../types';
 import { useAppContext } from '../../contexts/AppContext';
-import { validatePosition } from '../../utils/calculations';
+
+// 本地类型定义
+enum PositionSide {
+  LONG = 'long',
+  SHORT = 'short'
+}
+
+enum PositionStatus {
+  ACTIVE = 'active',
+  CLOSED = 'closed',
+  LIQUIDATED = 'liquidated',
+  PARTIAL = 'partial'
+}
+
+interface Position {
+  id: string;
+  symbol: string;
+  side: PositionSide;
+  leverage: number;
+  entryPrice: number;
+  quantity: number;
+  margin: number;
+  status: PositionStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface PositionFormProps {
   position?: Position | null;
@@ -33,6 +57,33 @@ export default function PositionForm({ position, onSubmit, onCancel }: PositionF
     margin: '',
   });
   const [errors, setErrors] = useState<string[]>([]);
+
+  // 简单的验证函数
+  const validatePosition = (position: Partial<Position>): string[] => {
+    const errors: string[] = [];
+
+    if (!position.symbol || position.symbol.trim() === '') {
+      errors.push('币种符号不能为空');
+    }
+
+    if (!position.leverage || position.leverage <= 0 || position.leverage > 125) {
+      errors.push('杠杆倍数必须在1-125之间');
+    }
+
+    if (!position.entryPrice || position.entryPrice <= 0) {
+      errors.push('开仓价格必须大于0');
+    }
+
+    if (!position.quantity || position.quantity <= 0) {
+      errors.push('持有数量必须大于0');
+    }
+
+    if (!position.margin || position.margin <= 0) {
+      errors.push('保证金必须大于0');
+    }
+
+    return errors;
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 如果是编辑模式，填充表单数据
@@ -101,8 +152,9 @@ export default function PositionForm({ position, onSubmit, onCancel }: PositionF
       } else {
         // 创建模式
         const newPosition: Position = {
-          id: Date.now().toString(),
           ...positionData as Position,
+          id: Date.now().toString(),
+          status: PositionStatus.ACTIVE,
           createdAt: new Date(),
           updatedAt: new Date(),
         };

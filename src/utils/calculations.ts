@@ -30,14 +30,97 @@ export function calculateAveragePrice(
 }
 
 /**
- * 计算爆仓价格
- * @param position 仓位信息
+ * 计算爆仓价格 - 简化接口用于测试
+ */
+interface LiquidationPriceParams {
+  entryPrice: number;
+  quantity: number;
+  leverage: number;
+  side: 'long' | 'short';
+  margin: number;
+  maintenanceMarginRate: number;
+}
+
+export function calculateLiquidationPrice(params: LiquidationPriceParams): number {
+  const { entryPrice, leverage, side, maintenanceMarginRate } = params;
+
+  if (leverage <= 0) {
+    throw new Error('杠杆倍数必须大于0');
+  }
+
+  if (entryPrice <= 0) {
+    throw new Error('开仓价格必须大于0');
+  }
+
+  if (side === 'long') {
+    // 多头爆仓价格 = 开仓价格 * (1 - 1/杠杆 + 维持保证金率)
+    return entryPrice * (1 - 1/leverage + maintenanceMarginRate);
+  } else {
+    // 空头爆仓价格 = 开仓价格 * (1 + 1/杠杆 - 维持保证金率)
+    return entryPrice * (1 + 1/leverage - maintenanceMarginRate);
+  }
+}
+
+/**
+ * 计算盈亏 - 简化接口用于测试
+ */
+interface PnLParams {
+  entryPrice: number;
+  currentPrice: number;
+  quantity: number;
+  side: 'long' | 'short';
+}
+
+export function calculatePnL(params: PnLParams): number {
+  const { entryPrice, currentPrice, quantity, side } = params;
+
+  if (side === 'long') {
+    return (currentPrice - entryPrice) * quantity;
+  } else {
+    return (entryPrice - currentPrice) * quantity;
+  }
+}
+
+/**
+ * 计算保证金比率 - 简化接口用于测试
+ */
+interface MarginRatioParams {
+  margin: number;
+  unrealizedPnL: number;
+  positionValue: number;
+}
+
+export function calculateMarginRatio(params: MarginRatioParams): number {
+  const { margin, unrealizedPnL, positionValue } = params;
+
+  if (positionValue <= 0) return 0;
+  return (margin + unrealizedPnL) / positionValue;
+}
+
+/**
+ * 计算所需保证金 - 简化接口用于测试
+ */
+interface RequiredMarginParams {
+  price: number;
+  quantity: number;
+  leverage: number;
+}
+
+export function calculateRequiredMargin(params: RequiredMarginParams): number {
+  const { price, quantity, leverage } = params;
+  return (price * quantity) / leverage;
+}
+
+/**
+ * 计算爆仓价格 - 原有接口保持兼容
+ * @param side 仓位方向
+ * @param leverage 杠杆倍数
  * @param averagePrice 平均成本价
  * @param totalMargin 总保证金
  * @param totalQuantity 总数量
  * @returns 爆仓价格
  */
-export function calculateLiquidationPrice(
+export function calculateLiquidationPriceOriginal(
   side: PositionSide,
   leverage: number,
   averagePrice: number,
@@ -45,10 +128,10 @@ export function calculateLiquidationPrice(
   totalQuantity: number
 ): number {
   if (totalQuantity === 0 || totalMargin === 0) return 0;
-  
+
   // 维持保证金率通常为0.5%
   const maintenanceMarginRate = 0.005;
-  
+
   if (side === PositionSide.LONG) {
     // 多头爆仓价格 = 平均价格 * (1 - 1/杠杆 + 维持保证金率)
     return averagePrice * (1 - 1/leverage + maintenanceMarginRate);
@@ -108,7 +191,7 @@ export function calculatePositionResult(
     position.quantity
   );
   
-  const liquidationPrice = calculateLiquidationPrice(
+  const liquidationPrice = calculateLiquidationPriceOriginal(
     position.side,
     position.leverage,
     position.entryPrice,
@@ -118,13 +201,22 @@ export function calculatePositionResult(
   
   const roe = calculateROE(unrealizedPnl, position.margin);
   
+  const totalValue = position.quantity * price;
+  const marginRatio = calculateMarginRatioOriginal(position.margin, totalValue);
+  const distanceToLiquidation = calculateDistanceToLiquidation(price, liquidationPrice, position.side);
+  const riskLevel = calculateRiskLevel(marginRatio, position.leverage, distanceToLiquidation);
+
   return {
     averagePrice: position.entryPrice,
     totalQuantity: position.quantity,
     totalMargin: position.margin,
     liquidationPrice,
     unrealizedPnl,
-    roe
+    roe,
+    totalValue,
+    marginRatio,
+    riskLevel,
+    distanceToLiquidation
   };
 }
 
@@ -160,7 +252,7 @@ export function calculateAddPositionResult(
   };
   
   // 计算爆仓价格
-  const liquidationPrice = calculateLiquidationPrice(
+  const liquidationPrice = calculateLiquidationPriceOriginal(
     originalPosition.side,
     originalPosition.leverage,
     newAveragePrice,
@@ -178,7 +270,11 @@ export function calculateAddPositionResult(
   );
   
   const roe = calculateROE(unrealizedPnl, newTotalMargin);
-  
+  const totalValue = newTotalQuantity * price;
+  const marginRatio = calculateMarginRatioOriginal(newTotalMargin, totalValue);
+  const distanceToLiquidation = calculateDistanceToLiquidation(price, liquidationPrice, originalPosition.side);
+  const riskLevel = calculateRiskLevel(marginRatio, originalPosition.leverage, distanceToLiquidation);
+
   return {
     originalPosition,
     addParams,
@@ -188,7 +284,11 @@ export function calculateAddPositionResult(
     totalMargin: newTotalMargin,
     liquidationPrice,
     unrealizedPnl,
-    roe
+    roe,
+    totalValue,
+    marginRatio,
+    riskLevel,
+    distanceToLiquidation
   };
 }
 
@@ -212,7 +312,7 @@ export function calculatePyramidOrderResult(params: PyramidOrderParams): Pyramid
     cumulativeQuantity,
     cumulativeMargin,
     averagePrice: params.initialPrice,
-    liquidationPrice: calculateLiquidationPrice(
+    liquidationPrice: calculateLiquidationPriceOriginal(
       params.side,
       params.leverage,
       params.initialPrice,
@@ -250,7 +350,7 @@ export function calculatePyramidOrderResult(params: PyramidOrderParams): Pyramid
     cumulativeValue += stepPrice * stepQuantity;
     
     const averagePrice = cumulativeValue / cumulativeQuantity;
-    const liquidationPrice = calculateLiquidationPrice(
+    const liquidationPrice = calculateLiquidationPriceOriginal(
       params.side,
       params.leverage,
       averagePrice,
@@ -271,13 +371,22 @@ export function calculatePyramidOrderResult(params: PyramidOrderParams): Pyramid
   }
   
   const finalStep = steps[steps.length - 1];
+  const totalValue = finalStep.cumulativeQuantity * finalStep.averagePrice;
+  const marginRatio = calculateMarginRatioOriginal(finalStep.cumulativeMargin, totalValue);
+  const distanceToLiquidation = calculateDistanceToLiquidation(finalStep.averagePrice, finalStep.liquidationPrice, params.side);
+  const riskLevel = calculateRiskLevel(marginRatio, params.leverage, distanceToLiquidation);
+
   const finalResult: CalculationResult = {
     averagePrice: finalStep.averagePrice,
     totalQuantity: finalStep.cumulativeQuantity,
     totalMargin: finalStep.cumulativeMargin,
     liquidationPrice: finalStep.liquidationPrice,
     unrealizedPnl: 0, // 初始状态下未实现盈亏为0
-    roe: 0
+    roe: 0,
+    totalValue,
+    marginRatio,
+    riskLevel,
+    distanceToLiquidation
   };
   
   return {
@@ -407,12 +516,12 @@ export function calculateDistanceToLiquidation(
 }
 
 /**
- * 计算保证金率
+ * 计算保证金率 - 原有接口保持兼容
  * @param margin 保证金
  * @param totalValue 总价值
  * @returns 保证金率
  */
-export function calculateMarginRatio(margin: number, totalValue: number): number {
+export function calculateMarginRatioOriginal(margin: number, totalValue: number): number {
   if (totalValue <= 0) return 0;
   return margin / totalValue;
 }
@@ -438,8 +547,8 @@ export function performRiskAnalysis(
   currentPrice: number = position.entryPrice
 ): RiskAnalysisResult {
   const totalValue = calculateTotalValue(position.quantity, currentPrice);
-  const marginRatio = calculateMarginRatio(position.margin, totalValue);
-  const liquidationPrice = calculateLiquidationPrice(
+  const marginRatio = calculateMarginRatioOriginal(position.margin, totalValue);
+  const liquidationPrice = calculateLiquidationPriceOriginal(
     position.side,
     position.leverage,
     position.entryPrice,
@@ -495,7 +604,7 @@ export function calculateEnhancedPositionResult(
 ): CalculationResult {
   const basicResult = calculatePositionResult(position, currentPrice);
   const totalValue = calculateTotalValue(position.quantity, currentPrice);
-  const marginRatio = calculateMarginRatio(position.margin, totalValue);
+  const marginRatio = calculateMarginRatioOriginal(position.margin, totalValue);
   const distanceToLiquidation = calculateDistanceToLiquidation(
     currentPrice,
     basicResult.liquidationPrice,

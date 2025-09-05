@@ -23,10 +23,33 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
-import { Position } from '../../types';
 import { useAppContext } from '../../contexts/AppContext';
-import { calculatePositionResult, formatNumber, formatPercentage } from '../../utils/calculations';
-import { customColors } from '../../styles/theme';
+
+// 本地类型定义
+enum PositionSide {
+  LONG = 'long',
+  SHORT = 'short'
+}
+
+enum PositionStatus {
+  ACTIVE = 'active',
+  CLOSED = 'closed',
+  LIQUIDATED = 'liquidated',
+  PARTIAL = 'partial'
+}
+
+interface Position {
+  id: string;
+  symbol: string;
+  side: PositionSide;
+  leverage: number;
+  entryPrice: number;
+  quantity: number;
+  margin: number;
+  status: PositionStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface PositionListProps {
   onEditPosition: (position: Position) => void;
@@ -41,10 +64,30 @@ interface PositionCardProps {
 function PositionCard({ position, onEdit, onDelete }: PositionCardProps) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const result = calculatePositionResult(position);
-  
-  const isProfit = result.unrealizedPnl >= 0;
-  const profitColor = isProfit ? customColors.profit.main : customColors.loss.main;
+
+  // 简单的爆仓价格计算
+  const calculateLiquidationPrice = (position: Position) => {
+    const maintenanceMarginRate = 0.005;
+    if (position.side === PositionSide.LONG) {
+      return position.entryPrice * (1 - 1/position.leverage + maintenanceMarginRate);
+    } else {
+      return position.entryPrice * (1 + 1/position.leverage - maintenanceMarginRate);
+    }
+  };
+
+  const liquidationPrice = calculateLiquidationPrice(position);
+  const profitColor = theme.palette.mode === 'dark' ? '#4caf50' : '#2e7d32';
+
+  // 简单的格式化函数
+  const formatNumber = (value: number, decimals: number = 4): string => {
+    if (isNaN(value) || !isFinite(value)) return '0';
+    return value.toFixed(decimals);
+  };
+
+  const formatPercentage = (value: number, decimals: number = 2): string => {
+    if (isNaN(value) || !isFinite(value)) return '0.00%';
+    return `${value.toFixed(decimals)}%`;
+  };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -151,15 +194,15 @@ function PositionCard({ position, onEdit, onDelete }: PositionCardProps) {
               爆仓价格
             </Typography>
             <Typography variant="body1" fontWeight={500}>
-              ${formatNumber(result.liquidationPrice)}
+              ${formatNumber(liquidationPrice)}
             </Typography>
           </Grid>
         </Grid>
         
-        {/* 盈亏信息 */}
-        <Box 
-          display="flex" 
-          justifyContent="space-between" 
+        {/* 状态信息 */}
+        <Box
+          display="flex"
+          justifyContent="center"
           alignItems="center"
           sx={{
             backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
@@ -167,28 +210,9 @@ function PositionCard({ position, onEdit, onDelete }: PositionCardProps) {
             p: 2,
           }}
         >
-          <Box>
-            <Typography variant="body2" color="textSecondary">
-              未实现盈亏
-            </Typography>
-            <Typography 
-              variant="h6" 
-              sx={{ color: profitColor, fontWeight: 600 }}
-            >
-              ${formatNumber(result.unrealizedPnl, 2)}
-            </Typography>
-          </Box>
-          <Box textAlign="right">
-            <Typography variant="body2" color="textSecondary">
-              收益率
-            </Typography>
-            <Typography 
-              variant="h6" 
-              sx={{ color: profitColor, fontWeight: 600 }}
-            >
-              {formatPercentage(result.roe)}
-            </Typography>
-          </Box>
+          <Typography variant="body2" color="textSecondary">
+            状态: {position.status === 'active' ? '活跃' : position.status}
+          </Typography>
         </Box>
         
         {/* 时间信息 */}

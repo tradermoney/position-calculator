@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   AppBar,
@@ -30,25 +31,31 @@ import { useAppContext } from '../../contexts/AppContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  currentPage: string;
-  onPageChange: (page: string) => void;
 }
 
 const drawerWidth = 240;
 
 const menuItems = [
-  { id: 'dashboard', label: '仪表盘', icon: <DashboardIcon /> },
-  { id: 'positions', label: '仓位管理', icon: <PositionIcon /> },
-  { id: 'add-position', label: '补仓计算', icon: <AddIcon /> },
-  { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon /> },
-  { id: 'settings', label: '设置', icon: <SettingsIcon /> },
+  { id: 'dashboard', label: '仪表盘', icon: <DashboardIcon />, path: '/dashboard' },
+  { id: 'positions', label: '仓位管理', icon: <PositionIcon />, path: '/positions' },
+  { id: 'add-position', label: '补仓计算', icon: <AddIcon />, path: '/add-position' },
+  { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon />, path: '/pyramid' },
+  { id: 'settings', label: '设置', icon: <SettingsIcon />, path: '/settings' },
 ];
 
-export default function AppLayout({ children, currentPage, onPageChange }: AppLayoutProps) {
+export default function AppLayout({ children }: AppLayoutProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const { state, setTheme } = useAppContext();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // 根据当前路径获取当前页面ID
+  const getCurrentPageId = () => {
+    const currentItem = menuItems.find(item => item.path === location.pathname);
+    return currentItem?.id || 'positions';
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -58,8 +65,8 @@ export default function AppLayout({ children, currentPage, onPageChange }: AppLa
     setTheme(state.theme === 'light' ? 'dark' : 'light');
   };
 
-  const handlePageChange = (page: string) => {
-    onPageChange(page);
+  const handlePageChange = (path: string) => {
+    navigate(path);
     if (isMobile) {
       setMobileOpen(false);
     }
@@ -74,39 +81,42 @@ export default function AppLayout({ children, currentPage, onPageChange }: AppLa
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.id} disablePadding>
-            <ListItemButton
-              selected={currentPage === item.id}
-              onClick={() => handlePageChange(item.id)}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: theme.palette.primary.main + '20',
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.main + '30',
-                  },
-                },
-              }}
-            >
-              <ListItemIcon
+        {menuItems.map((item) => {
+          const isSelected = location.pathname === item.path;
+          return (
+            <ListItem key={item.id} disablePadding>
+              <ListItemButton
+                selected={isSelected}
+                onClick={() => handlePageChange(item.path)}
                 sx={{
-                  color: currentPage === item.id ? theme.palette.primary.main : 'inherit',
+                  '&.Mui-selected': {
+                    backgroundColor: theme.palette.primary.main + '20',
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.main + '30',
+                    },
+                  },
                 }}
               >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.label}
-                sx={{
-                  '& .MuiListItemText-primary': {
-                    color: currentPage === item.id ? theme.palette.primary.main : 'inherit',
-                    fontWeight: currentPage === item.id ? 600 : 400,
-                  },
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+                <ListItemIcon
+                  sx={{
+                    color: isSelected ? theme.palette.primary.main : 'inherit',
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      color: isSelected ? theme.palette.primary.main : 'inherit',
+                      fontWeight: isSelected ? 600 : 400,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
     </Box>
   );
@@ -131,7 +141,7 @@ export default function AppLayout({ children, currentPage, onPageChange }: AppLa
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {menuItems.find(item => item.id === currentPage)?.label || '仓位计算器'}
+            {menuItems.find(item => item.path === location.pathname)?.label || '仓位计算器'}
           </Typography>
           <IconButton
             color="inherit"

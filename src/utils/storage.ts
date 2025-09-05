@@ -1,4 +1,4 @@
-import { Position } from '../types';
+import { Position } from '../types/basic';
 
 const STORAGE_KEYS = {
   POSITIONS: 'position-calculator-positions',
