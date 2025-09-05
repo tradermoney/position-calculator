@@ -20,16 +20,32 @@ import {
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 
-// 简化的类型定义
+// 仓位方向枚举
+enum PositionSide {
+  LONG = 'long',   // 多头
+  SHORT = 'short'  // 空头
+}
+
+// 仓位状态枚举
+enum PositionStatus {
+  ACTIVE = 'active',     // 活跃
+  CLOSED = 'closed',     // 已关闭
+  LIQUIDATED = 'liquidated', // 已爆仓
+  PARTIAL = 'partial'    // 部分平仓
+}
+
+// 基础仓位接口
 interface Position {
   id: string;
-  symbol: string;
-  side: 'long' | 'short';
-  leverage: number;
-  entryPrice: number;
-  quantity: number;
-  margin: number;
-  createdAt: Date;
+  symbol: string;           // 币种符号，如 'BTC/USDT'
+  side: PositionSide;       // 仓位方向
+  leverage: number;         // 杠杆倍数
+  entryPrice: number;       // 开仓价格
+  quantity: number;         // 持有数量
+  margin: number;           // 保证金
+  status: PositionStatus;   // 仓位状态
+  createdAt: Date;          // 创建时间
+  updatedAt: Date;          // 更新时间
 }
 
 function App() {
@@ -37,7 +53,7 @@ function App() {
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     symbol: '',
-    side: 'long' as 'long' | 'short',
+    side: PositionSide.LONG,
     leverage: 10,
     entryPrice: '',
     quantity: '',
@@ -54,14 +70,16 @@ function App() {
       entryPrice: parseFloat(formData.entryPrice),
       quantity: parseFloat(formData.quantity),
       margin: parseFloat(formData.margin),
-      createdAt: new Date()
+      status: PositionStatus.ACTIVE,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     setPositions([...positions, newPosition]);
     setOpenDialog(false);
     setFormData({
       symbol: '',
-      side: 'long',
+      side: PositionSide.LONG,
       leverage: 10,
       entryPrice: '',
       quantity: '',
@@ -71,7 +89,7 @@ function App() {
 
   const calculateLiquidationPrice = (position: Position) => {
     const maintenanceMarginRate = 0.005;
-    if (position.side === 'long') {
+    if (position.side === PositionSide.LONG) {
       return position.entryPrice * (1 - 1/position.leverage + maintenanceMarginRate);
     } else {
       return position.entryPrice * (1 + 1/position.leverage - maintenanceMarginRate);
@@ -127,8 +145,8 @@ function App() {
                             {position.symbol}
                           </Typography>
                           <Chip
-                            label={position.side === 'long' ? '多头' : '空头'}
-                            color={position.side === 'long' ? 'success' : 'error'}
+                            label={position.side === PositionSide.LONG ? '多头' : '空头'}
+                            color={position.side === PositionSide.LONG ? 'success' : 'error'}
                             size="small"
                           />
                         </Box>
@@ -207,10 +225,10 @@ function App() {
                     <Select
                       value={formData.side}
                       label="仓位方向"
-                      onChange={(e) => setFormData({...formData, side: e.target.value as 'long' | 'short'})}
+                      onChange={(e) => setFormData({...formData, side: e.target.value as PositionSide})}
                     >
-                      <MenuItem value="long">多头 (Long)</MenuItem>
-                      <MenuItem value="short">空头 (Short)</MenuItem>
+                      <MenuItem value={PositionSide.LONG}>多头 (Long)</MenuItem>
+                      <MenuItem value={PositionSide.SHORT}>空头 (Short)</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

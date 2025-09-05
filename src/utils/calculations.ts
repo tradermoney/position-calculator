@@ -7,7 +7,11 @@ import {
   PyramidOrderResult,
   PyramidStep,
   PyramidStrategy,
-  CalculationResult
+  CalculationResult,
+  RiskLevel,
+  RiskAnalysisResult,
+  PnlAnalysisResult,
+  CONSTANTS
 } from '../types';
 
 /**
@@ -334,4 +338,243 @@ export function formatNumber(value: number, decimals: number = 4): string {
 export function formatPercentage(value: number, decimals: number = 2): string {
   if (isNaN(value) || !isFinite(value)) return '0.00%';
   return `${value.toFixed(decimals)}%`;
+}
+
+/**
+ * 计算风险等级
+ * @param marginRatio 保证金率
+ * @param leverage 杠杆倍数
+ * @param distanceToLiquidation 距离爆仓的距离百分比
+ * @returns 风险等级
+ */
+export function calculateRiskLevel(
+  marginRatio: number,
+  leverage: number,
+  distanceToLiquidation: number
+): RiskLevel {
+  // 计算风险评分
+  const riskScore = calculateRiskScore(marginRatio, leverage, distanceToLiquidation);
+
+  if (riskScore < 25) return RiskLevel.LOW;
+  if (riskScore < 50) return RiskLevel.MEDIUM;
+  if (riskScore < 75) return RiskLevel.HIGH;
+  return RiskLevel.EXTREME;
+}
+
+/**
+ * 计算风险评分
+ * @param marginRatio 保证金率
+ * @param leverage 杠杆倍数
+ * @param distanceToLiquidation 距离爆仓的距离百分比
+ * @returns 风险评分 (0-100)
+ */
+export function calculateRiskScore(
+  marginRatio: number,
+  leverage: number,
+  distanceToLiquidation: number
+): number {
+  // 杠杆风险 (0-40分)
+  const leverageRisk = Math.min((leverage / 125) * 40, 40);
+
+  // 保证金率风险 (0-30分)
+  const marginRisk = Math.max(0, (1 - marginRatio) * 30);
+
+  // 爆仓距离风险 (0-30分)
+  const liquidationRisk = Math.max(0, (1 - distanceToLiquidation / 100) * 30);
+
+  return Math.min(leverageRisk + marginRisk + liquidationRisk, 100);
+}
+
+/**
+ * 计算距离爆仓的价格距离百分比
+ * @param currentPrice 当前价格
+ * @param liquidationPrice 爆仓价格
+ * @param side 仓位方向
+ * @returns 距离爆仓的百分比
+ */
+export function calculateDistanceToLiquidation(
+  currentPrice: number,
+  liquidationPrice: number,
+  side: PositionSide
+): number {
+  if (currentPrice <= 0 || liquidationPrice <= 0) return 0;
+
+  if (side === PositionSide.LONG) {
+    return ((currentPrice - liquidationPrice) / currentPrice) * 100;
+  } else {
+    return ((liquidationPrice - currentPrice) / currentPrice) * 100;
+  }
+}
+
+/**
+ * 计算保证金率
+ * @param margin 保证金
+ * @param totalValue 总价值
+ * @returns 保证金率
+ */
+export function calculateMarginRatio(margin: number, totalValue: number): number {
+  if (totalValue <= 0) return 0;
+  return margin / totalValue;
+}
+
+/**
+ * 计算总价值
+ * @param quantity 数量
+ * @param currentPrice 当前价格
+ * @returns 总价值
+ */
+export function calculateTotalValue(quantity: number, currentPrice: number): number {
+  return quantity * currentPrice;
+}
+
+/**
+ * 进行风险分析
+ * @param position 仓位信息
+ * @param currentPrice 当前价格
+ * @returns 风险分析结果
+ */
+export function performRiskAnalysis(
+  position: Position,
+  currentPrice: number = position.entryPrice
+): RiskAnalysisResult {
+  const totalValue = calculateTotalValue(position.quantity, currentPrice);
+  const marginRatio = calculateMarginRatio(position.margin, totalValue);
+  const liquidationPrice = calculateLiquidationPrice(
+    position.side,
+    position.leverage,
+    position.entryPrice,
+    position.margin,
+    position.quantity
+  );
+  const distanceToLiquidation = calculateDistanceToLiquidation(
+    currentPrice,
+    liquidationPrice,
+    position.side
+  );
+
+  const riskScore = calculateRiskScore(marginRatio, position.leverage, distanceToLiquidation);
+  const riskLevel = calculateRiskLevel(marginRatio, position.leverage, distanceToLiquidation);
+
+  // 计算各项风险评分
+  const leverageRisk = Math.min((position.leverage / 125) * 100, 100);
+  const concentrationRisk = 50; // 简化处理，实际应该根据仓位集中度计算
+
+  // 生成风险建议
+  const recommendations: string[] = [];
+  if (riskLevel === RiskLevel.HIGH || riskLevel === RiskLevel.EXTREME) {
+    recommendations.push('建议降低杠杆倍数');
+    recommendations.push('考虑设置止损价格');
+  }
+  if (distanceToLiquidation < 10) {
+    recommendations.push('距离爆仓价格过近，建议增加保证金');
+  }
+  if (position.leverage > 20) {
+    recommendations.push('杠杆倍数较高，注意风险控制');
+  }
+
+  return {
+    riskLevel,
+    riskScore,
+    marginRatio,
+    leverageRisk,
+    concentrationRisk,
+    liquidationDistance: distanceToLiquidation,
+    recommendations
+  };
+}
+
+/**
+ * 计算增强版的仓位结果（包含风险分析）
+ * @param position 仓位信息
+ * @param currentPrice 当前价格
+ * @returns 增强版计算结果
+ */
+export function calculateEnhancedPositionResult(
+  position: Position,
+  currentPrice: number = position.entryPrice
+): CalculationResult {
+  const basicResult = calculatePositionResult(position, currentPrice);
+  const totalValue = calculateTotalValue(position.quantity, currentPrice);
+  const marginRatio = calculateMarginRatio(position.margin, totalValue);
+  const distanceToLiquidation = calculateDistanceToLiquidation(
+    currentPrice,
+    basicResult.liquidationPrice,
+    position.side
+  );
+  const riskLevel = calculateRiskLevel(marginRatio, position.leverage, distanceToLiquidation);
+
+  return {
+    ...basicResult,
+    totalValue,
+    marginRatio,
+    riskLevel,
+    distanceToLiquidation
+  };
+}
+
+/**
+ * 计算多个仓位的盈亏分析
+ * @param positions 仓位数组
+ * @param currentPrices 当前价格映射
+ * @returns 盈亏分析结果
+ */
+export function calculatePnlAnalysis(
+  positions: Position[],
+  currentPrices: Record<string, number> = {}
+): PnlAnalysisResult {
+  let totalPnl = 0;
+  let realizedPnl = 0;
+  let unrealizedPnl = 0;
+  let totalMargin = 0;
+  let winCount = 0;
+  let lossCount = 0;
+  let totalWin = 0;
+  let totalLoss = 0;
+  let maxDrawdown = 0;
+
+  positions.forEach(position => {
+    const currentPrice = currentPrices[position.symbol] || position.entryPrice;
+    const result = calculatePositionResult(position, currentPrice);
+
+    totalMargin += position.margin;
+
+    if (position.status === 'closed') {
+      realizedPnl += result.unrealizedPnl;
+      if (result.unrealizedPnl > 0) {
+        winCount++;
+        totalWin += result.unrealizedPnl;
+      } else {
+        lossCount++;
+        totalLoss += Math.abs(result.unrealizedPnl);
+      }
+    } else {
+      unrealizedPnl += result.unrealizedPnl;
+    }
+
+    totalPnl += result.unrealizedPnl;
+
+    // 简化的最大回撤计算
+    if (result.unrealizedPnl < 0) {
+      maxDrawdown = Math.min(maxDrawdown, result.unrealizedPnl);
+    }
+  });
+
+  const totalTrades = winCount + lossCount;
+  const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
+  const avgWin = winCount > 0 ? totalWin / winCount : 0;
+  const avgLoss = lossCount > 0 ? totalLoss / lossCount : 0;
+  const profitFactor = totalLoss > 0 ? totalWin / totalLoss : 0;
+  const totalRoe = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
+
+  return {
+    totalPnl,
+    realizedPnl,
+    unrealizedPnl,
+    totalRoe,
+    winRate,
+    avgWin,
+    avgLoss,
+    profitFactor,
+    maxDrawdown: Math.abs(maxDrawdown)
+  };
 }
