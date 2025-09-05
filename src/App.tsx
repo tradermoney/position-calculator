@@ -79,45 +79,59 @@ function App() {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box py={4}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-          <Typography variant="h3" component="h1">
-            加密货币仓位计算器
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenDialog(true)}
-          >
-            创建仓位
-          </Button>
-        </Box>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        backgroundColor: '#fafafa',
+        py: 4
+      }}
+    >
+      <Container maxWidth="lg" sx={{ width: '100%' }}>
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} width="100%">
+            <Typography variant="h3" component="h1" textAlign="center" sx={{ flexGrow: 1 }}>
+              加密货币仓位计算器
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+            >
+              创建仓位
+            </Button>
+          </Box>
 
-        {positions.length === 0 ? (
-          <Card>
-            <CardContent>
-              <Typography variant="body1" color="textSecondary" textAlign="center" py={4}>
-                暂无仓位数据，请点击"创建仓位"按钮添加新仓位
-              </Typography>
-            </CardContent>
-          </Card>
-        ) : (
-          <Grid container spacing={3}>
-            {positions.map((position) => (
-              <Grid item xs={12} md={6} key={position.id}>
-                <Card>
-                  <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                      <Typography variant="h6" component="div">
-                        {position.symbol}
-                      </Typography>
-                      <Chip
-                        label={position.side === 'long' ? '多头' : '空头'}
-                        color={position.side === 'long' ? 'success' : 'error'}
-                        size="small"
-                      />
-                    </Box>
+          {positions.length === 0 ? (
+            <Box display="flex" justifyContent="center" width="100%">
+              <Card sx={{ maxWidth: 600, width: '100%' }}>
+                <CardContent>
+                  <Typography variant="body1" color="textSecondary" textAlign="center" py={4}>
+                    暂无仓位数据，请点击"创建仓位"按钮添加新仓位
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+          ) : (
+            <Box width="100%">
+              <Grid container spacing={3} justifyContent="center">
+                {positions.map((position) => (
+                  <Grid item xs={12} md={6} lg={4} key={position.id}>
+                    <Card sx={{ height: '100%' }}>
+                      <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                          <Typography variant="h6" component="div">
+                            {position.symbol}
+                          </Typography>
+                          <Chip
+                            label={position.side === 'long' ? '多头' : '空头'}
+                            color={position.side === 'long' ? 'success' : 'error'}
+                            size="small"
+                          />
+                        </Box>
 
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
@@ -165,15 +179,18 @@ function App() {
                 </Card>
               </Grid>
             ))}
-          </Grid>
-        )}
+              </Grid>
+            </Box>
+          )}
+        </Box>
+      </Container>
 
-        {/* 创建仓位对话框 */}
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>创建新仓位</DialogTitle>
-          <DialogContent>
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-              <Grid container spacing={3}>
+      {/* 创建仓位对话框 */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle textAlign="center">创建新仓位</DialogTitle>
+        <DialogContent>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -243,14 +260,13 @@ function App() {
                 </Grid>
               </Grid>
             </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenDialog(false)}>取消</Button>
-            <Button onClick={handleSubmit} variant="contained">创建仓位</Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </Container>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+          <Button onClick={() => setOpenDialog(false)}>取消</Button>
+          <Button onClick={handleSubmit} variant="contained">创建仓位</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
 
