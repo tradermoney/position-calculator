@@ -8,6 +8,7 @@ import Dashboard from '../../pages/Dashboard';
 import PositionManagement from '../../pages/PositionManagement';
 import AddPositionCalculator from '../../pages/AddPositionCalculator';
 import PyramidCalculator from '../../pages/PyramidCalculator';
+import ContractCalculator from '../../pages/ContractCalculator';
 import Settings from '../../pages/Settings';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
@@ -77,6 +78,7 @@ function AppContent() {
           <Route path="/positions" element={<PositionManagement />} />
           <Route path="/add-position" element={<AddPositionCalculator />} />
           <Route path="/pyramid" element={<PyramidCalculator />} />
+          <Route path="/contract-calculator" element={<ContractCalculator />} />
           <Route path="/settings" element={<Settings />} />
           {/* 404 重定向到仓位管理页面 */}
           <Route path="*" element={<Navigate to="/positions" replace />} />

@@ -23,6 +23,7 @@ import {
   AccountBalance as PositionIcon,
   Add as AddIcon,
   Timeline as PyramidIcon,
+  Calculate as CalculateIcon,
   Settings as SettingsIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
@@ -40,6 +41,7 @@ const menuItems = [
   { id: 'positions', label: '仓位管理', icon: <PositionIcon />, path: '/positions' },
   { id: 'add-position', label: '补仓计算', icon: <AddIcon />, path: '/add-position' },
   { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon />, path: '/pyramid' },
+  { id: 'contract-calculator', label: '合约计算器', icon: <CalculateIcon />, path: '/contract-calculator' },
   { id: 'settings', label: '设置', icon: <SettingsIcon />, path: '/settings' },
 ];
 
