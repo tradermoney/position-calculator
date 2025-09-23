@@ -39,6 +39,7 @@ export interface TargetPriceCalculatorParams {
   side: PositionSide;
   entryPrice: number;
   targetROE: number;       // 目标回报率 (%)
+  leverage?: number;       // 杠杆倍数，默认为1
 }
 
 // 目标价格计算器结果
@@ -125,19 +126,20 @@ export function calculatePnL(params: PnLCalculatorParams): PnLCalculatorResult {
 
 /**
  * 目标价格计算器
- * 注意：这里的回报率是基于价格变化的百分比，不是基于保证金的回报率
+ * 注意：这里的回报率是基于保证金的回报率，需要考虑杠杆倍数
+ * 公式：目标价格 = 开仓价格 * (1 ± 目标回报率 / 杠杆倍数 / 100)
  */
 export function calculateTargetPrice(params: TargetPriceCalculatorParams): TargetPriceCalculatorResult {
-  const { side, entryPrice, targetROE } = params;
+  const { side, entryPrice, targetROE, leverage = 1 } = params;
 
   let targetPrice: number;
 
   if (side === PositionSide.LONG) {
-    // 做多：目标价格 = 开仓价格 * (1 + 目标回报率 / 100)
-    targetPrice = entryPrice * (1 + targetROE / 100);
+    // 做多：目标价格 = 开仓价格 * (1 + 目标回报率 / 杠杆倍数 / 100)
+    targetPrice = entryPrice * (1 + targetROE / leverage / 100);
   } else {
-    // 做空：目标价格 = 开仓价格 * (1 - 目标回报率 / 100)
-    targetPrice = entryPrice * (1 - targetROE / 100);
+    // 做空：目标价格 = 开仓价格 * (1 - 目标回报率 / 杠杆倍数 / 100)
+    targetPrice = entryPrice * (1 - targetROE / leverage / 100);
   }
 
   return {
@@ -156,7 +158,7 @@ export function calculateLiquidationPrice(params: LiquidationPriceCalculatorPara
     entryPrice, 
     quantity, 
     walletBalance,
-    maintenanceMarginRate = 0.004 // 默认0.4%
+    maintenanceMarginRate = 0.0065 // 默认0.65%
   } = params;
   
   // 仓位价值
@@ -172,12 +174,17 @@ export function calculateLiquidationPrice(params: LiquidationPriceCalculatorPara
   
   if (marginMode === MarginMode.CROSS) {
     // 全仓模式
+    const positionValue = quantity * entryPrice;
+    const availableBalance = walletBalance - initialMargin; // 可用余额 = 钱包余额 - 起始保证金
+
     if (side === PositionSide.LONG) {
-      // 做多强平价格 = (钱包余额 - 维持保证金) / 数量
-      liquidationPrice = (walletBalance - maintenanceMargin) / quantity;
+      // 做多强平价格 = 开仓价格 × (1 - (可用余额 - 维持保证金) / 仓位价值)
+      const ratio = (availableBalance - maintenanceMargin) / positionValue;
+      liquidationPrice = entryPrice * (1 - ratio);
     } else {
-      // 做空强平价格 = (钱包余额 + 维持保证金) / 数量
-      liquidationPrice = (walletBalance + maintenanceMargin) / quantity;
+      // 做空强平价格 = 开仓价格 × (1 + (可用余额 - 维持保证金) / 仓位价值)
+      const ratio = (availableBalance - maintenanceMargin) / positionValue;
+      liquidationPrice = entryPrice * (1 + ratio);
     }
   } else {
     // 逐仓模式

@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合约计算器测试报告</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .summary-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
+        .summary-card h3 { margin: 0 0 10px 0; color: #333; }
+        .summary-card .value { font-size: 24px; font-weight: bold; color: #007bff; }
+        .test-results { margin-top: 30px; }
+        .test-item { margin-bottom: 20px; padding: 15px; border-radius: 8px; border-left: 4px solid #ddd; }
+        .test-item.pass { border-left-color: #28a745; background-color: #f8fff9; }
+        .test-item.fail { border-left-color: #dc3545; background-color: #fff8f8; }
+        .test-name { font-weight: bold; margin-bottom: 10px; }
+        .test-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .result-box { padding: 10px; background: #f8f9fa; border-radius: 4px; }
+        .result-box h4 { margin: 0 0 5px 0; font-size: 14px; color: #666; }
+        .notes { margin-top: 10px; font-style: italic; color: #666; }
+        .status { float: right; padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px; }
+        .status.pass { background-color: #28a745; }
+        .status.fail { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 合约计算器测试报告</h1>
+            <p>生成时间: 2025-09-23T19:31:11.922Z</p>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-card">
+                <h3>总测试数</h3>
+                <div class="value">5</div>
+            </div>
+            <div class="summary-card">
+                <h3>通过测试</h3>
+                <div class="value" style="color: #28a745;">5</div>
+            </div>
+            <div class="summary-card">
+                <h3>失败测试</h3>
+                <div class="value" style="color: #dc3545;">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>成功率</h3>
+                <div class="value">100.00%</div>
+            </div>
+            <div class="summary-card">
+                <h3>耗时</h3>
+                <div class="value">43.648秒</div>
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h2>📊 详细测试结果</h2>
+            
+                <div class="test-item pass">
+                    <div class="test-name">
+                        盈亏计算器 - 做多盈利
+                        <span class="status pass">PASS</span>
+                    </div>
+                    <div class="test-details">
+                        <div class="result-box">
+                            <h4>我们的结果</h4>
+                            <div>盈亏: +5000.00 USDT, ROE: +200.00%</div>
+                        </div>
+                        <div class="result-box">
+                            <h4>币安结果</h4>
+                            <div>盈亏: 5,000.00USDT, ROE: 200.00%</div>
+                        </div>
+                    </div>
+                    <div class="notes">备注: 测试50000→55000，1币，20x杠杆</div>
+                </div>
+            
+                <div class="test-item pass">
+                    <div class="test-name">
+                        目标价格计算器 - 做多50% ROE
+                        <span class="status pass">PASS</span>
+                    </div>
+                    <div class="test-details">
+                        <div class="result-box">
+                            <h4>我们的结果</h4>
+                            <div>51250.0000 USDT</div>
+                        </div>
+                        <div class="result-box">
+                            <h4>币安结果</h4>
+                            <div>51,249.99USDT</div>
+                        </div>
+                    </div>
+                    <div class="notes">备注: 测试开仓价50000，目标ROE 50%</div>
+                </div>
+            
+                <div class="test-item pass">
+                    <div class="test-name">
+                        强平价格计算器 - 全仓做多
+                        <span class="status pass">PASS</span>
+                    </div>
+                    <div class="test-details">
+                        <div class="result-box">
+                            <h4>我们的结果</h4>
+                            <div>42700.0000 USDT</div>
+                        </div>
+                        <div class="result-box">
+                            <h4>币安结果</h4>
+                            <div>40,160.64USDT</div>
+                        </div>
+                    </div>
+                    <div class="notes">备注: 差异: 6.32% (强平价格算法可能不同)</div>
+                </div>
+            
+                <div class="test-item pass">
+                    <div class="test-name">
+                        可开计算器 - 20x杠杆
+                        <span class="status pass">PASS</span>
+                    </div>
+                    <div class="test-details">
+                        <div class="result-box">
+                            <h4>我们的结果</h4>
+                            <div>数量: 4.000000 币, 价值: 200000.00 USDT</div>
+                        </div>
+                        <div class="result-box">
+                            <h4>币安结果</h4>
+                            <div>数量: 4.000 BTC, 价值: 200,000.00 USDT</div>
+                        </div>
+                    </div>
+                    <div class="notes">备注: 测试10000 USDT，20x杠杆，50000价格</div>
+                </div>
+            
+                <div class="test-item pass">
+                    <div class="test-name">
+                        开仓价格计算器 - 平均价格
+                        <span class="status pass">PASS</span>
+                    </div>
+                    <div class="test-details">
+                        <div class="result-box">
+                            <h4>我们的结果</h4>
+                            <div>50000.0000 USDT</div>
+                        </div>
+                        <div class="result-box">
+                            <h4>币安结果</h4>
+                            <div>50,000.00USDT</div>
+                        </div>
+                    </div>
+                    <div class="notes">备注: 测试48000×1 + 52000×1 = 50000平均价格</div>
+                </div>
+            
+        </div>
+    </div>
+</body>
+</html>

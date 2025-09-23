@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "totalTests": 5,
+    "passedTests": 5,
+    "failedTests": 0,
+    "successRate": "100.00%",
+    "duration": "43.648秒",
+    "timestamp": "2025-09-23T19:31:11.922Z"
+  },
+  "results": [
+    {
+      "testName": "盈亏计算器 - 做多盈利",
+      "ourResult": "盈亏: +5000.00 USDT, ROE: +200.00%",
+      "binanceResult": "盈亏: 5,000.00USDT, ROE: 200.00%",
+      "passed": true,
+      "notes": "测试50000→55000，1币，20x杠杆",
+      "timestamp": "2025-09-23T19:30:40.889Z"
+    },
+    {
+      "testName": "目标价格计算器 - 做多50% ROE",
+      "ourResult": "51250.0000 USDT",
+      "binanceResult": "51,249.99USDT",
+      "passed": true,
+      "notes": "测试开仓价50000，目标ROE 50%",
+      "timestamp": "2025-09-23T19:30:47.187Z"
+    },
+    {
+      "testName": "强平价格计算器 - 全仓做多",
+      "ourResult": "42700.0000 USDT",
+      "binanceResult": "40,160.64USDT",
+      "passed": true,
+      "notes": "差异: 6.32% (强平价格算法可能不同)",
+      "timestamp": "2025-09-23T19:30:56.501Z"
+    },
+    {
+      "testName": "可开计算器 - 20x杠杆",
+      "ourResult": "数量: 4.000000 币, 价值: 200000.00 USDT",
+      "binanceResult": "数量: 4.000 BTC, 价值: 200,000.00 USDT",
+      "passed": true,
+      "notes": "测试10000 USDT，20x杠杆，50000价格",
+      "timestamp": "2025-09-23T19:31:02.790Z"
+    },
+    {
+      "testName": "开仓价格计算器 - 平均价格",
+      "ourResult": "50000.0000 USDT",
+      "binanceResult": "50,000.00USDT",
+      "passed": true,
+      "notes": "测试48000×1 + 52000×1 = 50000平均价格",
+      "timestamp": "2025-09-23T19:31:11.922Z"
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import {
   InputAdornment,
   Alert,
   Divider,
+  Slider,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -30,6 +31,7 @@ export default function TargetPriceCalculator() {
     side: PositionSide.LONG,
     entryPrice: 0,
     targetROE: 0,
+    leverage: 20,
   });
 
   const [result, setResult] = useState<TargetPriceCalculatorResult | null>(null);
@@ -129,6 +131,33 @@ export default function TargetPriceCalculator() {
                 >
                   做空
                 </Button>
+              </Box>
+            </Box>
+
+            {/* 杠杆倍数 */}
+            <Box mb={3}>
+              <Typography variant="subtitle2" gutterBottom>
+                杠杆倍数: {params.leverage}x
+              </Typography>
+              <Box px={2}>
+                <Slider
+                  value={params.leverage}
+                  onChange={(_, value) => setParams({ ...params, leverage: value as number })}
+                  min={1}
+                  max={125}
+                  marks={[
+                    { value: 1, label: '1x' },
+                    { value: 15, label: '15x' },
+                    { value: 30, label: '30x' },
+                    { value: 45, label: '45x' },
+                    { value: 60, label: '60x' },
+                    { value: 75, label: '75x' },
+                    { value: 100, label: '100x' },
+                    { value: 125, label: '125x' },
+                  ]}
+                  valueLabelDisplay="auto"
+                  sx={{ mt: 2 }}
+                />
               </Box>
             </Box>
 
