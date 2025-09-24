@@ -133,7 +133,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param data 要保存的数据
    */
-  static async save<T>(storeName: 'settings' | 'theme', key: string, data: T): Promise<void> {
+  static async save<T>(storeName: 'settings' | 'theme' | 'volatilityInputs', key: string, data: T): Promise<void> {
     try {
       const db = await initDB();
       const tx = db.transaction(storeName, 'readwrite');
@@ -154,7 +154,7 @@ export class IndexedDBUtil {
    * @param defaultValue 默认值
    * @returns 读取的数据或默认值
    */
-  static async load<T>(storeName: 'settings' | 'theme', key: string, defaultValue: T): Promise<T> {
+  static async load<T>(storeName: 'settings' | 'theme' | 'volatilityInputs', key: string, defaultValue: T): Promise<T> {
     try {
       const db = await initDB();
       const tx = db.transaction(storeName, 'readonly');
@@ -175,7 +175,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 存储键
    */
-  static async remove(storeName: 'settings' | 'theme', key: string): Promise<void> {
+  static async remove(storeName: 'settings' | 'theme' | 'volatilityInputs', key: string): Promise<void> {
     try {
       const db = await initDB();
       const tx = db.transaction(storeName, 'readwrite');

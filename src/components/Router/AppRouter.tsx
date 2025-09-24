@@ -10,7 +10,6 @@ import AddPositionCalculator from '../../pages/AddPositionCalculator';
 import PyramidCalculator from '../../pages/PyramidCalculator';
 import ContractCalculator from '../../pages/ContractCalculator';
 import VolatilityCalculator from '../../pages/VolatilityCalculator';
-import Settings from '../../pages/Settings';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
@@ -27,7 +26,6 @@ const routePathMap = {
   '/contract-calculator/max-position': 'contract-calculator',
   '/contract-calculator/entry-price': 'contract-calculator',
   '/volatility-calculator': 'volatility-calculator',
-  '/settings': 'settings',
 } as const;
 
 // 根据路径获取页面键名
@@ -93,7 +91,6 @@ function AppContent() {
           <Route path="/contract-calculator/max-position" element={<ContractCalculator defaultTab={3} />} />
           <Route path="/contract-calculator/entry-price" element={<ContractCalculator defaultTab={4} />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
-          <Route path="/settings" element={<Settings />} />
           {/* 404 重定向到仓位管理页面 */}
           <Route path="*" element={<Navigate to="/positions" replace />} />
         </Routes>

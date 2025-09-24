@@ -79,7 +79,7 @@ const tabPaths = [
 ];
 
 export default function ContractCalculator({ defaultTab = 0 }: ContractCalculatorProps) {
-  usePageTitle('合约计算器');
+  usePageTitle('contract-calculator');
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(defaultTab);

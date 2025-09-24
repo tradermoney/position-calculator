@@ -25,7 +25,6 @@ import {
   Timeline as PyramidIcon,
   Calculate as CalculateIcon,
   TrendingUp as VolatilityIcon,
-  Settings as SettingsIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
@@ -44,7 +43,6 @@ const menuItems = [
   { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon />, path: '/pyramid' },
   { id: 'contract-calculator', label: '合约计算器', icon: <CalculateIcon />, path: '/contract-calculator' },
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
-  { id: 'settings', label: '设置', icon: <SettingsIcon />, path: '/settings' },
 ];
 
 export default function AppLayout({ children }: AppLayoutProps) {

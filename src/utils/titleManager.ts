@@ -11,7 +11,6 @@ export const PAGE_TITLES = {
   pyramid: '金字塔加仓 - 仓位计算器',
   'contract-calculator': '合约计算器 - 仓位计算器',
   'volatility-calculator': '波动率计算器 - 仓位计算器',
-  settings: '设置 - 仓位计算器',
 } as const;
 
 // 页面类型
@@ -49,7 +48,6 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     pyramid: '金字塔加仓策略计算器，制定分层加仓计划，优化仓位管理',
     'contract-calculator': '专业的合约交易计算工具，包含盈亏、目标价格、强平价格等计算器',
     'volatility-calculator': '价格波动率计算器，计算两个价格之间的波动率百分比，支持历史记录',
-    settings: '个性化设置您的交易参数、主题偏好和应用配置',
   };
   
   updateMetaTag('description', descriptions[pageKey] || '专业的加密货币仓位管理和计算工具');
