@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>合约计算器 - 专业的加密货币合约交易工具</title>
+
+    <!-- GitHub Pages 单页应用路由处理 -->
+    <script type="text/javascript">
+      // 处理从 404.html 重定向过来的路径
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
     <meta name="description" content="专业的加密货币合约交易和计算工具，提供合约分析、补仓计算、金字塔加仓等功能" />
     <meta name="keywords" content="合约计算器,加密货币,合约交易,补仓计算,金字塔加仓,风险管理,交易工具" />
     <meta name="author" content="合约计算器团队" />
