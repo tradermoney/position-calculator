@@ -1,0 +1,53 @@
+{
+  "summary": {
+    "totalTests": 6,
+    "passedTests": 3,
+    "failedTests": 3,
+    "successRate": "50.00%",
+    "totalTime": "43719ms",
+    "timestamp": "2025-09-24T05:36:43.724Z"
+  },
+  "details": [
+    {
+      "name": "页面加载性能",
+      "passed": false,
+      "details": "page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[aria-label=\"价格 1\"]') to be visible\u001b[22m\n",
+      "timestamp": "2025-09-24T05:36:12.769Z"
+    },
+    {
+      "name": "计算准确性",
+      "passed": true,
+      "details": "准确率: 100.00%",
+      "timestamp": "2025-09-24T05:36:18.222Z"
+    },
+    {
+      "name": "边界值处理",
+      "passed": true,
+      "details": "通过率: 83.33%",
+      "timestamp": "2025-09-24T05:36:23.749Z"
+    },
+    {
+      "name": "用户界面响应性",
+      "passed": false,
+      "details": "locator.isVisible: Error: strict mode violation: locator('text=/历史记录/') resolved to 4 elements:\n    1) <p class=\"MuiTypography-root MuiTypography-body1 css-4jgw5s-MuiTypography-root\">计算两个价格之间的波动率百分比，支持历史记录和数据持久化</p> aka getByText('计算两个价格之间的波动率百分比，支持历史记录和数据持久化')\n    2) <p class=\"MuiTypography-root MuiTypography-body1 css-shyxf2-MuiTypography-root\">…</p> aka getByText('使用说明：输入两个价格后自动计算波动率。波动率 = |价格')\n    3) <h6 class=\"MuiTypography-root MuiTypography-h6 MuiTypography-gutterBottom css-if30wf-MuiTypography-root\">…</h6> aka getByRole('heading', { name: '历史记录' })\n    4) <p class=\"MuiTypography-root MuiTypography-body2 css-e784if-MuiTypography-root\">暂无历史记录</p> aka getByText('暂无历史记录')\n\nCall log:\n\u001b[2m    - checking visibility of locator('text=/历史记录/')\u001b[22m\n",
+      "timestamp": "2025-09-24T05:36:25.028Z"
+    },
+    {
+      "name": "数据持久化完整性",
+      "passed": true,
+      "details": "多次刷新后数据保持完整",
+      "timestamp": "2025-09-24T05:36:41.905Z"
+    },
+    {
+      "name": "错误处理机制",
+      "passed": false,
+      "details": "locator.isVisible: Error: strict mode violation: locator('text=/[+-]\\\\d+\\\\.\\\\d+%/') resolved to 3 elements:\n    1) <p class=\"MuiTypography-root MuiTypography-body2 css-1b3lmwx-MuiTypography-root\">-6.25%</p> aka getByText('-6.25%')\n    2) <p class=\"MuiTypography-root MuiTypography-body2 css-1j5l5jj-MuiTypography-root\">+5.71%</p> aka getByText('+5.71%')\n    3) <p class=\"MuiTypography-root MuiTypography-body2 css-1b3lmwx-MuiTypography-root\">-7.41%</p> aka getByText('-7.41%')\n\nCall log:\n\u001b[2m    - checking visibility of locator('text=/[+-]\\\\d+\\\\.\\\\d+%/')\u001b[22m\n",
+      "timestamp": "2025-09-24T05:36:43.223Z"
+    }
+  ],
+  "environment": {
+    "browser": "Chromium",
+    "url": "http://localhost:57320/volatility-calculator",
+    "testSuite": "VolatilityComprehensiveTest"
+  }
+}
