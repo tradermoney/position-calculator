@@ -19,6 +19,12 @@ const routePathMap = {
   '/positions': 'positions',
   '/add-position': 'add-position',
   '/pyramid': 'pyramid',
+  '/contract-calculator': 'contract-calculator',
+  '/contract-calculator/pnl': 'contract-calculator',
+  '/contract-calculator/target-price': 'contract-calculator',
+  '/contract-calculator/liquidation': 'contract-calculator',
+  '/contract-calculator/max-position': 'contract-calculator',
+  '/contract-calculator/entry-price': 'contract-calculator',
   '/settings': 'settings',
 } as const;
 
@@ -79,6 +85,11 @@ function AppContent() {
           <Route path="/add-position" element={<AddPositionCalculator />} />
           <Route path="/pyramid" element={<PyramidCalculator />} />
           <Route path="/contract-calculator" element={<ContractCalculator />} />
+          <Route path="/contract-calculator/pnl" element={<ContractCalculator defaultTab={0} />} />
+          <Route path="/contract-calculator/target-price" element={<ContractCalculator defaultTab={1} />} />
+          <Route path="/contract-calculator/liquidation" element={<ContractCalculator defaultTab={2} />} />
+          <Route path="/contract-calculator/max-position" element={<ContractCalculator defaultTab={3} />} />
+          <Route path="/contract-calculator/entry-price" element={<ContractCalculator defaultTab={4} />} />
           <Route path="/settings" element={<Settings />} />
           {/* 404 重定向到仓位管理页面 */}
           <Route path="*" element={<Navigate to="/positions" replace />} />

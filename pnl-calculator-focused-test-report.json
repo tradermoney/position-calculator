@@ -1,0 +1,363 @@
+{
+  "summary": {
+    "totalTests": 35,
+    "passedTests": 34,
+    "failedTests": 1,
+    "successRate": "97.14%",
+    "duration": "96.051秒",
+    "avgCalculationTime": "2468.74ms",
+    "timestamp": "2025-09-23T20:11:50.831Z"
+  },
+  "results": [
+    {
+      "testName": "做多盈利",
+      "result": "盈亏: +5000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 4647
+      },
+      "timestamp": "2025-09-23T20:10:25.930Z"
+    },
+    {
+      "testName": "做多亏损",
+      "result": "ERROR",
+      "passed": false,
+      "notes": "测试执行失败: locator.textContent: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=/[+\\\\-]?\\\\d+\\\\.\\\\d+ USDT/').nth(1)\u001b[22m\n",
+      "performance": {
+        "calculationTime": 31451
+      },
+      "timestamp": "2025-09-23T20:10:57.387Z"
+    },
+    {
+      "testName": "做空盈利",
+      "result": "盈亏: +5000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: SHORT 50000→45000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1315
+      },
+      "timestamp": "2025-09-23T20:10:58.702Z"
+    },
+    {
+      "testName": "做空亏损",
+      "result": "盈亏: -5000.00 USDT, ROE: -200.00%",
+      "passed": true,
+      "notes": "参数: SHORT 50000→55000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1285
+      },
+      "timestamp": "2025-09-23T20:10:59.988Z"
+    },
+    {
+      "testName": "无杠杆交易",
+      "result": "盈亏: +5000.00 USDT, ROE: +10.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 1x杠杆",
+      "performance": {
+        "calculationTime": 1275
+      },
+      "timestamp": "2025-09-23T20:11:01.263Z"
+    },
+    {
+      "testName": "高杠杆交易",
+      "result": "盈亏: +5000.00 USDT, ROE: +1250.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 125x杠杆",
+      "performance": {
+        "calculationTime": 1318
+      },
+      "timestamp": "2025-09-23T20:11:02.581Z"
+    },
+    {
+      "testName": "小数量交易",
+      "result": "盈亏: +50.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 0.01币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1286
+      },
+      "timestamp": "2025-09-23T20:11:03.867Z"
+    },
+    {
+      "testName": "大数量交易",
+      "result": "盈亏: +500000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 100币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1257
+      },
+      "timestamp": "2025-09-23T20:11:05.124Z"
+    },
+    {
+      "testName": "平价交易",
+      "result": "盈亏: +0.00 USDT, ROE: +0.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→50000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1291
+      },
+      "timestamp": "2025-09-23T20:11:06.415Z"
+    },
+    {
+      "testName": "微小价差",
+      "result": "盈亏: +1.00 USDT, ROE: +0.04%",
+      "passed": true,
+      "notes": "参数: LONG 50000→50001, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1421
+      },
+      "timestamp": "2025-09-23T20:11:07.836Z"
+    },
+    {
+      "testName": "1x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +10.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 1x杠杆",
+      "performance": {
+        "calculationTime": 1287
+      },
+      "timestamp": "2025-09-23T20:11:10.125Z"
+    },
+    {
+      "testName": "5x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +50.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 5x杠杆",
+      "performance": {
+        "calculationTime": 1262
+      },
+      "timestamp": "2025-09-23T20:11:11.387Z"
+    },
+    {
+      "testName": "10x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +100.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 10x杠杆",
+      "performance": {
+        "calculationTime": 1260
+      },
+      "timestamp": "2025-09-23T20:11:12.647Z"
+    },
+    {
+      "testName": "20x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1413
+      },
+      "timestamp": "2025-09-23T20:11:14.060Z"
+    },
+    {
+      "testName": "50x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +500.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 50x杠杆",
+      "performance": {
+        "calculationTime": 1252
+      },
+      "timestamp": "2025-09-23T20:11:15.312Z"
+    },
+    {
+      "testName": "75x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +750.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 75x杠杆",
+      "performance": {
+        "calculationTime": 1252
+      },
+      "timestamp": "2025-09-23T20:11:16.565Z"
+    },
+    {
+      "testName": "100x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +1000.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 100x杠杆",
+      "performance": {
+        "calculationTime": 1271
+      },
+      "timestamp": "2025-09-23T20:11:17.836Z"
+    },
+    {
+      "testName": "125x杠杆",
+      "result": "盈亏: +5000.00 USDT, ROE: +1250.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 1币, 125x杠杆",
+      "performance": {
+        "calculationTime": 1363
+      },
+      "timestamp": "2025-09-23T20:11:19.199Z"
+    },
+    {
+      "testName": "0.001币数量",
+      "result": "盈亏: +5.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 0.001币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1313
+      },
+      "timestamp": "2025-09-23T20:11:20.512Z"
+    },
+    {
+      "testName": "0.01币数量",
+      "result": "盈亏: +50.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 0.01币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1280
+      },
+      "timestamp": "2025-09-23T20:11:21.792Z"
+    },
+    {
+      "testName": "0.1币数量",
+      "result": "盈亏: +500.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 0.1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1611
+      },
+      "timestamp": "2025-09-23T20:11:24.406Z"
+    },
+    {
+      "testName": "0.5币数量",
+      "result": "盈亏: +2500.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 0.5币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1385
+      },
+      "timestamp": "2025-09-23T20:11:25.791Z"
+    },
+    {
+      "testName": "2币数量",
+      "result": "盈亏: +10000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 2币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1497
+      },
+      "timestamp": "2025-09-23T20:11:27.288Z"
+    },
+    {
+      "testName": "10币数量",
+      "result": "盈亏: +50000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 10币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1387
+      },
+      "timestamp": "2025-09-23T20:11:28.675Z"
+    },
+    {
+      "testName": "100币数量",
+      "result": "盈亏: +500000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 100币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1424
+      },
+      "timestamp": "2025-09-23T20:11:30.099Z"
+    },
+    {
+      "testName": "低价区间",
+      "result": "盈亏: +100.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 1000→1100, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1455
+      },
+      "timestamp": "2025-09-23T20:11:31.554Z"
+    },
+    {
+      "testName": "中价区间",
+      "result": "盈亏: +3000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 30000→33000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1460
+      },
+      "timestamp": "2025-09-23T20:11:33.014Z"
+    },
+    {
+      "testName": "高价区间",
+      "result": "盈亏: +10000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 100000→110000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1689
+      },
+      "timestamp": "2025-09-23T20:11:34.703Z"
+    },
+    {
+      "testName": "极高价格",
+      "result": "盈亏: +50000.00 USDT, ROE: +200.00%",
+      "passed": true,
+      "notes": "参数: LONG 500000→550000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1423
+      },
+      "timestamp": "2025-09-23T20:11:36.126Z"
+    },
+    {
+      "testName": "小数价格",
+      "result": "盈亏: +5000.33 USDT, ROE: +200.01%",
+      "passed": true,
+      "notes": "参数: LONG 50000.123→55000.456, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 2659
+      },
+      "timestamp": "2025-09-23T20:11:38.785Z"
+    },
+    {
+      "testName": "最大亏损",
+      "result": "盈亏: -25000.00 USDT, ROE: -1000.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→25000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 2273
+      },
+      "timestamp": "2025-09-23T20:11:42.127Z"
+    },
+    {
+      "testName": "极大盈利",
+      "result": "盈亏: +50000.00 USDT, ROE: +2000.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→100000, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 3537
+      },
+      "timestamp": "2025-09-23T20:11:45.679Z"
+    },
+    {
+      "testName": "最小价差",
+      "result": "盈亏: +0.01 USDT, ROE: +0.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→50000.01, 1币, 20x杠杆",
+      "performance": {
+        "calculationTime": 1963
+      },
+      "timestamp": "2025-09-23T20:11:47.643Z"
+    },
+    {
+      "testName": "最大数量",
+      "result": "盈亏: +4999995000.00 USDT, ROE: +10.00%",
+      "passed": true,
+      "notes": "参数: LONG 50000→55000, 999999币, 1x杠杆",
+      "performance": {
+        "calculationTime": 1568
+      },
+      "timestamp": "2025-09-23T20:11:49.251Z"
+    },
+    {
+      "testName": "最小杠杆最大数量",
+      "result": "盈亏: +1000000.00 USDT, ROE: +100.00%",
+      "passed": true,
+      "notes": "参数: LONG 1→2, 1000000币, 1x杠杆",
+      "performance": {
+        "calculationTime": 1576
+      },
+      "timestamp": "2025-09-23T20:11:50.827Z"
+    }
+  ]
+}

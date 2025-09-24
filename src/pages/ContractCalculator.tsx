@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -64,12 +65,39 @@ const tabs: TabConfig[] = [
   },
 ];
 
-export default function ContractCalculator() {
+interface ContractCalculatorProps {
+  defaultTab?: number;
+}
+
+// 标签页路径映射
+const tabPaths = [
+  '/contract-calculator/pnl',
+  '/contract-calculator/target-price',
+  '/contract-calculator/liquidation',
+  '/contract-calculator/max-position',
+  '/contract-calculator/entry-price'
+];
+
+export default function ContractCalculator({ defaultTab = 0 }: ContractCalculatorProps) {
   usePageTitle('合约计算器');
-  const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  // 根据当前路径设置活动标签页
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const tabIndex = tabPaths.indexOf(currentPath);
+    if (tabIndex !== -1) {
+      setActiveTab(tabIndex);
+    } else if (currentPath === '/contract-calculator') {
+      setActiveTab(0); // 默认显示第一个标签页
+    }
+  }, [location.pathname]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+    navigate(tabPaths[newValue]);
   };
 
   return (

@@ -1,0 +1,333 @@
+{
+  "summary": {
+    "totalTests": 32,
+    "passedTests": 31,
+    "failedTests": 1,
+    "successRate": "96.88%",
+    "duration": "112.81秒",
+    "avgCalculationTime": "3278.72ms",
+    "timestamp": "2025-09-23T20:48:03.007Z"
+  },
+  "results": [
+    {
+      "testName": "两笔等量",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 48000×1 + 52000×1",
+      "performance": {
+        "calculationTime": 2221
+      },
+      "timestamp": "2025-09-23T20:46:17.231Z"
+    },
+    {
+      "testName": "两笔不等量",
+      "result": "平均价格: 46666.6667 USDT",
+      "passed": true,
+      "notes": "参数: LONG 40000×2 + 60000×1",
+      "performance": {
+        "calculationTime": 1770
+      },
+      "timestamp": "2025-09-23T20:46:19.003Z"
+    },
+    {
+      "testName": "三笔交易",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 45000×1 + 50000×2 + 55000×1",
+      "performance": {
+        "calculationTime": 2525
+      },
+      "timestamp": "2025-09-23T20:46:21.529Z"
+    },
+    {
+      "testName": "四笔交易",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 40000×1 + 45000×1 + 55000×1 + 60000×1",
+      "performance": {
+        "calculationTime": 3247
+      },
+      "timestamp": "2025-09-23T20:46:24.778Z"
+    },
+    {
+      "testName": "五笔交易",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 30000×1 + 40000×1 + 50000×1 + 60000×1 + 70000×1",
+      "performance": {
+        "calculationTime": 4183
+      },
+      "timestamp": "2025-09-23T20:46:28.961Z"
+    },
+    {
+      "testName": "做空两笔",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 52000×1 + 48000×1",
+      "performance": {
+        "calculationTime": 2030
+      },
+      "timestamp": "2025-09-23T20:46:30.992Z"
+    },
+    {
+      "testName": "单笔交易",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×1",
+      "performance": {
+        "calculationTime": 1314
+      },
+      "timestamp": "2025-09-23T20:46:32.306Z"
+    },
+    {
+      "testName": "零数量测试",
+      "result": "ERROR",
+      "passed": false,
+      "notes": "测试执行失败: locator.textContent: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=/\\\\d+\\\\.\\\\d+ USDT/').first()\u001b[22m\n",
+      "performance": {
+        "calculationTime": 32483
+      },
+      "timestamp": "2025-09-23T20:47:04.789Z"
+    },
+    {
+      "testName": "大小数量",
+      "result": "平均价格: 50909.0909 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×10 + 60000×1",
+      "performance": {
+        "calculationTime": 2020
+      },
+      "timestamp": "2025-09-23T20:47:06.810Z"
+    },
+    {
+      "testName": "极端权重",
+      "result": "平均价格: 40396.0396 USDT",
+      "passed": true,
+      "notes": "参数: LONG 40000×100 + 80000×1",
+      "performance": {
+        "calculationTime": 2276
+      },
+      "timestamp": "2025-09-23T20:47:09.086Z"
+    },
+    {
+      "testName": "小数数量",
+      "result": "平均价格: 53750.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×0.5 + 55000×1.5",
+      "performance": {
+        "calculationTime": 2016
+      },
+      "timestamp": "2025-09-23T20:47:12.105Z"
+    },
+    {
+      "testName": "微小数量",
+      "result": "平均价格: 54995.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×0.001 + 55000×0.999",
+      "performance": {
+        "calculationTime": 2043
+      },
+      "timestamp": "2025-09-23T20:47:14.148Z"
+    },
+    {
+      "testName": "等权重",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 45000×2 + 55000×2",
+      "performance": {
+        "calculationTime": 1800
+      },
+      "timestamp": "2025-09-23T20:47:15.948Z"
+    },
+    {
+      "testName": "递增数量",
+      "result": "平均价格: 53333.3333 USDT",
+      "passed": true,
+      "notes": "参数: LONG 40000×1 + 50000×2 + 60000×3",
+      "performance": {
+        "calculationTime": 2606
+      },
+      "timestamp": "2025-09-23T20:47:18.554Z"
+    },
+    {
+      "testName": "递减数量",
+      "result": "平均价格: 46666.6667 USDT",
+      "passed": true,
+      "notes": "参数: LONG 40000×3 + 50000×2 + 60000×1",
+      "performance": {
+        "calculationTime": 2596
+      },
+      "timestamp": "2025-09-23T20:47:21.150Z"
+    },
+    {
+      "testName": "高精度数量",
+      "result": "平均价格: 53376.7430 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×1.234 + 55000×2.567",
+      "performance": {
+        "calculationTime": 2033
+      },
+      "timestamp": "2025-09-23T20:47:23.184Z"
+    },
+    {
+      "testName": "低价区间",
+      "result": "平均价格: 1000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 900×1 + 1100×1",
+      "performance": {
+        "calculationTime": 1972
+      },
+      "timestamp": "2025-09-23T20:47:25.157Z"
+    },
+    {
+      "testName": "中价区间",
+      "result": "平均价格: 30000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 25000×1 + 35000×1",
+      "performance": {
+        "calculationTime": 1918
+      },
+      "timestamp": "2025-09-23T20:47:27.075Z"
+    },
+    {
+      "testName": "高价区间",
+      "result": "平均价格: 100000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 90000×1 + 110000×1",
+      "performance": {
+        "calculationTime": 1907
+      },
+      "timestamp": "2025-09-23T20:47:28.982Z"
+    },
+    {
+      "testName": "极高价格",
+      "result": "平均价格: 500000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 450000×1 + 550000×1",
+      "performance": {
+        "calculationTime": 2588
+      },
+      "timestamp": "2025-09-23T20:47:31.571Z"
+    },
+    {
+      "testName": "小数价格",
+      "result": "平均价格: 52500.2895 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000.123×1 + 55000.456×1",
+      "performance": {
+        "calculationTime": 2179
+      },
+      "timestamp": "2025-09-23T20:47:34.756Z"
+    },
+    {
+      "testName": "价格跨度大",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 10000×1 + 90000×1",
+      "performance": {
+        "calculationTime": 1980
+      },
+      "timestamp": "2025-09-23T20:47:36.736Z"
+    },
+    {
+      "testName": "价格跨度小",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 49999×1 + 50001×1",
+      "performance": {
+        "calculationTime": 2002
+      },
+      "timestamp": "2025-09-23T20:47:38.738Z"
+    },
+    {
+      "testName": "混合价格",
+      "result": "平均价格: 50333.3333 USDT",
+      "passed": true,
+      "notes": "参数: LONG 1000×1 + 50000×1 + 100000×1",
+      "performance": {
+        "calculationTime": 2500
+      },
+      "timestamp": "2025-09-23T20:47:41.239Z"
+    },
+    {
+      "testName": "六笔交易",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 30000×1 + 35000×1 + 40000×1 + 60000×1 + 65000×1 + 70000×1",
+      "performance": {
+        "calculationTime": 3893
+      },
+      "timestamp": "2025-09-23T20:47:45.135Z"
+    },
+    {
+      "testName": "重复价格",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×1 + 50000×2 + 50000×3",
+      "performance": {
+        "calculationTime": 2467
+      },
+      "timestamp": "2025-09-23T20:47:47.602Z"
+    },
+    {
+      "testName": "交替价格",
+      "result": "平均价格: 50000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 45000×1 + 55000×1 + 45000×1 + 55000×1",
+      "performance": {
+        "calculationTime": 3021
+      },
+      "timestamp": "2025-09-23T20:47:50.623Z"
+    },
+    {
+      "testName": "最小价格",
+      "result": "平均价格: 0.0150 USDT",
+      "passed": true,
+      "notes": "参数: LONG 0.01×1 + 0.02×1",
+      "performance": {
+        "calculationTime": 1805
+      },
+      "timestamp": "2025-09-23T20:47:52.428Z"
+    },
+    {
+      "testName": "最大价格",
+      "result": "平均价格: 999999.5000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 999999×1 + 1000000×1",
+      "performance": {
+        "calculationTime": 1882
+      },
+      "timestamp": "2025-09-23T20:47:54.310Z"
+    },
+    {
+      "testName": "最小数量",
+      "result": "平均价格: 52500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×0.000001 + 55000×0.000001",
+      "performance": {
+        "calculationTime": 1996
+      },
+      "timestamp": "2025-09-23T20:47:56.306Z"
+    },
+    {
+      "testName": "最大数量",
+      "result": "平均价格: 52500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 50000×1000000 + 55000×1000000",
+      "performance": {
+        "calculationTime": 2502
+      },
+      "timestamp": "2025-09-23T20:47:59.822Z"
+    },
+    {
+      "testName": "极端组合",
+      "result": "平均价格: 2.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 1×1000000 + 1000000×1",
+      "performance": {
+        "calculationTime": 3144
+      },
+      "timestamp": "2025-09-23T20:48:03.007Z"
+    }
+  ]
+}

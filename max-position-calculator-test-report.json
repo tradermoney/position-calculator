@@ -1,0 +1,343 @@
+{
+  "summary": {
+    "totalTests": 33,
+    "passedTests": 33,
+    "failedTests": 0,
+    "successRate": "100.00%",
+    "duration": "54.334秒",
+    "avgCalculationTime": "1452.27ms",
+    "timestamp": "2025-09-23T20:43:00.047Z"
+  },
+  "results": [
+    {
+      "testName": "标准场景",
+      "result": "数量: 可开数量4.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1442
+      },
+      "timestamp": "2025-09-23T20:42:10.531Z"
+    },
+    {
+      "testName": "做空场景",
+      "result": "数量: 可开数量4.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1157
+      },
+      "timestamp": "2025-09-23T20:42:11.690Z"
+    },
+    {
+      "testName": "低杠杆",
+      "result": "数量: 可开数量0.200000币, 价值: 10000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 1x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1157
+      },
+      "timestamp": "2025-09-23T20:42:12.847Z"
+    },
+    {
+      "testName": "高杠杆",
+      "result": "数量: 可开数量25.000000币, 价值: 1250000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 125x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 2102
+      },
+      "timestamp": "2025-09-23T20:42:14.949Z"
+    },
+    {
+      "testName": "小余额",
+      "result": "数量: 可开数量0.400000币, 价值: 20000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额1000",
+      "performance": {
+        "calculationTime": 1731
+      },
+      "timestamp": "2025-09-23T20:42:16.680Z"
+    },
+    {
+      "testName": "大余额",
+      "result": "数量: 可开数量40.000000币, 价值: 2000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额100000",
+      "performance": {
+        "calculationTime": 1598
+      },
+      "timestamp": "2025-09-23T20:42:18.279Z"
+    },
+    {
+      "testName": "低价格",
+      "result": "数量: 可开数量200.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓1000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1556
+      },
+      "timestamp": "2025-09-23T20:42:19.835Z"
+    },
+    {
+      "testName": "高价格",
+      "result": "数量: 可开数量2.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓100000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1557
+      },
+      "timestamp": "2025-09-23T20:42:21.392Z"
+    },
+    {
+      "testName": "1x杠杆",
+      "result": "数量: 可开数量0.200000币, 价值: 10000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 1x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1428
+      },
+      "timestamp": "2025-09-23T20:42:22.820Z"
+    },
+    {
+      "testName": "5x杠杆",
+      "result": "数量: 可开数量1.000000币, 价值: 50000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 5x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1362
+      },
+      "timestamp": "2025-09-23T20:42:24.182Z"
+    },
+    {
+      "testName": "10x杠杆",
+      "result": "数量: 可开数量2.000000币, 价值: 100000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 10x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1461
+      },
+      "timestamp": "2025-09-23T20:42:26.645Z"
+    },
+    {
+      "testName": "20x杠杆",
+      "result": "数量: 可开数量4.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1523
+      },
+      "timestamp": "2025-09-23T20:42:28.168Z"
+    },
+    {
+      "testName": "50x杠杆",
+      "result": "数量: 可开数量10.000000币, 价值: 500000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 50x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1312
+      },
+      "timestamp": "2025-09-23T20:42:29.480Z"
+    },
+    {
+      "testName": "75x杠杆",
+      "result": "数量: 可开数量15.000000币, 价值: 750000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 75x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1936
+      },
+      "timestamp": "2025-09-23T20:42:31.416Z"
+    },
+    {
+      "testName": "100x杠杆",
+      "result": "数量: 可开数量20.000000币, 价值: 1000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 100x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1609
+      },
+      "timestamp": "2025-09-23T20:42:33.025Z"
+    },
+    {
+      "testName": "125x杠杆",
+      "result": "数量: 可开数量25.000000币, 价值: 1250000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 125x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1336
+      },
+      "timestamp": "2025-09-23T20:42:34.361Z"
+    },
+    {
+      "testName": "100 USDT余额",
+      "result": "数量: 可开数量0.040000币, 价值: 2000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额100",
+      "performance": {
+        "calculationTime": 1541
+      },
+      "timestamp": "2025-09-23T20:42:35.903Z"
+    },
+    {
+      "testName": "500 USDT余额",
+      "result": "数量: 可开数量0.200000币, 价值: 10000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额500",
+      "performance": {
+        "calculationTime": 1649
+      },
+      "timestamp": "2025-09-23T20:42:37.553Z"
+    },
+    {
+      "testName": "1000 USDT余额",
+      "result": "数量: 可开数量0.400000币, 价值: 20000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额1000",
+      "performance": {
+        "calculationTime": 1416
+      },
+      "timestamp": "2025-09-23T20:42:38.969Z"
+    },
+    {
+      "testName": "5000 USDT余额",
+      "result": "数量: 可开数量2.000000币, 价值: 100000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额5000",
+      "performance": {
+        "calculationTime": 1309
+      },
+      "timestamp": "2025-09-23T20:42:40.278Z"
+    },
+    {
+      "testName": "10000 USDT余额",
+      "result": "数量: 可开数量4.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1192
+      },
+      "timestamp": "2025-09-23T20:42:42.490Z"
+    },
+    {
+      "testName": "50000 USDT余额",
+      "result": "数量: 可开数量20.000000币, 价值: 1000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额50000",
+      "performance": {
+        "calculationTime": 1193
+      },
+      "timestamp": "2025-09-23T20:42:43.683Z"
+    },
+    {
+      "testName": "100000 USDT余额",
+      "result": "数量: 可开数量40.000000币, 价值: 2000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额100000",
+      "performance": {
+        "calculationTime": 1282
+      },
+      "timestamp": "2025-09-23T20:42:44.965Z"
+    },
+    {
+      "testName": "1000000 USDT余额",
+      "result": "数量: 可开数量400.000000币, 价值: 20000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额1000000",
+      "performance": {
+        "calculationTime": 1594
+      },
+      "timestamp": "2025-09-23T20:42:46.559Z"
+    },
+    {
+      "testName": "极低价格",
+      "result": "数量: 可开数量2000.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓100, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1647
+      },
+      "timestamp": "2025-09-23T20:42:48.207Z"
+    },
+    {
+      "testName": "低价格",
+      "result": "数量: 可开数量200.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓1000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1425
+      },
+      "timestamp": "2025-09-23T20:42:49.632Z"
+    },
+    {
+      "testName": "中价格",
+      "result": "数量: 可开数量6.666667币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓30000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1191
+      },
+      "timestamp": "2025-09-23T20:42:50.824Z"
+    },
+    {
+      "testName": "高价格",
+      "result": "数量: 可开数量2.000000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓100000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1222
+      },
+      "timestamp": "2025-09-23T20:42:52.046Z"
+    },
+    {
+      "testName": "极高价格",
+      "result": "数量: 可开数量0.400000币, 价值: 200000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓500000, 20x杠杆, 余额10000",
+      "performance": {
+        "calculationTime": 1308
+      },
+      "timestamp": "2025-09-23T20:42:53.354Z"
+    },
+    {
+      "testName": "最小可开",
+      "result": "数量: 可开数量0.000020币, 价值: 1.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 1x杠杆, 余额1",
+      "performance": {
+        "calculationTime": 1643
+      },
+      "timestamp": "2025-09-23T20:42:54.998Z"
+    },
+    {
+      "testName": "最大可开",
+      "result": "数量: 可开数量125000000.000000币, 价值: 125000000.00 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓1, 125x杠杆, 余额1000000",
+      "performance": {
+        "calculationTime": 1278
+      },
+      "timestamp": "2025-09-23T20:42:57.277Z"
+    },
+    {
+      "testName": "小数精度",
+      "result": "数量: 可开数量4.000173币, 价值: 200009.12 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000.123, 20x杠杆, 余额10000.456",
+      "performance": {
+        "calculationTime": 1334
+      },
+      "timestamp": "2025-09-23T20:42:58.612Z"
+    },
+    {
+      "testName": "零余额",
+      "result": "数量: 可开数量4.000182币, 价值: 200009.12 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 20x杠杆, 余额0",
+      "performance": {
+        "calculationTime": 1434
+      },
+      "timestamp": "2025-09-23T20:43:00.046Z"
+    }
+  ]
+}

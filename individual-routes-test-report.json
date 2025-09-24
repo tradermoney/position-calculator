@@ -1,0 +1,93 @@
+{
+  "summary": {
+    "totalTests": 8,
+    "passedTests": 8,
+    "failedTests": 0,
+    "successRate": "100.00%",
+    "duration": "36.675秒",
+    "avgLoadTime": "3795.00ms",
+    "timestamp": "2025-09-24T04:54:17.798Z"
+  },
+  "results": [
+    {
+      "testName": "盈亏计算器路由",
+      "result": "路由正确，标签页: 盈亏计算器",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator/pnl",
+      "performance": {
+        "loadTime": 3306
+      },
+      "timestamp": "2025-09-24T04:53:47.716Z"
+    },
+    {
+      "testName": "目标价格计算器路由",
+      "result": "路由正确，标签页: 目标价格",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator/target-price",
+      "performance": {
+        "loadTime": 2425
+      },
+      "timestamp": "2025-09-24T04:53:50.645Z"
+    },
+    {
+      "testName": "强平价格计算器路由",
+      "result": "路由正确，标签页: 强平价格",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator/liquidation",
+      "performance": {
+        "loadTime": 2596
+      },
+      "timestamp": "2025-09-24T04:53:53.744Z"
+    },
+    {
+      "testName": "可开计算器路由",
+      "result": "路由正确，标签页: 可开计算器",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator/max-position",
+      "performance": {
+        "loadTime": 2234
+      },
+      "timestamp": "2025-09-24T04:53:56.480Z"
+    },
+    {
+      "testName": "开仓价格计算器路由",
+      "result": "路由正确，标签页: 开仓价格",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator/entry-price",
+      "performance": {
+        "loadTime": 2379
+      },
+      "timestamp": "2025-09-24T04:53:59.362Z"
+    },
+    {
+      "testName": "主路由重定向",
+      "result": "路由正确，标签页: 盈亏计算器",
+      "passed": true,
+      "notes": "URL: http://localhost:57319/contract-calculator",
+      "performance": {
+        "loadTime": 2275
+      },
+      "timestamp": "2025-09-24T04:54:02.138Z"
+    },
+    {
+      "testName": "标签页导航",
+      "result": "成功测试5个标签页",
+      "passed": true,
+      "notes": "URL变化: contract-calculator → target-price → liquidation → max-position → entry-price",
+      "performance": {
+        "navigationTime": 6440
+      },
+      "timestamp": "2025-09-24T04:54:09.081Z"
+    },
+    {
+      "testName": "浏览器导航",
+      "result": "前进后退功能正常",
+      "passed": true,
+      "notes": "后退: target-price, 前进: liquidation",
+      "performance": {
+        "browserNavTime": 8705
+      },
+      "timestamp": "2025-09-24T04:54:17.797Z"
+    }
+  ]
+}

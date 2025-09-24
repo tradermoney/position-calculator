@@ -1,0 +1,333 @@
+{
+  "summary": {
+    "totalTests": 32,
+    "passedTests": 32,
+    "failedTests": 0,
+    "successRate": "100.00%",
+    "duration": "46.414秒",
+    "avgCalculationTime": "1248.38ms",
+    "timestamp": "2025-09-23T20:20:01.890Z"
+  },
+  "results": [
+    {
+      "testName": "做多25% ROE",
+      "result": "目标价格: 50625.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE25%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1454
+      },
+      "timestamp": "2025-09-23T20:19:20.371Z"
+    },
+    {
+      "testName": "做多50% ROE",
+      "result": "目标价格: 51250.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1348
+      },
+      "timestamp": "2025-09-23T20:19:21.724Z"
+    },
+    {
+      "testName": "做多100% ROE",
+      "result": "目标价格: 52500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE100%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1246
+      },
+      "timestamp": "2025-09-23T20:19:22.973Z"
+    },
+    {
+      "testName": "做空25% ROE",
+      "result": "目标价格: 49375.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 目标ROE25%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1185
+      },
+      "timestamp": "2025-09-23T20:19:24.158Z"
+    },
+    {
+      "testName": "做空50% ROE",
+      "result": "目标价格: 48750.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1173
+      },
+      "timestamp": "2025-09-23T20:19:25.331Z"
+    },
+    {
+      "testName": "做空100% ROE",
+      "result": "目标价格: 47500.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 目标ROE100%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1225
+      },
+      "timestamp": "2025-09-23T20:19:26.556Z"
+    },
+    {
+      "testName": "零回报率",
+      "result": "目标价格: 52500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE0%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1260
+      },
+      "timestamp": "2025-09-23T20:19:27.817Z"
+    },
+    {
+      "testName": "微小回报率",
+      "result": "目标价格: 50000.2500 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE0.01%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1204
+      },
+      "timestamp": "2025-09-23T20:19:29.021Z"
+    },
+    {
+      "testName": "1x杠杆50% ROE",
+      "result": "目标价格: 75000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 1x杠杆",
+      "performance": {
+        "calculationTime": 1294
+      },
+      "timestamp": "2025-09-23T20:19:30.315Z"
+    },
+    {
+      "testName": "5x杠杆50% ROE",
+      "result": "目标价格: 55000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 5x杠杆",
+      "performance": {
+        "calculationTime": 1205
+      },
+      "timestamp": "2025-09-23T20:19:31.520Z"
+    },
+    {
+      "testName": "10x杠杆50% ROE",
+      "result": "目标价格: 52500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 10x杠杆",
+      "performance": {
+        "calculationTime": 1158
+      },
+      "timestamp": "2025-09-23T20:19:33.682Z"
+    },
+    {
+      "testName": "20x杠杆50% ROE",
+      "result": "目标价格: 51250.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1156
+      },
+      "timestamp": "2025-09-23T20:19:34.838Z"
+    },
+    {
+      "testName": "50x杠杆50% ROE",
+      "result": "目标价格: 50500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 50x杠杆",
+      "performance": {
+        "calculationTime": 1154
+      },
+      "timestamp": "2025-09-23T20:19:35.992Z"
+    },
+    {
+      "testName": "75x杠杆50% ROE",
+      "result": "目标价格: 50333.3333 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 75x杠杆",
+      "performance": {
+        "calculationTime": 1156
+      },
+      "timestamp": "2025-09-23T20:19:37.148Z"
+    },
+    {
+      "testName": "100x杠杆50% ROE",
+      "result": "目标价格: 50250.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 100x杠杆",
+      "performance": {
+        "calculationTime": 1142
+      },
+      "timestamp": "2025-09-23T20:19:38.290Z"
+    },
+    {
+      "testName": "125x杠杆50% ROE",
+      "result": "目标价格: 50200.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE50%, 125x杠杆",
+      "performance": {
+        "calculationTime": 1153
+      },
+      "timestamp": "2025-09-23T20:19:39.443Z"
+    },
+    {
+      "testName": "5% ROE",
+      "result": "目标价格: 50125.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE5%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1163
+      },
+      "timestamp": "2025-09-23T20:19:40.606Z"
+    },
+    {
+      "testName": "10% ROE",
+      "result": "目标价格: 50250.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE10%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1164
+      },
+      "timestamp": "2025-09-23T20:19:41.770Z"
+    },
+    {
+      "testName": "15% ROE",
+      "result": "目标价格: 50375.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE15%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1153
+      },
+      "timestamp": "2025-09-23T20:19:42.923Z"
+    },
+    {
+      "testName": "75% ROE",
+      "result": "目标价格: 51875.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE75%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1149
+      },
+      "timestamp": "2025-09-23T20:19:44.072Z"
+    },
+    {
+      "testName": "150% ROE",
+      "result": "目标价格: 53750.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE150%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1171
+      },
+      "timestamp": "2025-09-23T20:19:46.244Z"
+    },
+    {
+      "testName": "200% ROE",
+      "result": "目标价格: 55000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE200%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1271
+      },
+      "timestamp": "2025-09-23T20:19:47.515Z"
+    },
+    {
+      "testName": "500% ROE",
+      "result": "目标价格: 62500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE500%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1150
+      },
+      "timestamp": "2025-09-23T20:19:48.666Z"
+    },
+    {
+      "testName": "1000% ROE",
+      "result": "目标价格: 75000.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE1000%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1325
+      },
+      "timestamp": "2025-09-23T20:19:49.991Z"
+    },
+    {
+      "testName": "做多-25% ROE",
+      "result": "目标价格: 49375.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE-25%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1245
+      },
+      "timestamp": "2025-09-23T20:19:51.237Z"
+    },
+    {
+      "testName": "做多-50% ROE",
+      "result": "目标价格: 48750.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000, 目标ROE-50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1505
+      },
+      "timestamp": "2025-09-23T20:19:52.745Z"
+    },
+    {
+      "testName": "做空-25% ROE",
+      "result": "目标价格: 50625.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 目标ROE-25%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1260
+      },
+      "timestamp": "2025-09-23T20:19:54.006Z"
+    },
+    {
+      "testName": "做空-50% ROE",
+      "result": "目标价格: 51250.0000 USDT",
+      "passed": true,
+      "notes": "参数: SHORT 开仓50000, 目标ROE-50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1494
+      },
+      "timestamp": "2025-09-23T20:19:55.500Z"
+    },
+    {
+      "testName": "低价区间",
+      "result": "目标价格: 1025.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓1000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1376
+      },
+      "timestamp": "2025-09-23T20:19:56.877Z"
+    },
+    {
+      "testName": "高价区间",
+      "result": "目标价格: 102500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓100000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1520
+      },
+      "timestamp": "2025-09-23T20:19:58.398Z"
+    },
+    {
+      "testName": "极高价格",
+      "result": "目标价格: 512500.0000 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓500000, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1292
+      },
+      "timestamp": "2025-09-23T20:20:00.692Z"
+    },
+    {
+      "testName": "小数价格",
+      "result": "目标价格: 51250.1261 USDT",
+      "passed": true,
+      "notes": "参数: LONG 开仓50000.123, 目标ROE50%, 20x杠杆",
+      "performance": {
+        "calculationTime": 1197
+      },
+      "timestamp": "2025-09-23T20:20:01.889Z"
+    }
+  ]
+}
