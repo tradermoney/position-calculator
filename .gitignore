@@ -145,3 +145,17 @@ storybook-static/
 # Misc
 *.tgz
 *.tar.gz
+
+# Project specific files
+.cunzhi-memory/
+*test-report.json
+*test-report.html
+test-report.*
+
+# Test files (generated)
+*-test.js
+test-*.js
+comprehensive-test-suite.js
+
+# Frontend logs
+frontend.log

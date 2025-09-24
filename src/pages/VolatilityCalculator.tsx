@@ -52,6 +52,13 @@ interface VolatilityResult {
   difference: number;
   maxPrice: number;
   formula: string;
+  // 投资金额相关计算结果
+  investmentVolatility?: {
+    amount: number;
+    volatilityAmount: number;
+    upperBound: number;
+    lowerBound: number;
+  };
 }
 
 export default function VolatilityCalculator() {
@@ -60,6 +67,7 @@ export default function VolatilityCalculator() {
   // 状态管理
   const [price1, setPrice1] = useState<string>('');
   const [price2, setPrice2] = useState<string>('');
+  const [investmentAmount, setInvestmentAmount] = useState<string>('');
   const [result, setResult] = useState<VolatilityResult | null>(null);
   const [history, setHistory] = useState<VolatilityRecord[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -141,29 +149,46 @@ export default function VolatilityCalculator() {
     if (validationErrors.length > 0) {
       return null;
     }
-    
+
     const p1 = parseFloat(price1);
     const p2 = parseFloat(price2);
-    
+
     // 计算差值和符号
     const difference = p1 - p2;
     const sign: '+' | '-' = difference >= 0 ? '+' : '-';
-    
+
     // 计算波动率：|价格1-价格2|/max(价格1,价格2)*100
     const maxPrice = Math.max(p1, p2);
     const volatility = (Math.abs(difference) / maxPrice) * 100;
-    
+
     // 生成计算公式
     const formula = `|${p1} - ${p2}| / max(${p1}, ${p2}) × 100 = ${Math.abs(difference).toFixed(4)} / ${maxPrice} × 100`;
-    
+
+    // 计算投资金额波动（如果用户输入了投资金额）
+    let investmentVolatility = undefined;
+    if (investmentAmount && parseFloat(investmentAmount) > 0) {
+      const amount = parseFloat(investmentAmount);
+      const volatilityAmount = (amount * volatility) / 100;
+      const upperBound = amount + volatilityAmount;
+      const lowerBound = amount - volatilityAmount;
+
+      investmentVolatility = {
+        amount,
+        volatilityAmount,
+        upperBound,
+        lowerBound
+      };
+    }
+
     return {
       volatility,
       sign,
       difference: Math.abs(difference),
       maxPrice,
-      formula
+      formula,
+      investmentVolatility
     };
-  }, [price1, price2, validateInputs]);
+  }, [price1, price2, investmentAmount, validateInputs]);
 
   // 实时计算
   useEffect(() => {
@@ -224,6 +249,7 @@ export default function VolatilityCalculator() {
     try {
       setPrice1('');
       setPrice2('');
+      setInvestmentAmount('');
       setResult(null);
       setErrors([]);
 
@@ -299,6 +325,22 @@ export default function VolatilityCalculator() {
                   }}
                 />
               </InputGroup>
+
+              <InputGroup>
+                <PriceInput
+                  label="投资金额 (可选)"
+                  type="number"
+                  value={investmentAmount}
+                  onChange={(e) => setInvestmentAmount(e.target.value)}
+                  placeholder="请输入投资金额，计算波动影响"
+                  fullWidth
+                  inputProps={{
+                    min: 0,
+                    step: 0.01,
+                  }}
+                  helperText="输入投资金额后，将显示该金额在当前波动率下的波动区间"
+                />
+              </InputGroup>
             </InputSection>
 
             {/* 操作按钮 */}
@@ -354,6 +396,21 @@ export default function VolatilityCalculator() {
                   <div><strong>基准价格：</strong> {formatNumber(result.maxPrice)}</div>
                   <div><strong>变化方向：</strong> {result.sign === '+' ? '价格1 > 价格2' : '价格1 < 价格2'}</div>
                 </CalculationDetails>
+
+                {/* 投资金额波动分析 */}
+                {result.investmentVolatility && (
+                  <CalculationDetails style={{ marginTop: '16px', padding: '16px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                      💰 投资金额波动分析
+                    </Typography>
+                    <div><strong>投资金额：</strong> {formatNumber(result.investmentVolatility.amount, 2)} USDT</div>
+                    <div><strong>波动金额：</strong> {formatNumber(result.investmentVolatility.volatilityAmount, 2)} USDT</div>
+                    <div><strong>波动区间：</strong> {formatNumber(result.investmentVolatility.lowerBound, 2)} ~ {formatNumber(result.investmentVolatility.upperBound, 2)} USDT</div>
+                    <div style={{ marginTop: '8px', fontSize: '0.9em', color: '#666' }}>
+                      <strong>说明：</strong> 在当前 {formatNumber(result.volatility, 2)}% 的波动率下，您的 {formatNumber(result.investmentVolatility.amount, 2)} USDT 投资可能波动 ±{formatNumber(result.investmentVolatility.volatilityAmount, 2)} USDT
+                    </div>
+                  </CalculationDetails>
+                )}
               </ResultSection>
             </CalculatorCard>
           )}
@@ -364,6 +421,7 @@ export default function VolatilityCalculator() {
             <strong>使用说明：</strong>
             输入两个价格后自动计算波动率。波动率 = |价格1-价格2|/max(价格1,价格2)×100%。
             正号表示价格1大于价格2，负号表示价格1小于价格2。
+            可选择输入投资金额，系统将计算该金额在当前波动率下的波动区间。
             点击"保存记录"可将当前计算保存到历史记录中。
           </InfoText>
         </CalculatorMain>

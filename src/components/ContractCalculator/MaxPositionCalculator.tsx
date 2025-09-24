@@ -382,6 +382,22 @@ export default function MaxPositionCalculator() {
                   </Box>
                 </Box>
 
+                {/* 数量限制提醒 */}
+                <Alert severity="warning" sx={{ mt: 2 }}>
+                  <Typography variant="body2" gutterBottom>
+                    <strong>⚠️ 重要提醒：交易所数量限制</strong>
+                  </Typography>
+                  <Typography variant="body2">
+                    • 每个加密货币都有最大可开数量限制，实际可开数量可能小于计算结果
+                  </Typography>
+                  <Typography variant="body2">
+                    • 请在开仓前查看交易所的具体数量限制规则
+                  </Typography>
+                  <Typography variant="body2">
+                    • 建议参考实际能够开仓的数量限制进行交易
+                  </Typography>
+                </Alert>
+
                 {/* 风险提示 */}
                 <Alert severity="info" sx={{ mt: 2 }}>
                   <Typography variant="body2">

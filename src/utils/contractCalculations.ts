@@ -17,21 +17,43 @@ export enum PositionMode {
   HEDGE = 'hedge'          // 双向持仓
 }
 
+// 平仓委托单
+export interface ExitOrder {
+  id: string;              // 委托单ID
+  price: number;           // 平仓价格
+  quantity: number;        // 平仓数量
+  enabled: boolean;        // 是否启用（复选框状态）
+}
+
+// 单个委托单的盈亏结果
+export interface ExitOrderResult {
+  id: string;              // 委托单ID
+  price: number;           // 平仓价格
+  quantity: number;        // 平仓数量
+  pnl: number;             // 该委托单的盈亏
+  roe: number;             // 该委托单的回报率
+  margin: number;          // 该委托单对应的保证金
+}
+
 // 盈亏计算器参数
 export interface PnLCalculatorParams {
   side: PositionSide;
   leverage: number;
   entryPrice: number;
-  exitPrice: number;
+  exitPrice: number;       // 保留向后兼容
   quantity: number;
+  exitOrders?: ExitOrder[]; // 多个平仓委托单
 }
 
 // 盈亏计算器结果
 export interface PnLCalculatorResult {
   initialMargin: number;    // 起始保证金
-  pnl: number;             // 盈亏
-  roe: number;             // 回报率 (%)
+  pnl: number;             // 总盈亏
+  roe: number;             // 总回报率 (%)
   positionValue: number;   // 仓位价值
+  exitOrderResults?: ExitOrderResult[]; // 各委托单详细结果
+  totalExitQuantity: number; // 总平仓数量
+  remainingQuantity: number; // 剩余持仓数量
 }
 
 // 目标价格计算器参数
@@ -94,33 +116,113 @@ export interface EntryPriceCalculatorResult {
 }
 
 /**
- * 盈亏计算器
+ * 盈亏计算器 - 支持多次分批平仓
  */
 export function calculatePnL(params: PnLCalculatorParams): PnLCalculatorResult {
-  const { side, leverage, entryPrice, exitPrice, quantity } = params;
-  
+  const { side, leverage, entryPrice, exitPrice, quantity, exitOrders } = params;
+
   // 仓位价值
   const positionValue = entryPrice * quantity;
-  
+
   // 起始保证金 = 仓位价值 / 杠杆
   const initialMargin = positionValue / leverage;
-  
-  // 计算盈亏
+
+  // 如果有多个平仓委托单，使用新的计算逻辑
+  if (exitOrders && exitOrders.length > 0) {
+    return calculateMultipleExitPnL(params);
+  }
+
+  // 向后兼容：单一平仓价格的计算逻辑
   let pnl: number;
   if (side === PositionSide.LONG) {
     pnl = (exitPrice - entryPrice) * quantity;
   } else {
     pnl = (entryPrice - exitPrice) * quantity;
   }
-  
+
   // 回报率 = 盈亏 / 起始保证金 * 100%
   const roe = (pnl / initialMargin) * 100;
-  
+
   return {
     initialMargin,
     pnl,
     roe,
-    positionValue
+    positionValue,
+    totalExitQuantity: quantity,
+    remainingQuantity: 0
+  };
+}
+
+/**
+ * 多次分批平仓的盈亏计算
+ */
+function calculateMultipleExitPnL(params: PnLCalculatorParams): PnLCalculatorResult {
+  const { side, leverage, entryPrice, quantity, exitOrders = [] } = params;
+
+  // 仓位价值
+  const positionValue = entryPrice * quantity;
+
+  // 起始保证金 = 仓位价值 / 杠杆
+  const initialMargin = positionValue / leverage;
+
+  // 过滤启用的委托单
+  const enabledOrders = exitOrders.filter(order => order.enabled);
+
+  let totalPnl = 0;
+  let totalExitQuantity = 0;
+  const exitOrderResults: ExitOrderResult[] = [];
+
+  // 计算每个委托单的盈亏
+  for (const order of enabledOrders) {
+    // 确保平仓数量不超过剩余持仓
+    const actualQuantity = Math.min(order.quantity, quantity - totalExitQuantity);
+
+    if (actualQuantity <= 0) {
+      // 如果没有剩余持仓，跳过此委托单
+      continue;
+    }
+
+    // 计算该委托单的盈亏
+    let orderPnl: number;
+    if (side === PositionSide.LONG) {
+      orderPnl = (order.price - entryPrice) * actualQuantity;
+    } else {
+      orderPnl = (entryPrice - order.price) * actualQuantity;
+    }
+
+    // 计算该委托单对应的保证金
+    const orderMargin = (entryPrice * actualQuantity) / leverage;
+
+    // 计算该委托单的回报率
+    const orderRoe = orderMargin > 0 ? (orderPnl / orderMargin) * 100 : 0;
+
+    totalPnl += orderPnl;
+    totalExitQuantity += actualQuantity;
+
+    exitOrderResults.push({
+      id: order.id,
+      price: order.price,
+      quantity: actualQuantity,
+      pnl: orderPnl,
+      roe: orderRoe,
+      margin: orderMargin
+    });
+  }
+
+  // 计算总回报率
+  const totalRoe = initialMargin > 0 ? (totalPnl / initialMargin) * 100 : 0;
+
+  // 剩余持仓数量
+  const remainingQuantity = quantity - totalExitQuantity;
+
+  return {
+    initialMargin,
+    pnl: totalPnl,
+    roe: totalRoe,
+    positionValue,
+    exitOrderResults,
+    totalExitQuantity,
+    remainingQuantity
   };
 }
 
