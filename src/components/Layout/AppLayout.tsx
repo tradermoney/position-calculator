@@ -86,7 +86,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <Box>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
-          仓位计算器
+          合约计算器
         </Typography>
       </Toolbar>
       <Divider />
@@ -151,7 +151,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {menuItems.find(item => item.path === location.pathname)?.label || '仓位计算器'}
+            {menuItems.find(item => item.path === location.pathname)?.label || '合约计算器'}
           </Typography>
           <IconButton
             color="inherit"

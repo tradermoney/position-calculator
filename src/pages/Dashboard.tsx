@@ -55,10 +55,10 @@ export default function Dashboard() {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                欢迎使用仓位计算器
+                欢迎使用合约计算器
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                这是一个专业的加密货币仓位管理工具，支持仓位创建、补仓计算、金字塔加仓等功能。
+                这是一个专业的加密货币合约交易工具，支持合约分析、补仓计算、金字塔加仓等功能。
               </Typography>
             </CardContent>
           </Card>

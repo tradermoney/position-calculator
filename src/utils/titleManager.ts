@@ -5,23 +5,23 @@
 
 // 页面标题配置
 export const PAGE_TITLES = {
-  dashboard: '仪表盘 - 仓位计算器',
-  positions: '仓位管理 - 仓位计算器',
-  'add-position': '补仓计算 - 仓位计算器',
-  pyramid: '金字塔加仓 - 仓位计算器',
-  'pnl-calculator': '盈亏计算器 - 仓位计算器',
-  'target-price-calculator': '目标价格计算器 - 仓位计算器',
-  'liquidation-calculator': '强平价格计算器 - 仓位计算器',
-  'max-position-calculator': '可开计算器 - 仓位计算器',
-  'entry-price-calculator': '开仓价格计算器 - 仓位计算器',
-  'volatility-calculator': '波动率计算器 - 仓位计算器',
+  dashboard: '仪表盘 - 合约计算器',
+  positions: '仓位管理 - 合约计算器',
+  'add-position': '补仓计算 - 合约计算器',
+  pyramid: '金字塔加仓 - 合约计算器',
+  'pnl-calculator': '盈亏计算器 - 合约计算器',
+  'target-price-calculator': '目标价格计算器 - 合约计算器',
+  'liquidation-calculator': '强平价格计算器 - 合约计算器',
+  'max-position-calculator': '可开计算器 - 合约计算器',
+  'entry-price-calculator': '开仓价格计算器 - 合约计算器',
+  'volatility-calculator': '波动率计算器 - 合约计算器',
 } as const;
 
 // 页面类型
 export type PageKey = keyof typeof PAGE_TITLES;
 
 // 默认标题
-export const DEFAULT_TITLE = '仓位计算器 - 专业的加密货币仓位管理工具';
+export const DEFAULT_TITLE = '合约计算器 - 专业的加密货币合约交易工具';
 
 /**
  * 设置页面标题
@@ -92,7 +92,7 @@ function updateMetaTag(name: string, content: string, attribute: 'name' | 'prope
  */
 export function resetTitle(): void {
   document.title = DEFAULT_TITLE;
-  updateMetaTag('description', '专业的加密货币仓位管理和计算工具，提供仓位分析、补仓计算、金字塔加仓等功能');
+  updateMetaTag('description', '专业的加密货币合约交易和计算工具，提供合约分析、补仓计算、金字塔加仓等功能');
 }
 
 /**

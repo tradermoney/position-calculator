@@ -8,7 +8,7 @@ class MenuRestructureTest {
     this.browser = null;
     this.context = null;
     this.page = null;
-    this.baseUrl = 'http://localhost:57321';
+    this.baseUrl = 'http://localhost:57319';
   }
 
   async setup() {

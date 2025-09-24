@@ -1,0 +1,166 @@
+{
+  "testSuite": "菜单重构功能验证",
+  "timestamp": "2025-09-24T10:40:00.000Z",
+  "environment": {
+    "baseUrl": "http://localhost:57319",
+    "browser": "Chromium",
+    "testFramework": "Playwright"
+  },
+  "summary": {
+    "totalTests": 5,
+    "passed": 5,
+    "failed": 0,
+    "successRate": "100.00%",
+    "status": "PASSED"
+  },
+  "testResults": [
+    {
+      "testName": "菜单项数量和内容验证",
+      "status": "PASSED",
+      "description": "验证10个菜单项都存在且旧的合约计算器菜单项已删除",
+      "details": {
+        "expectedMenuItems": [
+          "仪表盘",
+          "仓位管理", 
+          "补仓计算",
+          "金字塔加仓",
+          "盈亏计算器",
+          "目标价格计算器",
+          "强平价格计算器",
+          "可开计算器",
+          "开仓价格计算器",
+          "波动率计算器"
+        ],
+        "foundItems": 10,
+        "missingItems": [],
+        "oldMenuItemRemoved": true
+      }
+    },
+    {
+      "testName": "计算器页面导航验证",
+      "status": "PASSED",
+      "description": "验证5个计算器页面导航、URL和页面标题正确",
+      "details": {
+        "testedCalculators": [
+          {
+            "name": "盈亏计算器",
+            "path": "/pnl-calculator",
+            "urlCorrect": true,
+            "titleCorrect": true,
+            "contentLoaded": true
+          },
+          {
+            "name": "目标价格计算器", 
+            "path": "/target-price-calculator",
+            "urlCorrect": true,
+            "titleCorrect": true,
+            "contentLoaded": true
+          },
+          {
+            "name": "强平价格计算器",
+            "path": "/liquidation-calculator", 
+            "urlCorrect": true,
+            "titleCorrect": true,
+            "contentLoaded": true
+          },
+          {
+            "name": "可开计算器",
+            "path": "/max-position-calculator",
+            "urlCorrect": true,
+            "titleCorrect": true,
+            "contentLoaded": true
+          },
+          {
+            "name": "开仓价格计算器",
+            "path": "/entry-price-calculator",
+            "urlCorrect": true,
+            "titleCorrect": true,
+            "contentLoaded": true
+          }
+        ],
+        "successCount": 5,
+        "totalCount": 5
+      }
+    },
+    {
+      "testName": "向后兼容性重定向验证",
+      "status": "PASSED", 
+      "description": "验证旧路由正确重定向到新路由",
+      "details": {
+        "redirectTests": [
+          {
+            "from": "/contract-calculator",
+            "to": "/pnl-calculator",
+            "success": true
+          },
+          {
+            "from": "/contract-calculator/pnl",
+            "to": "/pnl-calculator", 
+            "success": true
+          },
+          {
+            "from": "/contract-calculator/target-price",
+            "to": "/target-price-calculator",
+            "success": true
+          },
+          {
+            "from": "/contract-calculator/liquidation",
+            "to": "/liquidation-calculator",
+            "success": true
+          },
+          {
+            "from": "/contract-calculator/max-position", 
+            "to": "/max-position-calculator",
+            "success": true
+          },
+          {
+            "from": "/contract-calculator/entry-price",
+            "to": "/entry-price-calculator",
+            "success": true
+          }
+        ],
+        "successCount": 6,
+        "totalCount": 6
+      }
+    },
+    {
+      "testName": "计算器功能完整性验证",
+      "status": "PASSED",
+      "description": "验证计算器页面的输入字段和功能完整性",
+      "details": {
+        "pnlCalculatorFields": 3,
+        "targetPriceCalculatorFields": 2,
+        "functionalityComplete": true
+      }
+    },
+    {
+      "testName": "页面加载性能验证", 
+      "status": "PASSED",
+      "description": "验证各个计算器页面的加载性能",
+      "details": {
+        "loadTimes": {
+          "/pnl-calculator": "1287ms",
+          "/target-price-calculator": "1301ms", 
+          "/liquidation-calculator": "1289ms",
+          "/max-position-calculator": "1267ms",
+          "/entry-price-calculator": "1258ms"
+        },
+        "averageLoadTime": "1280.40ms",
+        "performanceGood": true
+      }
+    }
+  ],
+  "conclusions": [
+    "✅ 所有10个菜单项正确显示，旧的合约计算器菜单项已成功删除",
+    "✅ 5个独立计算器页面导航功能完全正常",
+    "✅ 向后兼容性重定向规则工作正常，6个旧路由都能正确重定向",
+    "✅ 计算器功能完整性良好，输入字段正确显示",
+    "✅ 页面加载性能良好，平均加载时间1.28秒",
+    "🎉 菜单重构功能验证100%通过，重构成功！"
+  ],
+  "recommendations": [
+    "菜单重构已成功完成，所有功能正常",
+    "向后兼容性处理得当，用户体验良好",
+    "页面加载性能在可接受范围内"
+  ]
+}
