@@ -18,6 +18,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Checkbox,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -39,13 +40,14 @@ interface Position {
   id: number;
   price: number;
   quantity: number;
+  enabled: boolean;  // 是否启用此仓位参与计算
 }
 
 export default function EntryPriceCalculator() {
   const [side, setSide] = useState<PositionSide>(PositionSide.LONG);
   const [positions, setPositions] = useState<Position[]>([
-    { id: 1, price: 0, quantity: 0 },
-    { id: 2, price: 0, quantity: 0 },
+    { id: 1, price: 0, quantity: 0, enabled: true },
+    { id: 2, price: 0, quantity: 0, enabled: true },
   ]);
   const [result, setResult] = useState<EntryPriceCalculatorResult | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -53,20 +55,23 @@ export default function EntryPriceCalculator() {
   // 验证输入参数
   const validateParams = (): string[] => {
     const errors: string[] = [];
-    
-    const validPositions = positions.filter(p => p.price > 0 && p.quantity > 0);
-    
-    if (validPositions.length === 0) {
-      errors.push('至少需要输入一个有效的仓位（价格和数量都大于0）');
+
+    const enabledPositions = positions.filter(p => p.enabled);
+    const validPositions = enabledPositions.filter(p => p.price > 0 && p.quantity > 0);
+
+    if (enabledPositions.length === 0) {
+      errors.push('至少需要启用一个仓位');
+    } else if (validPositions.length === 0) {
+      errors.push('至少需要输入一个有效的启用仓位（价格和数量都大于0）');
     }
-    
+
     for (let i = 0; i < positions.length; i++) {
       const pos = positions[i];
-      if ((pos.price > 0 && pos.quantity <= 0) || (pos.price <= 0 && pos.quantity > 0)) {
+      if (pos.enabled && ((pos.price > 0 && pos.quantity <= 0) || (pos.price <= 0 && pos.quantity > 0))) {
         errors.push(`仓位 ${i + 1}: 价格和数量必须同时大于0或同时为空`);
       }
     }
-    
+
     return errors;
   };
 
@@ -76,7 +81,7 @@ export default function EntryPriceCalculator() {
     setErrors(validationErrors);
     
     if (validationErrors.length === 0) {
-      const validPositions = positions.filter(p => p.price > 0 && p.quantity > 0);
+      const validPositions = positions.filter(p => p.enabled && p.price > 0 && p.quantity > 0);
       const params: EntryPriceCalculatorParams = {
         positions: validPositions.map(p => ({ price: p.price, quantity: p.quantity }))
       };
@@ -91,8 +96,8 @@ export default function EntryPriceCalculator() {
   const handleReset = () => {
     setSide(PositionSide.LONG);
     setPositions([
-      { id: 1, price: 0, quantity: 0 },
-      { id: 2, price: 0, quantity: 0 },
+      { id: 1, price: 0, quantity: 0, enabled: true },
+      { id: 2, price: 0, quantity: 0, enabled: true },
     ]);
     setResult(null);
     setErrors([]);
@@ -101,7 +106,7 @@ export default function EntryPriceCalculator() {
   // 添加仓位
   const addPosition = () => {
     const newId = Math.max(...positions.map(p => p.id)) + 1;
-    setPositions([...positions, { id: newId, price: 0, quantity: 0 }]);
+    setPositions([...positions, { id: newId, price: 0, quantity: 0, enabled: true }]);
   };
 
   // 删除仓位
@@ -112,15 +117,15 @@ export default function EntryPriceCalculator() {
   };
 
   // 更新仓位
-  const updatePosition = (id: number, field: 'price' | 'quantity', value: number) => {
-    setPositions(positions.map(p => 
+  const updatePosition = (id: number, field: 'price' | 'quantity' | 'enabled', value: number | boolean) => {
+    setPositions(positions.map(p =>
       p.id === id ? { ...p, [field]: value } : p
     ));
   };
 
   // 自动计算（当有有效仓位时）
   useEffect(() => {
-    const validPositions = positions.filter(p => p.price > 0 && p.quantity > 0);
+    const validPositions = positions.filter(p => p.enabled && p.price > 0 && p.quantity > 0);
     if (validPositions.length > 0) {
       const validationErrors = validateParams();
       if (validationErrors.length === 0) {
@@ -193,6 +198,7 @@ export default function EntryPriceCalculator() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
+                      <TableCell>启用</TableCell>
                       <TableCell>序号</TableCell>
                       <TableCell>开仓价格 (USDT)</TableCell>
                       <TableCell>成交数量 (币)</TableCell>
@@ -201,7 +207,21 @@ export default function EntryPriceCalculator() {
                   </TableHead>
                   <TableBody>
                     {positions.map((position, index) => (
-                      <TableRow key={position.id}>
+                      <TableRow
+                        key={position.id}
+                        sx={{
+                          opacity: position.enabled ? 1 : 0.5,
+                          backgroundColor: position.enabled ? 'inherit' : 'action.hover'
+                        }}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            checked={position.enabled}
+                            onChange={(e) => updatePosition(position.id, 'enabled', e.target.checked)}
+                            color="primary"
+                            size="small"
+                          />
+                        </TableCell>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>
                           <TextField
@@ -210,7 +230,13 @@ export default function EntryPriceCalculator() {
                             value={position.price || ''}
                             onChange={(e) => updatePosition(position.id, 'price', parseFloat(e.target.value) || 0)}
                             placeholder="0.00"
-                            sx={{ width: '100%' }}
+                            disabled={!position.enabled}
+                            sx={{
+                              width: '100%',
+                              '& .MuiInputBase-input': {
+                                color: position.enabled ? 'inherit' : 'text.disabled'
+                              }
+                            }}
                           />
                         </TableCell>
                         <TableCell>
@@ -220,7 +246,13 @@ export default function EntryPriceCalculator() {
                             value={position.quantity || ''}
                             onChange={(e) => updatePosition(position.id, 'quantity', parseFloat(e.target.value) || 0)}
                             placeholder="0.00"
-                            sx={{ width: '100%' }}
+                            disabled={!position.enabled}
+                            sx={{
+                              width: '100%',
+                              '& .MuiInputBase-input': {
+                                color: position.enabled ? 'inherit' : 'text.disabled'
+                              }
+                            }}
                           />
                         </TableCell>
                         <TableCell>
@@ -361,7 +393,7 @@ export default function EntryPriceCalculator() {
                     </Typography>
                     <Typography variant="body2">
                       {(() => {
-                        const validPositions = positions.filter(p => p.price > 0 && p.quantity > 0);
+                        const validPositions = positions.filter(p => p.enabled && p.price > 0 && p.quantity > 0);
                         if (validPositions.length === 0) return '-';
                         const prices = validPositions.map(p => p.price);
                         const minPrice = Math.min(...prices);
@@ -384,6 +416,13 @@ export default function EntryPriceCalculator() {
                 <Alert severity="info" sx={{ mt: 2 }}>
                   <Typography variant="body2">
                     平均开仓价格 = 总价值 ÷ 总数量。此计算不考虑手续费和滑点。
+                  </Typography>
+                </Alert>
+
+                {/* 复选框使用说明 */}
+                <Alert severity="success" sx={{ mt: 1 }}>
+                  <Typography variant="body2">
+                    💡 使用复选框可以临时排除某些仓位的计算，无需删除数据。取消勾选的仓位将不参与平均价格计算。
                   </Typography>
                 </Alert>
               </Box>
