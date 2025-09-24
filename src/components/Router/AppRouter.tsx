@@ -8,7 +8,11 @@ import Dashboard from '../../pages/Dashboard';
 import PositionManagement from '../../pages/PositionManagement';
 import AddPositionCalculator from '../../pages/AddPositionCalculator';
 import PyramidCalculator from '../../pages/PyramidCalculator';
-import ContractCalculator from '../../pages/ContractCalculator';
+import PnLCalculatorPage from '../../pages/PnLCalculatorPage';
+import TargetPriceCalculatorPage from '../../pages/TargetPriceCalculatorPage';
+import LiquidationCalculatorPage from '../../pages/LiquidationCalculatorPage';
+import MaxPositionCalculatorPage from '../../pages/MaxPositionCalculatorPage';
+import EntryPriceCalculatorPage from '../../pages/EntryPriceCalculatorPage';
 import VolatilityCalculator from '../../pages/VolatilityCalculator';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
@@ -19,12 +23,11 @@ const routePathMap = {
   '/positions': 'positions',
   '/add-position': 'add-position',
   '/pyramid': 'pyramid',
-  '/contract-calculator': 'contract-calculator',
-  '/contract-calculator/pnl': 'contract-calculator',
-  '/contract-calculator/target-price': 'contract-calculator',
-  '/contract-calculator/liquidation': 'contract-calculator',
-  '/contract-calculator/max-position': 'contract-calculator',
-  '/contract-calculator/entry-price': 'contract-calculator',
+  '/pnl-calculator': 'pnl-calculator',
+  '/target-price-calculator': 'target-price-calculator',
+  '/liquidation-calculator': 'liquidation-calculator',
+  '/max-position-calculator': 'max-position-calculator',
+  '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
 } as const;
 
@@ -84,13 +87,21 @@ function AppContent() {
           <Route path="/positions" element={<PositionManagement />} />
           <Route path="/add-position" element={<AddPositionCalculator />} />
           <Route path="/pyramid" element={<PyramidCalculator />} />
-          <Route path="/contract-calculator" element={<ContractCalculator />} />
-          <Route path="/contract-calculator/pnl" element={<ContractCalculator defaultTab={0} />} />
-          <Route path="/contract-calculator/target-price" element={<ContractCalculator defaultTab={1} />} />
-          <Route path="/contract-calculator/liquidation" element={<ContractCalculator defaultTab={2} />} />
-          <Route path="/contract-calculator/max-position" element={<ContractCalculator defaultTab={3} />} />
-          <Route path="/contract-calculator/entry-price" element={<ContractCalculator defaultTab={4} />} />
+          <Route path="/pnl-calculator" element={<PnLCalculatorPage />} />
+          <Route path="/target-price-calculator" element={<TargetPriceCalculatorPage />} />
+          <Route path="/liquidation-calculator" element={<LiquidationCalculatorPage />} />
+          <Route path="/max-position-calculator" element={<MaxPositionCalculatorPage />} />
+          <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
+
+          {/* 向后兼容性重定向 */}
+          <Route path="/contract-calculator" element={<Navigate to="/pnl-calculator" replace />} />
+          <Route path="/contract-calculator/pnl" element={<Navigate to="/pnl-calculator" replace />} />
+          <Route path="/contract-calculator/target-price" element={<Navigate to="/target-price-calculator" replace />} />
+          <Route path="/contract-calculator/liquidation" element={<Navigate to="/liquidation-calculator" replace />} />
+          <Route path="/contract-calculator/max-position" element={<Navigate to="/max-position-calculator" replace />} />
+          <Route path="/contract-calculator/entry-price" element={<Navigate to="/entry-price-calculator" replace />} />
+
           {/* 404 重定向到仓位管理页面 */}
           <Route path="*" element={<Navigate to="/positions" replace />} />
         </Routes>

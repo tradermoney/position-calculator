@@ -9,7 +9,11 @@ export const PAGE_TITLES = {
   positions: '仓位管理 - 仓位计算器',
   'add-position': '补仓计算 - 仓位计算器',
   pyramid: '金字塔加仓 - 仓位计算器',
-  'contract-calculator': '合约计算器 - 仓位计算器',
+  'pnl-calculator': '盈亏计算器 - 仓位计算器',
+  'target-price-calculator': '目标价格计算器 - 仓位计算器',
+  'liquidation-calculator': '强平价格计算器 - 仓位计算器',
+  'max-position-calculator': '可开计算器 - 仓位计算器',
+  'entry-price-calculator': '开仓价格计算器 - 仓位计算器',
   'volatility-calculator': '波动率计算器 - 仓位计算器',
 } as const;
 
@@ -46,7 +50,11 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     positions: '管理您的加密货币仓位，查看详细信息、编辑参数和风险评估',
     'add-position': '智能补仓计算器，帮您制定最优的补仓策略，降低平均成本',
     pyramid: '金字塔加仓策略计算器，制定分层加仓计划，优化仓位管理',
-    'contract-calculator': '专业的合约交易计算工具，包含盈亏、目标价格、强平价格等计算器',
+    'pnl-calculator': '合约盈亏计算器，计算交易盈利/亏损、回报率和起始保证金',
+    'target-price-calculator': '目标价格计算器，根据期望回报率计算目标价格',
+    'liquidation-calculator': '强平价格计算器，计算仓位的强制平仓价格，管理交易风险',
+    'max-position-calculator': '可开计算器，计算最大可开仓位数量，合理分配资金',
+    'entry-price-calculator': '开仓价格计算器，计算多笔交易的平均开仓价格',
     'volatility-calculator': '价格波动率计算器，计算两个价格之间的波动率百分比，支持历史记录',
   };
   

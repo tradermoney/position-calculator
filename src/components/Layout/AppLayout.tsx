@@ -24,6 +24,10 @@ import {
   Add as AddIcon,
   Timeline as PyramidIcon,
   Calculate as CalculateIcon,
+  TrendingUp as TrendingUpIcon,
+  Warning as WarningIcon,
+  AccountBalance as AccountBalanceIcon,
+  PriceChange as PriceChangeIcon,
   TrendingUp as VolatilityIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
@@ -41,7 +45,11 @@ const menuItems = [
   { id: 'positions', label: '仓位管理', icon: <PositionIcon />, path: '/positions' },
   { id: 'add-position', label: '补仓计算', icon: <AddIcon />, path: '/add-position' },
   { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon />, path: '/pyramid' },
-  { id: 'contract-calculator', label: '合约计算器', icon: <CalculateIcon />, path: '/contract-calculator' },
+  { id: 'pnl-calculator', label: '盈亏计算器', icon: <CalculateIcon />, path: '/pnl-calculator' },
+  { id: 'target-price-calculator', label: '目标价格计算器', icon: <TrendingUpIcon />, path: '/target-price-calculator' },
+  { id: 'liquidation-calculator', label: '强平价格计算器', icon: <WarningIcon />, path: '/liquidation-calculator' },
+  { id: 'max-position-calculator', label: '可开计算器', icon: <AccountBalanceIcon />, path: '/max-position-calculator' },
+  { id: 'entry-price-calculator', label: '开仓价格计算器', icon: <PriceChangeIcon />, path: '/entry-price-calculator' },
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
 ];
 
