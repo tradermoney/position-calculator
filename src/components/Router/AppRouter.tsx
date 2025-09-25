@@ -111,8 +111,11 @@ function AppContent() {
 }
 
 export default function AppRouter() {
+  // GitHub Pages 部署時需要設置 basename
+  const basename = process.env.NODE_ENV === 'production' ? '/volatility-calculator' : '';
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <AppProvider>
         <AppContent />
       </AppProvider>
