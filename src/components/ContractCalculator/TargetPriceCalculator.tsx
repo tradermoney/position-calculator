@@ -226,6 +226,7 @@ export default function TargetPriceCalculator() {
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 onClick={handleReset}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 重置
               </Button>

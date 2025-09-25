@@ -310,7 +310,7 @@ export default function VolatilityCalculator() {
                   }}
                 />
               </InputGroup>
-              
+
               <InputGroup>
                 <PriceInput
                   label="价格 2"
@@ -328,17 +328,17 @@ export default function VolatilityCalculator() {
 
               <InputGroup>
                 <PriceInput
-                  label="投资金额 (可选)"
+                  label="投资金额"
                   type="number"
                   value={investmentAmount}
                   onChange={(e) => setInvestmentAmount(e.target.value)}
-                  placeholder="请输入投资金额，计算波动影响"
+                  placeholder="请输入投资金额"
                   fullWidth
                   inputProps={{
                     min: 0,
                     step: 0.01,
                   }}
-                  helperText="输入投资金额后，将显示该金额在当前波动率下的波动区间"
+                  helperText="可选，计算波动影响"
                 />
               </InputGroup>
             </InputSection>
@@ -359,6 +359,7 @@ export default function VolatilityCalculator() {
                 startIcon={<ClearIcon />}
                 onClick={clearInputs}
                 size="large"
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 清空输入
               </Button>

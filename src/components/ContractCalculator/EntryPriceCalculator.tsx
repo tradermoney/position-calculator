@@ -39,15 +39,16 @@ import {
 interface Position {
   id: number;
   price: number;
-  quantity: number;
-  enabled: boolean;  // 是否启用此仓位参与计算
+  quantity: number;      // 成交数量（币）
+  quantityUsdt: number;  // 成交数量（U）
+  enabled: boolean;      // 是否启用此仓位参与计算
 }
 
 export default function EntryPriceCalculator() {
   const [side, setSide] = useState<PositionSide>(PositionSide.LONG);
   const [positions, setPositions] = useState<Position[]>([
-    { id: 1, price: 0, quantity: 0, enabled: true },
-    { id: 2, price: 0, quantity: 0, enabled: true },
+    { id: 1, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
+    { id: 2, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
   ]);
   const [result, setResult] = useState<EntryPriceCalculatorResult | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -96,8 +97,8 @@ export default function EntryPriceCalculator() {
   const handleReset = () => {
     setSide(PositionSide.LONG);
     setPositions([
-      { id: 1, price: 0, quantity: 0, enabled: true },
-      { id: 2, price: 0, quantity: 0, enabled: true },
+      { id: 1, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
+      { id: 2, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
     ]);
     setResult(null);
     setErrors([]);
@@ -106,7 +107,7 @@ export default function EntryPriceCalculator() {
   // 添加仓位
   const addPosition = () => {
     const newId = Math.max(...positions.map(p => p.id)) + 1;
-    setPositions([...positions, { id: newId, price: 0, quantity: 0, enabled: true }]);
+    setPositions([...positions, { id: newId, price: 0, quantity: 0, quantityUsdt: 0, enabled: true }]);
   };
 
   // 删除仓位
@@ -117,10 +118,32 @@ export default function EntryPriceCalculator() {
   };
 
   // 更新仓位
-  const updatePosition = (id: number, field: 'price' | 'quantity' | 'enabled', value: number | boolean) => {
-    setPositions(positions.map(p =>
-      p.id === id ? { ...p, [field]: value } : p
-    ));
+  const updatePosition = (id: number, field: 'price' | 'quantity' | 'quantityUsdt' | 'enabled', value: number | boolean) => {
+    setPositions(positions.map(p => {
+      if (p.id === id) {
+        const updatedPosition = { ...p, [field]: value };
+
+        // 自动绑定逻辑：当价格和其中一个数量字段都有值时，自动计算另一个数量字段
+        if (field === 'quantity' && typeof value === 'number' && updatedPosition.price > 0) {
+          // 当更新币数量时，自动计算USDT数量
+          updatedPosition.quantityUsdt = updatedPosition.price * value;
+        } else if (field === 'quantityUsdt' && typeof value === 'number' && updatedPosition.price > 0) {
+          // 当更新USDT数量时，自动计算币数量
+          updatedPosition.quantity = value / updatedPosition.price;
+        } else if (field === 'price' && typeof value === 'number' && value > 0) {
+          // 当更新价格时，如果币数量有值，重新计算USDT数量
+          if (updatedPosition.quantity > 0) {
+            updatedPosition.quantityUsdt = value * updatedPosition.quantity;
+          } else if (updatedPosition.quantityUsdt > 0) {
+            // 如果USDT数量有值，重新计算币数量
+            updatedPosition.quantity = updatedPosition.quantityUsdt / value;
+          }
+        }
+
+        return updatedPosition;
+      }
+      return p;
+    }));
   };
 
   // 自动计算（当有有效仓位时）
@@ -202,6 +225,7 @@ export default function EntryPriceCalculator() {
                       <TableCell>序号</TableCell>
                       <TableCell>开仓价格 (USDT)</TableCell>
                       <TableCell>成交数量 (币)</TableCell>
+                      <TableCell>成交数量 (U)</TableCell>
                       <TableCell>操作</TableCell>
                     </TableRow>
                   </TableHead>
@@ -256,6 +280,22 @@ export default function EntryPriceCalculator() {
                           />
                         </TableCell>
                         <TableCell>
+                          <TextField
+                            size="small"
+                            type="number"
+                            value={position.quantityUsdt || ''}
+                            onChange={(e) => updatePosition(position.id, 'quantityUsdt', parseFloat(e.target.value) || 0)}
+                            placeholder="0.00"
+                            disabled={!position.enabled}
+                            sx={{
+                              width: '100%',
+                              '& .MuiInputBase-input': {
+                                color: position.enabled ? 'inherit' : 'text.disabled'
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
                           <IconButton
                             size="small"
                             color="error"
@@ -286,6 +326,7 @@ export default function EntryPriceCalculator() {
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 onClick={handleReset}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 重置
               </Button>

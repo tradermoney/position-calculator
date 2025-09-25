@@ -15,7 +15,7 @@ export default function MaxPositionCalculatorPage() {
   usePageTitle('max-position-calculator');
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       {/* 页面标题 */}
       <Box mb={3}>
         <Box display="flex" alignItems="center" mb={2}>

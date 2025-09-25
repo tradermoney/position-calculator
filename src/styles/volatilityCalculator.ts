@@ -26,11 +26,12 @@ export const InputSection = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(3),
   marginBottom: theme.spacing(4),
-  
+
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: theme.spacing(2),
   },
 }));
 
@@ -40,9 +41,10 @@ export const InputGroup = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(1),
-  
+
   [theme.breakpoints.up('md')]: {
-    maxWidth: '300px',
+    maxWidth: '280px',
+    minWidth: '200px',
   },
 }));
 

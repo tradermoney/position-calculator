@@ -49,6 +49,7 @@ export default function PnLCalculator() {
     entryPrice: 0,
     exitPrice: 0,
     quantity: 0,
+    quantityUsdt: 0,  // 新增USDT数量字段
     exitOrders: []
   });
 
@@ -89,6 +90,40 @@ export default function PnLCalculator() {
         order.id === id ? { ...order, ...updates } : order
       )
     }));
+  };
+
+  // 更新开仓数量（支持自动绑定）
+  const updateQuantity = (field: 'quantity' | 'quantityUsdt', value: number) => {
+    setParams(prev => {
+      const updatedParams = { ...prev, [field]: value };
+
+      // 自动绑定逻辑：当价格和其中一个数量字段都有值时，自动计算另一个数量字段
+      if (field === 'quantity' && value > 0 && prev.entryPrice > 0) {
+        updatedParams.quantityUsdt = prev.entryPrice * value;
+      } else if (field === 'quantityUsdt' && value > 0 && prev.entryPrice > 0) {
+        updatedParams.quantity = value / prev.entryPrice;
+      }
+
+      return updatedParams;
+    });
+  };
+
+  // 更新开仓价格（支持自动绑定）
+  const updateEntryPrice = (value: number) => {
+    setParams(prev => {
+      const updatedParams = { ...prev, entryPrice: value };
+
+      // 当价格变化时，根据已有的数量字段自动重新计算另一个数量字段
+      if (value > 0) {
+        if (prev.quantity > 0) {
+          updatedParams.quantityUsdt = value * prev.quantity;
+        } else if (prev.quantityUsdt > 0) {
+          updatedParams.quantity = prev.quantityUsdt / value;
+        }
+      }
+
+      return updatedParams;
+    });
   };
 
   // 验证输入参数
@@ -161,6 +196,7 @@ export default function PnLCalculator() {
       entryPrice: 0,
       exitPrice: 0,
       quantity: 0,
+      quantityUsdt: 0,
       exitOrders: []
     });
     setResult(null);
@@ -283,21 +319,33 @@ export default function PnLCalculator() {
                   label="开仓价格"
                   type="number"
                   value={params.entryPrice || ''}
-                  onChange={(e) => setParams({ ...params, entryPrice: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => updateEntryPrice(parseFloat(e.target.value) || 0)}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">USDT</InputAdornment>,
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   fullWidth
-                  label="成交数量"
+                  label="成交数量 (币)"
                   type="number"
                   value={params.quantity || ''}
-                  onChange={(e) => setParams({ ...params, quantity: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => updateQuantity('quantity', parseFloat(e.target.value) || 0)}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">币</InputAdornment>,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="成交数量 (U)"
+                  type="number"
+                  value={params.quantityUsdt || ''}
+                  onChange={(e) => updateQuantity('quantityUsdt', parseFloat(e.target.value) || 0)}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">USDT</InputAdornment>,
                   }}
                 />
               </Grid>
@@ -376,8 +424,8 @@ export default function PnLCalculator() {
                       </Box>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={5}>
                           <TextField
                             fullWidth
                             label="平仓价格"
@@ -390,7 +438,7 @@ export default function PnLCalculator() {
                             }}
                           />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={5}>
                           <TextField
                             fullWidth
                             label="平仓数量"
@@ -403,8 +451,8 @@ export default function PnLCalculator() {
                             }}
                           />
                         </Grid>
-                        <Grid item xs={12}>
-                          <Box display="flex" justifyContent="flex-end">
+                        <Grid item xs={2}>
+                          <Box display="flex" justifyContent="center">
                             <IconButton
                               size="small"
                               color="error"
@@ -444,6 +492,7 @@ export default function PnLCalculator() {
                 startIcon={<RefreshIcon />}
                 onClick={handleReset}
                 fullWidth
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 重置
               </Button>

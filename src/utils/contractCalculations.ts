@@ -42,6 +42,7 @@ export interface PnLCalculatorParams {
   entryPrice: number;
   exitPrice: number;       // 保留向后兼容
   quantity: number;
+  quantityUsdt?: number;   // USDT数量（可选）
   exitOrders?: ExitOrder[]; // 多个平仓委托单
 }
 

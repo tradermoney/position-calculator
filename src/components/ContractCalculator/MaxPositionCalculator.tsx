@@ -120,7 +120,7 @@ export default function MaxPositionCalculator() {
   return (
     <Grid container spacing={3}>
       {/* 左侧：参数输入 */}
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={7}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -252,6 +252,7 @@ export default function MaxPositionCalculator() {
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 onClick={handleReset}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 重置
               </Button>
@@ -272,7 +273,7 @@ export default function MaxPositionCalculator() {
       </Grid>
 
       {/* 右侧：计算结果 */}
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={5}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

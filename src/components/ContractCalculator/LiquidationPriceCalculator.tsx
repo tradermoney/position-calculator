@@ -273,6 +273,7 @@ export default function LiquidationPriceCalculator() {
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 onClick={handleReset}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 重置
               </Button>
