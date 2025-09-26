@@ -6,12 +6,17 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  ToggleButton,
+  ToggleButtonGroup,
+  Box,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
   History as HistoryIcon,
   Clear as ClearIcon,
   Info as InfoIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
 import {
@@ -45,6 +50,12 @@ import {
 // 使用存储模块中的接口
 export type VolatilityRecord = StoredVolatilityRecord;
 
+// 计算模式枚举
+enum CalculationMode {
+  FORWARD = 'forward',   // 正向计算：起始价格 + 目标价格 → 波动率
+  REVERSE = 'reverse'    // 反向计算：起始价格 + 波动率 → 目标价格
+}
+
 // 波动率计算结果接口
 interface VolatilityResult {
   volatility: number;
@@ -61,14 +72,33 @@ interface VolatilityResult {
   };
 }
 
+// 反向计算结果接口
+interface ReverseCalculationResult {
+  targetPrice: number;
+  volatility: number;
+  sign: '+' | '-';
+  difference: number;
+  formula: string;
+  // 投资金额相关计算结果
+  investmentVolatility?: {
+    amount: number;
+    volatilityAmount: number;
+    upperBound: number;
+    lowerBound: number;
+  };
+}
+
 export default function VolatilityCalculator() {
   usePageTitle('volatility-calculator');
 
   // 状态管理
+  const [calculationMode, setCalculationMode] = useState<CalculationMode>(CalculationMode.FORWARD);
   const [price1, setPrice1] = useState<string>('');
   const [price2, setPrice2] = useState<string>('');
+  const [volatilityInput, setVolatilityInput] = useState<string>('');
   const [investmentAmount, setInvestmentAmount] = useState<string>('');
   const [result, setResult] = useState<VolatilityResult | null>(null);
+  const [reverseResult, setReverseResult] = useState<ReverseCalculationResult | null>(null);
   const [history, setHistory] = useState<VolatilityRecord[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -121,31 +151,60 @@ export default function VolatilityCalculator() {
     }
   }, [price1, price2, isLoading]);
 
-  // 验证输入参数
-  const validateInputs = useCallback((): string[] => {
+  // 验证正向计算输入参数
+  const validateForwardInputs = useCallback((): string[] => {
     const errors: string[] = [];
-    
+
     const p1 = parseFloat(price1);
     const p2 = parseFloat(price2);
-    
+
     if (!price1 || isNaN(p1) || p1 <= 0) {
-      errors.push('价格1必须是大于0的有效数字');
+      errors.push('起始价格必须是大于0的有效数字');
     }
-    
+
     if (!price2 || isNaN(p2) || p2 <= 0) {
-      errors.push('价格2必须是大于0的有效数字');
+      errors.push('目标价格必须是大于0的有效数字');
     }
-    
+
     if (p1 === p2 && !isNaN(p1) && !isNaN(p2)) {
       errors.push('两个价格不能相同');
     }
-    
+
     return errors;
   }, [price1, price2]);
 
-  // 计算波动率
+  // 验证反向计算输入参数
+  const validateReverseInputs = useCallback((): string[] => {
+    const errors: string[] = [];
+
+    const p1 = parseFloat(price1);
+    const vol = parseFloat(volatilityInput);
+
+    if (!price1 || isNaN(p1) || p1 <= 0) {
+      errors.push('起始价格必须是大于0的有效数字');
+    }
+
+    if (!volatilityInput || isNaN(vol) || vol <= 0) {
+      errors.push('波动率必须是大于0的有效数字');
+    }
+
+    if (vol >= 100) {
+      errors.push('波动率不能大于等于100%');
+    }
+
+    return errors;
+  }, [price1, volatilityInput]);
+
+  // 根据计算模式验证输入
+  const validateInputs = useCallback((): string[] => {
+    return calculationMode === CalculationMode.FORWARD
+      ? validateForwardInputs()
+      : validateReverseInputs();
+  }, [calculationMode, validateForwardInputs, validateReverseInputs]);
+
+  // 计算波动率（正向计算）
   const calculateVolatility = useCallback((): VolatilityResult | null => {
-    const validationErrors = validateInputs();
+    const validationErrors = validateForwardInputs();
     if (validationErrors.length > 0) {
       return null;
     }
@@ -153,16 +212,16 @@ export default function VolatilityCalculator() {
     const p1 = parseFloat(price1);
     const p2 = parseFloat(price2);
 
-    // 计算差值和符号
-    const difference = p1 - p2;
+    // 计算差值和符号（目标价格 - 起始价格）
+    const difference = p2 - p1;
     const sign: '+' | '-' = difference >= 0 ? '+' : '-';
 
-    // 计算波动率：|价格1-价格2|/max(价格1,价格2)*100
+    // 计算波动率：|目标价格-起始价格|/max(起始价格,目标价格)*100
     const maxPrice = Math.max(p1, p2);
     const volatility = (Math.abs(difference) / maxPrice) * 100;
 
     // 生成计算公式
-    const formula = `|${p1} - ${p2}| / max(${p1}, ${p2}) × 100 = ${Math.abs(difference).toFixed(4)} / ${maxPrice} × 100`;
+    const formula = `|${p2} - ${p1}| / max(${p1}, ${p2}) × 100 = ${Math.abs(difference).toFixed(4)} / ${maxPrice} × 100`;
 
     // 计算投资金额波动（如果用户输入了投资金额）
     let investmentVolatility = undefined;
@@ -188,32 +247,102 @@ export default function VolatilityCalculator() {
       formula,
       investmentVolatility
     };
-  }, [price1, price2, investmentAmount, validateInputs]);
+  }, [price1, price2, investmentAmount, validateForwardInputs]);
+
+  // 计算目标价格（反向计算）
+  const calculateTargetPrice = useCallback((): ReverseCalculationResult | null => {
+    const validationErrors = validateReverseInputs();
+    if (validationErrors.length > 0) {
+      return null;
+    }
+
+    const p1 = parseFloat(price1);
+    const vol = parseFloat(volatilityInput);
+
+    // 反向计算公式推导：
+    // 波动率 = |目标价格 - 起始价格| / max(起始价格, 目标价格) * 100
+    // 设目标价格为 p2，则：
+    // vol/100 = |p2 - p1| / max(p1, p2)
+
+    // 分两种情况：
+    // 1. 如果 p2 > p1，则 max(p1, p2) = p2，公式变为：vol/100 = (p2 - p1) / p2
+    //    解得：p2 = p1 / (1 - vol/100)
+    // 2. 如果 p2 < p1，则 max(p1, p2) = p1，公式变为：vol/100 = (p1 - p2) / p1
+    //    解得：p2 = p1 * (1 - vol/100)
+
+    // 计算两种可能的目标价格
+    const targetPriceUp = p1 / (1 - vol / 100);   // 上涨情况
+    const targetPriceDown = p1 * (1 - vol / 100); // 下跌情况
+
+    // 默认选择上涨情况，用户可以通过符号选择器来切换
+    const targetPrice = targetPriceUp;
+    const difference = Math.abs(targetPrice - p1);
+    const sign: '+' | '-' = targetPrice >= p1 ? '+' : '-';
+
+    // 生成计算公式
+    const formula = `${p1} / (1 - ${vol}/100) = ${p1} / ${(1 - vol/100).toFixed(4)} = ${targetPrice.toFixed(4)}`;
+
+    // 计算投资金额波动（如果用户输入了投资金额）
+    let investmentVolatility = undefined;
+    if (investmentAmount && parseFloat(investmentAmount) > 0) {
+      const amount = parseFloat(investmentAmount);
+      const volatilityAmount = (amount * vol) / 100;
+      const upperBound = amount + volatilityAmount;
+      const lowerBound = amount - volatilityAmount;
+
+      investmentVolatility = {
+        amount,
+        volatilityAmount,
+        upperBound,
+        lowerBound
+      };
+    }
+
+    return {
+      targetPrice,
+      volatility: vol,
+      sign,
+      difference,
+      formula,
+      investmentVolatility
+    };
+  }, [price1, volatilityInput, investmentAmount, validateReverseInputs]);
 
   // 实时计算
   useEffect(() => {
     const validationErrors = validateInputs();
     setErrors(validationErrors);
-    
-    if (validationErrors.length === 0 && price1 && price2) {
-      const calculationResult = calculateVolatility();
-      setResult(calculationResult);
+
+    if (validationErrors.length === 0) {
+      if (calculationMode === CalculationMode.FORWARD && price1 && price2) {
+        const calculationResult = calculateVolatility();
+        setResult(calculationResult);
+        setReverseResult(null);
+      } else if (calculationMode === CalculationMode.REVERSE && price1 && volatilityInput) {
+        const calculationResult = calculateTargetPrice();
+        setReverseResult(calculationResult);
+        setResult(null);
+      }
     } else {
       setResult(null);
+      setReverseResult(null);
     }
-  }, [price1, price2, validateInputs, calculateVolatility]);
+  }, [calculationMode, price1, price2, volatilityInput, investmentAmount, validateInputs, calculateVolatility, calculateTargetPrice]);
 
   // 保存计算记录
   const saveRecord = useCallback(async () => {
-    if (!result) return;
+    const currentResult = result || reverseResult;
+    if (!currentResult) return;
 
     try {
       const record: VolatilityRecord = {
         id: Date.now().toString(),
         price1: parseFloat(price1),
-        price2: parseFloat(price2),
-        volatility: result.volatility,
-        sign: result.sign,
+        price2: calculationMode === CalculationMode.FORWARD
+          ? parseFloat(price2)
+          : reverseResult?.targetPrice || 0,
+        volatility: currentResult.volatility,
+        sign: currentResult.sign,
         calculatedAt: new Date(),
       };
 
@@ -226,7 +355,7 @@ export default function VolatilityCalculator() {
     } catch (error) {
       console.error('保存计算记录失败:', error);
     }
-  }, [result, price1, price2]);
+  }, [result, reverseResult, price1, price2, calculationMode]);
 
   // 从历史记录恢复
   const restoreFromHistory = useCallback((record: VolatilityRecord) => {
@@ -249,8 +378,10 @@ export default function VolatilityCalculator() {
     try {
       setPrice1('');
       setPrice2('');
+      setVolatilityInput('');
       setInvestmentAmount('');
       setResult(null);
+      setReverseResult(null);
       setErrors([]);
 
       // 清空IndexedDB中的输入状态
@@ -292,17 +423,59 @@ export default function VolatilityCalculator() {
           <CalculatorCard>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CalculateIcon />
-              价格输入
+              计算设置
             </Typography>
-            
+
+            {/* 计算模式选择器 */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                计算模式
+              </Typography>
+              <ToggleButtonGroup
+                value={calculationMode}
+                exclusive
+                onChange={(_, newMode) => {
+                  if (newMode !== null) {
+                    setCalculationMode(newMode);
+                    // 切换模式时清空相关输入
+                    if (newMode === CalculationMode.FORWARD) {
+                      setVolatilityInput('');
+                    } else {
+                      setPrice2('');
+                    }
+                    setResult(null);
+                    setReverseResult(null);
+                    setErrors([]);
+                  }
+                }}
+                size="small"
+                fullWidth
+              >
+                <ToggleButton value={CalculationMode.FORWARD}>
+                  <TrendingUpIcon sx={{ mr: 1 }} />
+                  正向计算
+                </ToggleButton>
+                <ToggleButton value={CalculationMode.REVERSE}>
+                  <TrendingDownIcon sx={{ mr: 1 }} />
+                  反向计算
+                </ToggleButton>
+              </ToggleButtonGroup>
+              <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                {calculationMode === CalculationMode.FORWARD
+                  ? '输入起始价格和目标价格，计算波动率'
+                  : '输入起始价格和波动率，计算目标价格'
+                }
+              </Typography>
+            </Box>
+
             <InputSection>
               <InputGroup>
                 <PriceInput
-                  label="价格 1"
+                  label="起始价格"
                   type="number"
                   value={price1}
                   onChange={(e) => setPrice1(e.target.value)}
-                  placeholder="请输入第一个价格"
+                  placeholder="请输入起始价格"
                   fullWidth
                   inputProps={{
                     min: 0,
@@ -311,20 +484,38 @@ export default function VolatilityCalculator() {
                 />
               </InputGroup>
 
-              <InputGroup>
-                <PriceInput
-                  label="价格 2"
-                  type="number"
-                  value={price2}
-                  onChange={(e) => setPrice2(e.target.value)}
-                  placeholder="请输入第二个价格"
-                  fullWidth
-                  inputProps={{
-                    min: 0,
-                    step: 0.0001,
-                  }}
-                />
-              </InputGroup>
+              {calculationMode === CalculationMode.FORWARD ? (
+                <InputGroup>
+                  <PriceInput
+                    label="目标价格"
+                    type="number"
+                    value={price2}
+                    onChange={(e) => setPrice2(e.target.value)}
+                    placeholder="请输入目标价格"
+                    fullWidth
+                    inputProps={{
+                      min: 0,
+                      step: 0.0001,
+                    }}
+                  />
+                </InputGroup>
+              ) : (
+                <InputGroup>
+                  <PriceInput
+                    label="波动率 (%)"
+                    type="number"
+                    value={volatilityInput}
+                    onChange={(e) => setVolatilityInput(e.target.value)}
+                    placeholder="请输入波动率"
+                    fullWidth
+                    inputProps={{
+                      min: 0,
+                      max: 99.99,
+                      step: 0.01,
+                    }}
+                  />
+                </InputGroup>
+              )}
 
               <InputGroup>
                 <PriceInput
@@ -349,7 +540,7 @@ export default function VolatilityCalculator() {
                 variant="contained"
                 startIcon={<CalculateIcon />}
                 onClick={saveRecord}
-                disabled={!result}
+                disabled={!result && !reverseResult}
                 size="large"
               >
                 保存记录
@@ -375,27 +566,27 @@ export default function VolatilityCalculator() {
             </Alert>
           )}
 
-          {/* 结果显示 */}
-          {result && (
+          {/* 正向计算结果显示 */}
+          {result && calculationMode === CalculationMode.FORWARD && (
             <CalculatorCard>
               <Typography variant="h6" gutterBottom>
                 计算结果
               </Typography>
-              
+
               <ResultSection>
                 <ResultLabel>波动率</ResultLabel>
-                <VolatilityResult 
+                <VolatilityResult
                   color={result.sign === '+' ? 'positive' : 'negative'}
                 >
                   {result.sign}{formatNumber(result.volatility, 2)}%
                 </VolatilityResult>
                 
                 <CalculationDetails>
-                  <div><strong>计算公式：</strong> |价格1 - 价格2| ÷ max(价格1, 价格2) × 100</div>
+                  <div><strong>计算公式：</strong> |目标价格 - 起始价格| ÷ max(起始价格, 目标价格) × 100</div>
                   <div><strong>详细计算：</strong> {result.formula}</div>
                   <div><strong>价格差值：</strong> {formatNumber(result.difference)}</div>
                   <div><strong>基准价格：</strong> {formatNumber(result.maxPrice)}</div>
-                  <div><strong>变化方向：</strong> {result.sign === '+' ? '价格1 > 价格2' : '价格1 < 价格2'}</div>
+                  <div><strong>变化方向：</strong> {result.sign === '+' ? '上涨（目标价格 > 起始价格）' : '下跌（目标价格 < 起始价格）'}</div>
                 </CalculationDetails>
 
                 {/* 投资金额波动分析 */}
@@ -416,12 +607,64 @@ export default function VolatilityCalculator() {
             </CalculatorCard>
           )}
 
+          {/* 反向计算结果显示 */}
+          {reverseResult && calculationMode === CalculationMode.REVERSE && (
+            <CalculatorCard>
+              <Typography variant="h6" gutterBottom>
+                计算结果
+              </Typography>
+
+              <ResultSection>
+                <ResultLabel>目标价格</ResultLabel>
+                <VolatilityResult
+                  color={reverseResult.sign === '+' ? 'positive' : 'negative'}
+                >
+                  {formatNumber(reverseResult.targetPrice, 4)} USDT
+                </VolatilityResult>
+
+                <CalculationDetails>
+                  <div><strong>计算公式：</strong> 起始价格 ÷ (1 - 波动率/100)</div>
+                  <div><strong>详细计算：</strong> {reverseResult.formula}</div>
+                  <div><strong>价格差值：</strong> {formatNumber(reverseResult.difference, 4)} USDT</div>
+                  <div><strong>波动率：</strong> {formatNumber(reverseResult.volatility, 2)}%</div>
+                  <div><strong>变化方向：</strong> {reverseResult.sign === '+' ? '上涨（目标价格 > 起始价格）' : '下跌（目标价格 < 起始价格）'}</div>
+                </CalculationDetails>
+
+                {/* 投资金额波动分析 */}
+                {reverseResult.investmentVolatility && (
+                  <CalculationDetails style={{ marginTop: '16px', padding: '16px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                      💰 投资金额波动分析
+                    </Typography>
+                    <div><strong>投资金额：</strong> {formatNumber(reverseResult.investmentVolatility.amount, 2)} USDT</div>
+                    <div><strong>波动金额：</strong> {formatNumber(reverseResult.investmentVolatility.volatilityAmount, 2)} USDT</div>
+                    <div><strong>波动区间：</strong> {formatNumber(reverseResult.investmentVolatility.lowerBound, 2)} ~ {formatNumber(reverseResult.investmentVolatility.upperBound, 2)} USDT</div>
+                    <div style={{ marginTop: '8px', fontSize: '0.9em', color: '#666' }}>
+                      <strong>说明：</strong> 在当前 {formatNumber(reverseResult.volatility, 2)}% 的波动率下，您的 {formatNumber(reverseResult.investmentVolatility.amount, 2)} USDT 投资可能波动 ±{formatNumber(reverseResult.investmentVolatility.volatilityAmount, 2)} USDT
+                    </div>
+                  </CalculationDetails>
+                )}
+              </ResultSection>
+            </CalculatorCard>
+          )}
+
           {/* 使用说明 */}
           <InfoText>
             <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
             <strong>使用说明：</strong>
-            输入两个价格后自动计算波动率。波动率 = |价格1-价格2|/max(价格1,价格2)×100%。
-            正号表示价格1大于价格2，负号表示价格1小于价格2。
+            {calculationMode === CalculationMode.FORWARD ? (
+              <>
+                <strong>正向计算：</strong>输入起始价格和目标价格后自动计算波动率。
+                波动率 = |目标价格-起始价格|/max(起始价格,目标价格)×100%。
+                正号表示上涨（目标价格大于起始价格），负号表示下跌（目标价格小于起始价格）。
+              </>
+            ) : (
+              <>
+                <strong>反向计算：</strong>输入起始价格和波动率后自动计算目标价格。
+                目标价格 = 起始价格 ÷ (1 - 波动率/100)。
+                此计算假设价格上涨，如需计算下跌情况，请使用负波动率。
+              </>
+            )}
             可选择输入投资金额，系统将计算该金额在当前波动率下的波动区间。
             点击"保存记录"可将当前计算保存到历史记录中。
           </InfoText>

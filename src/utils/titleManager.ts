@@ -15,6 +15,7 @@ export const PAGE_TITLES = {
   'max-position-calculator': '可开计算器 - 合约计算器',
   'entry-price-calculator': '开仓价格计算器 - 合约计算器',
   'volatility-calculator': '波动率计算器 - 合约计算器',
+  'calculator': '计算器 - 合约计算器',
 } as const;
 
 // 页面类型
@@ -56,6 +57,7 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     'max-position-calculator': '可开计算器，计算最大可开仓位数量，合理分配资金',
     'entry-price-calculator': '开仓价格计算器，计算多笔交易的平均开仓价格',
     'volatility-calculator': '价格波动率计算器，计算两个价格之间的波动率百分比，支持历史记录',
+    'calculator': '科学计算器，支持基础运算和括号运算，自动保存计算历史记录',
   };
   
   updateMetaTag('description', descriptions[pageKey] || '专业的加密货币仓位管理和计算工具');

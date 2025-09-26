@@ -14,6 +14,7 @@ import LiquidationCalculatorPage from '../../pages/LiquidationCalculatorPage';
 import MaxPositionCalculatorPage from '../../pages/MaxPositionCalculatorPage';
 import EntryPriceCalculatorPage from '../../pages/EntryPriceCalculatorPage';
 import VolatilityCalculator from '../../pages/VolatilityCalculator';
+import CalculatorPage from '../../pages/CalculatorPage';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
@@ -29,6 +30,7 @@ const routePathMap = {
   '/max-position-calculator': 'max-position-calculator',
   '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
+  '/calculator': 'calculator',
 } as const;
 
 // 根据路径获取页面键名
@@ -93,6 +95,7 @@ function AppContent() {
           <Route path="/max-position-calculator" element={<MaxPositionCalculatorPage />} />
           <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
 
           {/* 向后兼容性重定向 */}
           <Route path="/contract-calculator" element={<Navigate to="/pnl-calculator" replace />} />

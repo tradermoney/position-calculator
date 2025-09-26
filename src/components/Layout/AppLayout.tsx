@@ -29,6 +29,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   PriceChange as PriceChangeIcon,
   TrendingUp as VolatilityIcon,
+  Functions as CalculatorIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
@@ -51,6 +52,7 @@ const menuItems = [
   { id: 'max-position-calculator', label: '可开计算器', icon: <AccountBalanceIcon />, path: '/max-position-calculator' },
   { id: 'entry-price-calculator', label: '开仓价格计算器', icon: <PriceChangeIcon />, path: '/entry-price-calculator' },
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
+  { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
 ];
 
 export default function AppLayout({ children }: AppLayoutProps) {

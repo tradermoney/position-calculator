@@ -27,7 +27,29 @@ import {
   Delete as DeleteIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
+  KeyboardArrowUp as ArrowUpIcon,
+  KeyboardArrowDown as ArrowDownIcon,
+  DragIndicator as DragIcon,
 } from '@mui/icons-material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   PositionSide,
   EntryPriceCalculatorParams,
@@ -46,12 +68,47 @@ interface Position {
 
 export default function EntryPriceCalculator() {
   const [side, setSide] = useState<PositionSide>(PositionSide.LONG);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [positions, setPositions] = useState<Position[]>([
     { id: 1, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
     { id: 2, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
   ]);
   const [result, setResult] = useState<EntryPriceCalculatorResult | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
+
+  // 拖拽传感器配置
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // 计算相对于当前价格的波动率
+  const calculateVolatilityFromCurrent = (positionPrice: number): string => {
+    if (!currentPrice || currentPrice <= 0 || positionPrice <= 0) {
+      return '-';
+    }
+    const volatility = ((positionPrice - currentPrice) / currentPrice) * 100;
+    return `${volatility >= 0 ? '+' : ''}${volatility.toFixed(2)}%`;
+  };
+
+  // 计算相对于上一个仓位的波动率
+  const calculateVolatilityFromPrevious = (currentIndex: number): string => {
+    if (currentIndex === 0) {
+      return '-'; // 第一个仓位没有上一个仓位
+    }
+    const currentPosition = positions[currentIndex];
+    const previousPosition = positions[currentIndex - 1];
+
+    if (!currentPosition.price || currentPosition.price <= 0 ||
+        !previousPosition.price || previousPosition.price <= 0) {
+      return '-';
+    }
+
+    const volatility = ((currentPosition.price - previousPosition.price) / previousPosition.price) * 100;
+    return `${volatility >= 0 ? '+' : ''}${volatility.toFixed(2)}%`;
+  };
 
   // 验证输入参数
   const validateParams = (): string[] => {
@@ -96,6 +153,7 @@ export default function EntryPriceCalculator() {
   // 重置表单
   const handleReset = () => {
     setSide(PositionSide.LONG);
+    setCurrentPrice(0);
     setPositions([
       { id: 1, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
       { id: 2, price: 0, quantity: 0, quantityUsdt: 0, enabled: true },
@@ -110,10 +168,34 @@ export default function EntryPriceCalculator() {
     setPositions([...positions, { id: newId, price: 0, quantity: 0, quantityUsdt: 0, enabled: true }]);
   };
 
+  // 在指定位置插入仓位
+  const insertPosition = (index: number, direction: 'above' | 'below') => {
+    const newId = Math.max(...positions.map(p => p.id)) + 1;
+    const newPosition = { id: newId, price: 0, quantity: 0, quantityUsdt: 0, enabled: true };
+    const insertIndex = direction === 'above' ? index : index + 1;
+    const newPositions = [...positions];
+    newPositions.splice(insertIndex, 0, newPosition);
+    setPositions(newPositions);
+  };
+
   // 删除仓位
   const removePosition = (id: number) => {
     if (positions.length > 1) {
       setPositions(positions.filter(p => p.id !== id));
+    }
+  };
+
+  // 处理拖拽结束
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setPositions((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
   };
 
@@ -162,10 +244,147 @@ export default function EntryPriceCalculator() {
     }
   }, [positions]);
 
+  // 可拖拽的表格行组件
+  const SortableTableRow = ({ position, index }: { position: Position; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id: position.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <TableRow
+        ref={setNodeRef}
+        style={style}
+        sx={{
+          opacity: position.enabled ? 1 : 0.5,
+          backgroundColor: position.enabled ? 'inherit' : 'action.hover'
+        }}
+      >
+        <TableCell sx={{ width: '60px' }}>
+          <Box display="flex" alignItems="center" gap={0.5}>
+            <IconButton size="small" {...attributes} {...listeners}>
+              <DragIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Checkbox
+            checked={position.enabled}
+            onChange={(e) => updatePosition(position.id, 'enabled', e.target.checked)}
+            color="primary"
+            size="small"
+          />
+        </TableCell>
+        <TableCell sx={{ width: '80px', textAlign: 'center', fontWeight: 'bold' }}>
+          {index + 1}
+        </TableCell>
+        <TableCell>
+          <TextField
+            size="small"
+            type="number"
+            value={position.price || ''}
+            onChange={(e) => updatePosition(position.id, 'price', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
+            disabled={!position.enabled}
+            sx={{
+              width: '100%',
+              '& .MuiInputBase-input': {
+                color: position.enabled ? 'inherit' : 'text.disabled'
+              }
+            }}
+          />
+        </TableCell>
+        <TableCell>
+          <TextField
+            size="small"
+            type="number"
+            value={position.quantity || ''}
+            onChange={(e) => updatePosition(position.id, 'quantity', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
+            disabled={!position.enabled}
+            sx={{
+              width: '100%',
+              '& .MuiInputBase-input': {
+                color: position.enabled ? 'inherit' : 'text.disabled'
+              }
+            }}
+          />
+        </TableCell>
+        <TableCell>
+          <TextField
+            size="small"
+            type="number"
+            value={position.quantityUsdt || ''}
+            onChange={(e) => updatePosition(position.id, 'quantityUsdt', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
+            disabled={!position.enabled}
+            sx={{
+              width: '100%',
+              '& .MuiInputBase-input': {
+                color: position.enabled ? 'inherit' : 'text.disabled'
+              }
+            }}
+          />
+        </TableCell>
+        <TableCell sx={{ textAlign: 'center', minWidth: '100px' }}>
+          <Typography variant="body2" color={
+            calculateVolatilityFromCurrent(position.price) === '-' ? 'text.secondary' :
+            calculateVolatilityFromCurrent(position.price).startsWith('+') ? 'success.main' : 'error.main'
+          }>
+            {calculateVolatilityFromCurrent(position.price)}
+          </Typography>
+        </TableCell>
+        <TableCell sx={{ textAlign: 'center', minWidth: '100px' }}>
+          <Typography variant="body2" color={
+            calculateVolatilityFromPrevious(index) === '-' ? 'text.secondary' :
+            calculateVolatilityFromPrevious(index).startsWith('+') ? 'success.main' : 'error.main'
+          }>
+            {calculateVolatilityFromPrevious(index)}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Box display="flex" gap={0.5}>
+            <IconButton
+              size="small"
+              onClick={() => insertPosition(index, 'above')}
+              title="在上方插入"
+            >
+              <ArrowUpIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => insertPosition(index, 'below')}
+              title="在下方插入"
+            >
+              <ArrowDownIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => removePosition(position.id)}
+              disabled={positions.length <= 1}
+              title="删除"
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </TableCell>
+      </TableRow>
+    );
+  };
+
   return (
     <Grid container spacing={3}>
       {/* 左侧：参数输入 */}
-      <Grid item xs={12} md={7}>
+      <Grid item xs={12} md={9}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -199,6 +418,25 @@ export default function EntryPriceCalculator() {
               </Box>
             </Box>
 
+            {/* 当前价格 */}
+            <Box mb={3}>
+              <Typography variant="subtitle2" gutterBottom>
+                当前价格（可选）
+              </Typography>
+              <TextField
+                size="small"
+                type="number"
+                value={currentPrice || ''}
+                onChange={(e) => setCurrentPrice(parseFloat(e.target.value) || 0)}
+                placeholder="输入当前价格以计算波动率"
+                fullWidth
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">USDT</InputAdornment>,
+                }}
+                helperText="输入当前价格后，将显示每个仓位相对于当前价格的波动率"
+              />
+            </Box>
+
             <Divider sx={{ my: 2 }} />
 
             {/* 仓位列表 */}
@@ -217,98 +455,48 @@ export default function EntryPriceCalculator() {
                 </Button>
               </Box>
 
-              <TableContainer component={Paper} variant="outlined">
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>启用</TableCell>
-                      <TableCell>序号</TableCell>
-                      <TableCell>开仓价格 (USDT)</TableCell>
-                      <TableCell>成交数量 (币)</TableCell>
-                      <TableCell>成交数量 (U)</TableCell>
-                      <TableCell>操作</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {positions.map((position, index) => (
-                      <TableRow
-                        key={position.id}
-                        sx={{
-                          opacity: position.enabled ? 1 : 0.5,
-                          backgroundColor: position.enabled ? 'inherit' : 'action.hover'
-                        }}
-                      >
-                        <TableCell>
-                          <Checkbox
-                            checked={position.enabled}
-                            onChange={(e) => updatePosition(position.id, 'enabled', e.target.checked)}
-                            color="primary"
-                            size="small"
-                          />
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <Table size="small" sx={{ minWidth: 1000 }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ width: '60px' }}>拖拽</TableCell>
+                        <TableCell sx={{ width: '60px' }}>启用</TableCell>
+                        <TableCell sx={{ width: '80px', textAlign: 'center' }}>
+                          <Box sx={{ whiteSpace: 'nowrap' }}>序号</Box>
                         </TableCell>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={position.price || ''}
-                            onChange={(e) => updatePosition(position.id, 'price', parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            disabled={!position.enabled}
-                            sx={{
-                              width: '100%',
-                              '& .MuiInputBase-input': {
-                                color: position.enabled ? 'inherit' : 'text.disabled'
-                              }
-                            }}
-                          />
+                        <TableCell>开仓价格 (USDT)</TableCell>
+                        <TableCell>成交数量 (币)</TableCell>
+                        <TableCell>成交数量 (U)</TableCell>
+                        <TableCell sx={{ textAlign: 'center', minWidth: '120px' }}>
+                          <Box sx={{ whiteSpace: 'nowrap' }}>相对于当前价格波动率</Box>
                         </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={position.quantity || ''}
-                            onChange={(e) => updatePosition(position.id, 'quantity', parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            disabled={!position.enabled}
-                            sx={{
-                              width: '100%',
-                              '& .MuiInputBase-input': {
-                                color: position.enabled ? 'inherit' : 'text.disabled'
-                              }
-                            }}
-                          />
+                        <TableCell sx={{ textAlign: 'center', minWidth: '120px' }}>
+                          <Box sx={{ whiteSpace: 'nowrap' }}>相对于上一个仓位波动率</Box>
                         </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={position.quantityUsdt || ''}
-                            onChange={(e) => updatePosition(position.id, 'quantityUsdt', parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            disabled={!position.enabled}
-                            sx={{
-                              width: '100%',
-                              '& .MuiInputBase-input': {
-                                color: position.enabled ? 'inherit' : 'text.disabled'
-                              }
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => removePosition(position.id)}
-                            disabled={positions.length <= 1}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+                        <TableCell sx={{ width: '140px' }}>操作</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHead>
+                    <TableBody>
+                      <SortableContext
+                        items={positions.map(p => p.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {positions.map((position, index) => (
+                          <SortableTableRow
+                            key={position.id}
+                            position={position}
+                            index={index}
+                          />
+                        ))}
+                      </SortableContext>
+                    </TableBody>
+                  </Table>
+                </DndContext>
               </TableContainer>
             </Box>
 
@@ -347,7 +535,7 @@ export default function EntryPriceCalculator() {
       </Grid>
 
       {/* 右侧：计算结果 */}
-      <Grid item xs={12} md={5}>
+      <Grid item xs={12} md={3}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
