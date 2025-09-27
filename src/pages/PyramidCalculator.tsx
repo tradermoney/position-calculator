@@ -30,7 +30,7 @@ export default function PyramidCalculator() {
     pyramidLevels: 5,
     strategy: PyramidStrategy.EQUAL_RATIO,
     priceDropPercent: 5,
-    ratioMultiplier: 1.5,
+    ratioMultiplier: 2,
   });
 
   const [result, setResult] = useState<PyramidResult | null>(null);
@@ -86,7 +86,7 @@ export default function PyramidCalculator() {
       pyramidLevels: 5,
       strategy: PyramidStrategy.EQUAL_RATIO,
       priceDropPercent: 5,
-      ratioMultiplier: 1.5,
+      ratioMultiplier: 2,
     });
     setResult(null);
     setErrors([]);
@@ -106,11 +106,11 @@ export default function PyramidCalculator() {
     >
       <Box maxWidth="xl" width="100%">
         <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
-          合约分批建仓计算器
+          金字塔委托单计算器
         </Typography>
 
         <Typography variant="body1" color="textSecondary" textAlign="center" paragraph>
-          制定专业的分批建仓策略，优化持仓成本和风险管理
+          制定每一档委托的价格、数量与保证金，助您构建稳定的金字塔型加仓计划
         </Typography>
 
         <Grid container spacing={3}>

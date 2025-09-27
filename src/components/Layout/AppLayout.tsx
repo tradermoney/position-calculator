@@ -20,7 +20,6 @@ import {
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
-  AccountBalance as PositionIcon,
   Add as AddIcon,
   Timeline as PyramidIcon,
   Calculate as CalculateIcon,
@@ -29,6 +28,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   PriceChange as PriceChangeIcon,
   TrendingUp as VolatilityIcon,
+  ShowChart as KellyIcon,
   Functions as CalculatorIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
@@ -42,16 +42,16 @@ interface AppLayoutProps {
 const drawerWidth = 240;
 
 const menuItems = [
-  { id: 'dashboard', label: '仪表盘', icon: <DashboardIcon />, path: '/dashboard' },
-  { id: 'positions', label: '仓位管理', icon: <PositionIcon />, path: '/positions' },
+  { id: 'dashboard', label: '功能索引', icon: <DashboardIcon />, path: '/dashboard' },
   { id: 'add-position', label: '补仓计算', icon: <AddIcon />, path: '/add-position' },
-  { id: 'pyramid', label: '金字塔加仓', icon: <PyramidIcon />, path: '/pyramid' },
+  { id: 'pyramid', label: '金字塔委托单计算器', icon: <PyramidIcon />, path: '/pyramid' },
   { id: 'pnl-calculator', label: '盈亏计算器', icon: <CalculateIcon />, path: '/pnl-calculator' },
   { id: 'target-price-calculator', label: '目标价格计算器', icon: <TrendingUpIcon />, path: '/target-price-calculator' },
   { id: 'liquidation-calculator', label: '强平价格计算器', icon: <WarningIcon />, path: '/liquidation-calculator' },
   { id: 'max-position-calculator', label: '可开计算器', icon: <AccountBalanceIcon />, path: '/max-position-calculator' },
   { id: 'entry-price-calculator', label: '开仓价格计算器', icon: <PriceChangeIcon />, path: '/entry-price-calculator' },
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
+  { id: 'kelly-calculator', label: '凯利公式计算器', icon: <KellyIcon />, path: '/kelly-calculator' },
   { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
 ];
 
@@ -66,7 +66,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // 根据当前路径获取当前页面ID
   const getCurrentPageId = () => {
     const currentItem = menuItems.find(item => item.path === location.pathname);
-    return currentItem?.id || 'positions';
+    return currentItem?.id || 'dashboard';
   };
 
   const handleDrawerToggle = () => {
@@ -134,11 +134,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+      }}
+    >
       <AppBar
         position="fixed"
         sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          width: { md: `calc(100vw - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
         }}
       >
@@ -206,9 +214,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          minHeight: '100vh',
+          width: '100%',
+          maxWidth: { md: `calc(100vw - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
           backgroundColor: theme.palette.background.default,
+          overflowX: 'hidden',
         }}
       >
         <Toolbar />
