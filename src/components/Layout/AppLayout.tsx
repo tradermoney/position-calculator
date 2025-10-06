@@ -32,6 +32,7 @@ import {
   TrendingUp as BreakEvenIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
+  GitHub as GitHubIcon,
 } from '@mui/icons-material';
 import { useAppContext } from '../../contexts/appContextHooks';
 
@@ -70,6 +71,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const handleThemeToggle = () => {
     setTheme(state.theme === 'light' ? 'dark' : 'light');
+  };
+
+  const handleGitHubClick = () => {
+    window.open('https://github.com/tradermoney/position-calculator', '_blank', 'noopener,noreferrer');
   };
 
   const handlePageChange = (path: string) => {
@@ -158,6 +163,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {menuItems.find(item => item.path === location.pathname)?.label || '合约计算器'}
           </Typography>
+          <IconButton
+            color="inherit"
+            onClick={handleGitHubClick}
+            aria-label="查看GitHub仓库"
+            sx={{ mr: 1 }}
+          >
+            <GitHubIcon />
+          </IconButton>
           <IconButton
             color="inherit"
             onClick={handleThemeToggle}
