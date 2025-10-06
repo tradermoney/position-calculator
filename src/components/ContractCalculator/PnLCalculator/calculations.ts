@@ -2,6 +2,7 @@ import { PositionSide } from '../../../utils/contractCalculations';
 import { PnLResult, Position, PositionStat, PositionType } from './types';
 
 // 浮点数比较的容差值（epsilon），用于处理浮点数精度问题
+// 版本：2025-10-06 修复浮点数精度边界问题
 const EPSILON = 1e-8;
 
 const getValidPositions = (positions: Position[]) =>
@@ -50,10 +51,24 @@ export const validatePositions = (positions: Position[], capital?: number): stri
       } else {
         // 平仓：减少持仓，释放资金（不检查资金，因为平仓是释放资金）
         // 使用 EPSILON 容差处理浮点数精度问题
-        if (position.quantity > currentHoldings + EPSILON) {
-          const deficit = position.quantity - currentHoldings;
+        const actualDeficit = position.quantity - currentHoldings;
+        const hasDeficit = position.quantity > currentHoldings + EPSILON;
+        
+        // 调试日志（可在控制台查看）
+        if (Math.abs(actualDeficit) < 0.001) {
+          console.log(`[PnL调试] 第${positionIndex}个仓位(平仓):`, {
+            平仓数量: position.quantity,
+            当前持仓: currentHoldings,
+            实际差值: actualDeficit,
+            '是否超出(带容差)': hasDeficit,
+            EPSILON容差: EPSILON,
+            版本: '2025-10-06-v2'
+          });
+        }
+        
+        if (hasDeficit) {
           errors.push(
-            `第${positionIndex}个仓位(平仓)：平仓数量 ${position.quantity.toFixed(4)} 超过当前持仓 ${currentHoldings.toFixed(4)}，超出 ${deficit.toFixed(4)}`
+            `第${positionIndex}个仓位(平仓)：平仓数量 ${position.quantity.toFixed(4)} 超过当前持仓 ${currentHoldings.toFixed(4)}，超出 ${actualDeficit.toFixed(4)}`
           );
         }
         currentHoldings -= Math.min(position.quantity, currentHoldings);
