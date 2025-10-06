@@ -140,7 +140,7 @@ export default function PositionRow({
       <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
         {stats && stats.isActive ? (
           <Box display="flex" flexDirection="column">
-            <Typography variant="body2" fontSize="0.875rem">{formatNumber(stats.holdings, 4)} 币</Typography>
+            <Typography variant="body2" fontSize="0.875rem">{formatNumber(Math.abs(stats.holdings), 4)} 币</Typography>
             <Typography variant="caption" color="textSecondary" fontSize="0.75rem">
               {stats.averagePrice !== null ? `${formatNumber(stats.averagePrice, 2)} USDT` : '--'}
             </Typography>
