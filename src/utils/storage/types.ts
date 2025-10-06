@@ -106,4 +106,4 @@ export interface PositionCalculatorDB extends DBSchema {
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 3;
+export const DB_VERSION = 4;

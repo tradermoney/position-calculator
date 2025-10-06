@@ -31,6 +31,12 @@ export function usePnLCalculator() {
   const [result, setResult] = useState<PnLResult | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [inputValues, setInputValues] = useState<InputValueMap>({});
+  
+  // 当前编辑的仓位信息
+  const [editingPosition, setEditingPosition] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   // 焦点管理
   const {
@@ -212,6 +218,9 @@ export function usePnLCalculator() {
     setResult(null);
     setErrors([]);
     setInputValues({});
+    
+    // 清除编辑状态
+    setEditingPosition(null);
   }, []);
 
   useEffect(() => {
@@ -246,6 +255,12 @@ export function usePnLCalculator() {
     setInputValues(params.inputValues);
     setResult(null);
     setErrors([]);
+    
+    // 设置当前编辑的仓位
+    setEditingPosition({
+      id: params.id,
+      name: params.name,
+    });
   }, []);
 
   // 导入仓位数据
@@ -335,6 +350,8 @@ export function usePnLCalculator() {
     importPositions,
     importPositionConfig,
     exportPositionConfig,
+    editingPosition,
+    setEditingPosition,
   };
 }
 

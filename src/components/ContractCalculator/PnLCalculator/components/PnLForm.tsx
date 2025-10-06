@@ -20,7 +20,6 @@ import {
 import type { DndContextProps, DragEndEvent } from '@dnd-kit/core';
 import { PositionSide, formatPercentage } from '../../../../utils/contractCalculations';
 import PositionTable from './PositionTable';
-import ImportExportDialog from './ImportExportDialog';
 import TooltipIcon from '../../../common/TooltipIcon';
 import { Position, PositionStat } from '../types';
 
@@ -84,26 +83,6 @@ export default function PnLForm({
   onImportPositions,
   onImportConfig,
 }: PnLFormProps) {
-  const [importExportOpen, setImportExportOpen] = useState(false);
-
-  const handleImportExport = () => {
-    setImportExportOpen(true);
-  };
-
-  const handleImport = (importedPositions: Position[]) => {
-    onImportPositions(importedPositions);
-    setImportExportOpen(false);
-  };
-
-  const handleImportConfig = (config: {
-    side: PositionSide;
-    capital: number;
-    leverage: number;
-    positions: Position[];
-  }) => {
-    onImportConfig(config);
-    setImportExportOpen(false);
-  };
   return (
     <>
       <Card>
@@ -236,7 +215,6 @@ export default function PnLForm({
             registerInputRef={registerInputRef}
             handleInputFocus={handleInputFocus}
             handleInputBlur={handleInputBlur}
-            onImportExport={handleImportExport}
           />
 
           <Box mt={3} display="flex" gap={2}>
@@ -260,16 +238,6 @@ export default function PnLForm({
         </CardContent>
       </Card>
 
-      <ImportExportDialog
-        open={importExportOpen}
-        onClose={() => setImportExportOpen(false)}
-        side={side}
-        capital={capital}
-        leverage={leverage}
-        positions={positions}
-        onImportPositions={handleImport}
-        onImportConfig={handleImportConfig}
-      />
     </>
   );
 }

@@ -38,7 +38,7 @@ export class IndexedDBUtil {
       // 根据表类型决定存储方式
       // 使用keyPath的表：直接存储数据对象
       // 其他表：使用 { key, value } 格式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'positions'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接存储数据对象
@@ -76,7 +76,7 @@ export class IndexedDBUtil {
       const result = await store.get(key);
       
       // 根据表类型决定读取方式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'positions'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接返回数据对象
@@ -162,7 +162,7 @@ export class IndexedDBUtil {
       const results = await store.getAll();
       
       // 根据表类型决定读取方式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'positions'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接返回数据对象数组

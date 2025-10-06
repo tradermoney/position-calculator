@@ -28,11 +28,21 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   Close as CloseIcon,
+  Download as DownloadIcon,
+  ContentCopy as ContentCopyIcon,
+  FileDownload as FileDownloadIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material';
 import { PositionSide } from '../../utils/contractCalculations';
-import { PositionListItem, SavePositionParams, RestorePositionParams } from '../../types/position';
+import { PositionListItem, SavePositionParams, RestorePositionParams, SavedPosition } from '../../types/position';
 import { SavedPositionStorage } from '../../utils/storage/savedPositionStorage';
 import { Position } from '../ContractCalculator/PnLCalculator/types';
+import { 
+  exportPositionToFile, 
+  copyPositionToClipboard, 
+  copyPositionTextToClipboard 
+} from '../../utils/positionExport';
+import ImportExportDialog from '../ContractCalculator/PnLCalculator/components/ImportExportDialog';
 
 interface PositionManagerProps {
   // 当前仓位数据
@@ -42,10 +52,21 @@ interface PositionManagerProps {
   positions: Position[];
   inputValues: { [key: string]: string };
   
+  // 编辑状态
+  editingPosition?: {
+    id: string;
+    name: string;
+  } | null;
+  
   // 回调函数
   onRestorePosition: (params: RestorePositionParams) => void;
   onSaveSuccess?: () => void;
   onError?: (error: string) => void;
+  onClearEditing?: () => void;
+  
+  // 导入导出功能
+  onImportPositions?: (positions: Position[]) => void;
+  onImportConfig?: (config: any) => void;
 }
 
 export default function PositionManager({
@@ -54,16 +75,22 @@ export default function PositionManager({
   leverage,
   positions,
   inputValues,
+  editingPosition,
   onRestorePosition,
   onSaveSuccess,
   onError,
+  onClearEditing,
+  onImportPositions,
+  onImportConfig,
 }: PositionManagerProps) {
-  const [savedPositions, setSavedPositions] = useState<PositionListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [positionName, setPositionName] = useState('');
   const [listDialogOpen, setListDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedPositions, setSavedPositions] = useState<PositionListItem[]>([]);
+  const [importExportOpen, setImportExportOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // 加载保存的仓位列表
   const loadSavedPositions = useCallback(async () => {
@@ -101,7 +128,15 @@ export default function PositionManager({
         inputValues,
       };
 
-      await SavedPositionStorage.savePosition(saveParams);
+      if (editingPosition) {
+        // 更新现有仓位
+        await SavedPositionStorage.updatePosition(editingPosition.id, saveParams);
+        onClearEditing?.();
+      } else {
+        // 保存新仓位
+        await SavedPositionStorage.savePosition(saveParams);
+      }
+      
       setSaveDialogOpen(false);
       setPositionName('');
       await loadSavedPositions();
@@ -167,6 +202,75 @@ export default function PositionManager({
     }
   };
 
+  // 导出仓位为JSON文件
+  const handleExportPosition = async (positionId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const position = await SavedPositionStorage.getPositionById(positionId);
+      if (!position) {
+        throw new Error('仓位不存在');
+      }
+
+      exportPositionToFile(position);
+      setSuccessMessage(`仓位 "${position.name}" 已导出为JSON文件`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '导出仓位失败';
+      setError(errorMsg);
+      onError?.(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 复制仓位JSON到剪贴板
+  const handleCopyPositionJson = async (positionId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const position = await SavedPositionStorage.getPositionById(positionId);
+      if (!position) {
+        throw new Error('仓位不存在');
+      }
+
+      await copyPositionToClipboard(position);
+      setSuccessMessage(`仓位 "${position.name}" 的JSON数据已复制到剪贴板`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '复制仓位失败';
+      setError(errorMsg);
+      onError?.(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 复制仓位文本到剪贴板
+  const handleCopyPositionText = async (positionId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const position = await SavedPositionStorage.getPositionById(positionId);
+      if (!position) {
+        throw new Error('仓位不存在');
+      }
+
+      await copyPositionTextToClipboard(position);
+      setSuccessMessage(`仓位 "${position.name}" 的文本数据已复制到剪贴板`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '复制仓位失败';
+      setError(errorMsg);
+      onError?.(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 获取方向图标
   const getSideIcon = (side: PositionSide) => {
     return side === PositionSide.LONG ? (
@@ -197,13 +301,63 @@ export default function PositionManager({
     }).format(capital);
   };
 
+  // 处理导入导出
+  const handleImportExport = () => {
+    setImportExportOpen(true);
+  };
+
+  // 处理导入委托单
+  const handleImportPositions = (importedPositions: Position[]) => {
+    if (onImportPositions) {
+      onImportPositions(importedPositions);
+      setSuccessMessage('委托单导入成功');
+    }
+  };
+
+  // 处理导入配置
+  const handleImportConfig = (config: any) => {
+    if (onImportConfig) {
+      onImportConfig(config);
+      setSuccessMessage('仓位配置导入成功');
+    }
+  };
+
   // 初始化时加载仓位列表
   useEffect(() => {
     loadSavedPositions();
   }, [loadSavedPositions]);
 
+  // 当编辑状态改变时，预填充仓位名称
+  useEffect(() => {
+    if (editingPosition) {
+      setPositionName(editingPosition.name);
+    } else {
+      setPositionName('');
+    }
+  }, [editingPosition]);
+
   return (
     <Box>
+      {/* 编辑状态指示器 */}
+      {editingPosition && (
+        <Alert 
+          severity="info" 
+          sx={{ mb: 2 }}
+          icon={<EditIcon />}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => onClearEditing?.()}
+            >
+              取消编辑
+            </Button>
+          }
+        >
+          正在编辑仓位：<strong>{editingPosition.name}</strong>
+        </Alert>
+      )}
+
       {/* 操作按钮 */}
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         <Button
@@ -212,7 +366,7 @@ export default function PositionManager({
           onClick={() => setSaveDialogOpen(true)}
           disabled={loading}
         >
-          保存仓位
+          {editingPosition ? `更新仓位 ${editingPosition.name}` : '保存仓位'}
         </Button>
         <Button
           variant="outlined"
@@ -239,9 +393,18 @@ export default function PositionManager({
         </Alert>
       )}
 
+      {/* 成功提示 */}
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccessMessage(null)}>
+          {successMessage}
+        </Alert>
+      )}
+
       {/* 保存仓位对话框 */}
       <Dialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>保存当前仓位</DialogTitle>
+        <DialogTitle>
+          {editingPosition ? `更新仓位：${editingPosition.name}` : '保存当前仓位'}
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -282,7 +445,7 @@ export default function PositionManager({
             disabled={loading || !positionName.trim()}
             startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
           >
-            {loading ? '保存中...' : '保存'}
+            {loading ? (editingPosition ? '更新中...' : '保存中...') : (editingPosition ? '更新' : '保存')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -292,9 +455,19 @@ export default function PositionManager({
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6">保存的仓位列表</Typography>
-            <IconButton onClick={() => setListDialogOpen(false)}>
-              <CloseIcon />
-            </IconButton>
+            <Box display="flex" gap={1} alignItems="center">
+              <Button 
+                size="small" 
+                startIcon={<FileDownloadIcon />} 
+                onClick={handleImportExport} 
+                variant="outlined"
+              >
+                导入/导出
+              </Button>
+              <IconButton onClick={() => setListDialogOpen(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -350,6 +523,33 @@ export default function PositionManager({
                             <RefreshIcon />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="导出为JSON文件">
+                          <IconButton
+                            onClick={() => handleExportPosition(position.id)}
+                            disabled={loading}
+                            color="info"
+                          >
+                            <FileDownloadIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="复制JSON到剪贴板">
+                          <IconButton
+                            onClick={() => handleCopyPositionJson(position.id)}
+                            disabled={loading}
+                            color="info"
+                          >
+                            <ContentCopyIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="复制文本到剪贴板">
+                          <IconButton
+                            onClick={() => handleCopyPositionText(position.id)}
+                            disabled={loading}
+                            color="secondary"
+                          >
+                            <DownloadIcon />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title="删除仓位">
                           <IconButton
                             onClick={() => handleDeletePosition(position.id)}
@@ -369,6 +569,18 @@ export default function PositionManager({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* 导入导出对话框 */}
+      <ImportExportDialog
+        open={importExportOpen}
+        onClose={() => setImportExportOpen(false)}
+        side={side}
+        capital={capital}
+        leverage={leverage}
+        positions={positions}
+        onImportPositions={handleImportPositions}
+        onImportConfig={handleImportConfig}
+      />
     </Box>
   );
 }

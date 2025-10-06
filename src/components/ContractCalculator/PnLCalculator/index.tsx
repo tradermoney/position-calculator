@@ -40,6 +40,8 @@ export default function PnLCalculator() {
     restorePosition,
     importPositions,
     importPositionConfig,
+    editingPosition,
+    setEditingPosition,
   } = usePnLCalculator();
 
   // 处理仓位恢复
@@ -82,6 +84,10 @@ export default function PnLCalculator() {
         onRestorePosition={handleRestorePosition}
         onSaveSuccess={handleSaveSuccess}
         onError={handleError}
+        editingPosition={editingPosition}
+        onClearEditing={() => setEditingPosition(null)}
+        onImportPositions={importPositions}
+        onImportConfig={importPositionConfig}
       />
 
       <PnLForm

@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Add as AddIcon, FileDownload as FileDownloadIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
 import type { DndContextProps } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -34,7 +34,6 @@ interface PositionTableProps {
   registerInputRef: (key: string) => (element: HTMLInputElement | null) => void;
   handleInputFocus: (key: string) => void;
   handleInputBlur: (key: string) => void;
-  onImportExport: () => void;
 }
 
 export default function PositionTable({
@@ -52,7 +51,6 @@ export default function PositionTable({
   registerInputRef,
   handleInputFocus,
   handleInputBlur,
-  onImportExport,
 }: PositionTableProps) {
   return (
     <Box mb={3}>
@@ -61,14 +59,9 @@ export default function PositionTable({
           <Typography variant="subtitle2">委托单列表</Typography>
           <TooltipIcon title="添加多个委托单来模拟复杂的交易策略，支持开仓和平仓操作" />
         </Box>
-        <Box display="flex" gap={1}>
-          <Button size="small" startIcon={<FileDownloadIcon />} onClick={onImportExport} variant="outlined">
-            导入/导出
-          </Button>
-          <Button size="small" startIcon={<AddIcon />} onClick={onAddPosition} variant="outlined">
-            增加仓位
-          </Button>
-        </Box>
+        <Button size="small" startIcon={<AddIcon />} onClick={onAddPosition} variant="outlined">
+          增加仓位
+        </Button>
       </Box>
 
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto', overflowX: 'auto', width: '100%' }}>

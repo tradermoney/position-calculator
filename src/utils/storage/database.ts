@@ -37,6 +37,8 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
   try {
     dbInstance = await openDB<PositionCalculatorDB>(DB_NAME, DB_VERSION, {
       upgrade(db, oldVersion) {
+        console.log('数据库升级事件触发，版本:', oldVersion, '->', DB_VERSION);
+        
         // 创建仓位表
         if (!db.objectStoreNames.contains('positions')) {
           const positionStore = db.createObjectStore('positions', {
@@ -48,6 +50,7 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           positionStore.createIndex('by-side', 'side');
           positionStore.createIndex('by-status', 'status');
           positionStore.createIndex('by-created', 'createdAt');
+          console.log('创建positions对象存储');
         }
 
         // 创建设置表
@@ -55,6 +58,7 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           db.createObjectStore('settings', {
             keyPath: 'key'
           });
+          console.log('创建settings对象存储');
         }
 
         // 创建主题表
@@ -62,25 +66,26 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           db.createObjectStore('theme', {
             keyPath: 'key'
           });
+          console.log('创建theme对象存储');
         }
 
-        // 版本2新增：创建波动率记录表
-        if (oldVersion < 2) {
-          if (!db.objectStoreNames.contains('volatilityRecords')) {
-            const volatilityStore = db.createObjectStore('volatilityRecords', {
-              keyPath: 'id'
-            });
+        // 创建波动率记录表
+        if (!db.objectStoreNames.contains('volatilityRecords')) {
+          const volatilityStore = db.createObjectStore('volatilityRecords', {
+            keyPath: 'id'
+          });
 
-            // 创建按计算时间的索引
-            volatilityStore.createIndex('by-calculated', 'calculatedAt');
-          }
+          // 创建按计算时间的索引
+          volatilityStore.createIndex('by-calculated', 'calculatedAt');
+          console.log('创建volatilityRecords对象存储');
+        }
 
-          // 创建波动率输入状态表
-          if (!db.objectStoreNames.contains('volatilityInputs')) {
-            db.createObjectStore('volatilityInputs', {
-              keyPath: 'key'
-            });
-          }
+        // 创建波动率输入状态表
+        if (!db.objectStoreNames.contains('volatilityInputs')) {
+          db.createObjectStore('volatilityInputs', {
+            keyPath: 'key'
+          });
+          console.log('创建volatilityInputs对象存储');
         }
 
         // 创建PnL计算器状态表
@@ -88,6 +93,7 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           db.createObjectStore('pnlCalculator', {
             keyPath: 'key'
           });
+          console.log('创建pnlCalculator对象存储');
         }
 
         // 创建保存的仓位表
@@ -98,16 +104,16 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           savedPositionsStore.createIndex('by-created', 'createdAt');
           savedPositionsStore.createIndex('by-updated', 'updatedAt');
           savedPositionsStore.createIndex('by-name', 'name');
+          console.log('创建savedPositions对象存储');
         }
 
-        // 版本3新增：创建计算器记录表
-        if (oldVersion < 3) {
-          if (!db.objectStoreNames.contains('calculatorRecords')) {
-            const calculatorStore = db.createObjectStore('calculatorRecords', {
-              keyPath: 'id'
-            });
-            calculatorStore.createIndex('by-calculated', 'calculatedAt');
-          }
+        // 创建计算器记录表
+        if (!db.objectStoreNames.contains('calculatorRecords')) {
+          const calculatorStore = db.createObjectStore('calculatorRecords', {
+            keyPath: 'id'
+          });
+          calculatorStore.createIndex('by-calculated', 'calculatedAt');
+          console.log('创建calculatorRecords对象存储');
         }
       },
     });
