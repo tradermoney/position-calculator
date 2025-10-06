@@ -2,7 +2,7 @@
  * 仓位相关计算函数
  */
 
-import { Position, CalculationResult, AddPositionParams, AddPositionResult, PyramidOrderParams, PyramidOrderResult, PyramidStep } from '../../types';
+import { Position, CalculationResult, AddPositionParams, AddPositionResult } from '../../types';
 import { 
   calculateAveragePrice, 
   calculateUnrealizedPnl, 

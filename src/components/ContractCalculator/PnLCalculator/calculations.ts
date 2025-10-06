@@ -1,0 +1,149 @@
+import { PositionSide } from '../../../utils/contractCalculations';
+import { PnLResult, Position, PositionStat, PositionType } from './types';
+
+const getValidPositions = (positions: Position[]) =>
+  positions.filter((position) => position.enabled && position.price > 0 && position.quantity > 0);
+
+export const validatePositions = (positions: Position[], capital?: number): string[] => {
+  const errors: string[] = [];
+  const validPositions = getValidPositions(positions);
+
+  if (validPositions.length === 0) {
+    errors.push('至少需要一个有效的仓位（价格和数量都大于0）');
+    return errors;
+  }
+
+  // 检查基本字段
+  validPositions.forEach((position, index) => {
+    if (position.price <= 0) {
+      errors.push(`第${index + 1}个仓位的价格必须大于0`);
+    }
+    if (position.quantity <= 0) {
+      errors.push(`第${index + 1}个仓位的数量必须大于0`);
+    }
+  });
+
+  // 检查平仓数量是否超过持仓，以及资金使用情况
+  let currentHoldings = 0;
+  let usedCapital = 0;
+  let positionIndex = 0;
+
+  positions.forEach((position) => {
+    if (position.enabled && position.price > 0 && position.quantity > 0) {
+      positionIndex++;
+
+      if (position.type === PositionType.OPEN) {
+        // 开仓：增加持仓，消耗资金（保证金）
+        currentHoldings += position.quantity;
+        usedCapital += position.marginUsdt;
+
+        // 检查是否超过总资金
+        if (capital && capital > 0 && usedCapital > capital) {
+          const excess = usedCapital - capital;
+          errors.push(
+            `第${positionIndex}个仓位(开仓)：累计使用保证金 ${usedCapital.toFixed(2)} USDT 超过总资金 ${capital.toFixed(2)} USDT，超出 ${excess.toFixed(2)} USDT`
+          );
+        }
+      } else {
+        // 平仓：减少持仓，释放资金（不检查资金，因为平仓是释放资金）
+        if (position.quantity > currentHoldings) {
+          const deficit = position.quantity - currentHoldings;
+          errors.push(
+            `第${positionIndex}个仓位(平仓)：平仓数量 ${position.quantity.toFixed(4)} 超过当前持仓 ${currentHoldings.toFixed(4)}，超出 ${deficit.toFixed(4)}`
+          );
+        }
+        currentHoldings -= Math.min(position.quantity, currentHoldings);
+      }
+    }
+  });
+
+  return errors;
+};
+
+export const calculatePnL = (positions: Position[], side: PositionSide): PnLResult => {
+  const validPositions = getValidPositions(positions);
+  const openPositions = validPositions.filter(position => position.type === PositionType.OPEN);
+  const closePositions = validPositions.filter(position => position.type === PositionType.CLOSE);
+
+  const totalOpenCost = openPositions.reduce((sum, position) => sum + position.price * position.quantity, 0);
+  const totalOpenQuantity = openPositions.reduce((sum, position) => sum + position.quantity, 0);
+  const totalCloseCost = closePositions.reduce((sum, position) => sum + position.price * position.quantity, 0);
+  const totalCloseQuantity = closePositions.reduce((sum, position) => sum + position.quantity, 0);
+
+  const quantityRatio = totalOpenQuantity === 0 ? 0 : totalCloseQuantity / totalOpenQuantity;
+
+  const totalPnL = side === PositionSide.LONG
+    ? totalCloseCost - totalOpenCost * quantityRatio
+    : totalOpenCost * quantityRatio - totalCloseCost;
+
+  // 计算总保证金（初始投入）
+  const totalMargin = openPositions.reduce((sum, position) => sum + position.marginUsdt, 0);
+  const totalInvestment = totalOpenCost;
+  // ROE = 盈亏 / 保证金 × 100%
+  const roe = totalMargin > 0 ? (totalPnL / totalMargin) * 100 : 0;
+
+  return {
+    totalPnL,
+    totalInvestment,
+    totalReturn: totalInvestment + totalPnL,
+    roe,
+    openPositions,
+    closePositions,
+  };
+};
+
+export const calculatePositionUsage = (positions: Position[], capital: number): number => {
+  if (capital <= 0) return 0;
+  const totalMargin = positions
+    .filter(position => position.enabled && position.type === PositionType.OPEN && position.price > 0 && position.quantity > 0)
+    .reduce((sum, position) => sum + position.marginUsdt, 0);
+  return (totalMargin / capital) * 100;
+};
+
+export const buildPositionStats = (positions: Position[], side: PositionSide, capital: number = 0): Map<number, PositionStat> => {
+  let currentQuantity = 0;
+  let totalCost = 0;
+  let cumulativePnL = 0;
+  let usedCapital = 0; // 累计已使用的保证金
+  const stats = new Map<number, PositionStat>();
+
+  const getAveragePrice = () => (currentQuantity > 0 ? totalCost / currentQuantity : null);
+
+  positions.forEach((position) => {
+    let isActive = false;
+
+    if (position.enabled && position.price > 0 && position.quantity > 0) {
+      isActive = true;
+
+      if (position.type === PositionType.OPEN) {
+        totalCost += position.price * position.quantity;
+        currentQuantity += position.quantity;
+        usedCapital += position.marginUsdt; // 累加保证金
+      } else {
+        const averagePrice = getAveragePrice() ?? position.price;
+        const executableQuantity = Math.min(position.quantity, currentQuantity);
+
+        if (executableQuantity > 0) {
+          const pnlDelta = (position.price - averagePrice) * executableQuantity * (side === PositionSide.SHORT ? -1 : 1);
+          cumulativePnL += pnlDelta;
+          totalCost -= averagePrice * executableQuantity;
+          currentQuantity -= executableQuantity;
+          // 平仓不释放保证金，因为保证金在开仓时已经占用
+        }
+      }
+    }
+
+    const capitalUsageRate = capital > 0 ? usedCapital / capital : 0;
+
+    stats.set(position.id, {
+      holdings: side === PositionSide.SHORT ? -currentQuantity : currentQuantity,
+      averagePrice: getAveragePrice(),
+      cumulativePnL,
+      isActive,
+      usedCapital, // 当前累计占用的保证金
+      capitalUsageRate, // 使用率
+    });
+  });
+
+  return stats;
+};

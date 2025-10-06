@@ -27,6 +27,15 @@ export interface Position {
   updatedAt: Date;
 }
 
+export interface ManualPositionInputs {
+  symbol: string;
+  side: PositionSide;
+  leverage: number | '';
+  entryPrice: number | '';
+  quantity: number | '';
+  margin: number | '';
+}
+
 export interface AddPositionParams {
   addPrice: number;
   addQuantity: number;

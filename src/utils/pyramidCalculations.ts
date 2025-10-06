@@ -61,11 +61,15 @@ export const validatePyramidParams = (params: PyramidParams): string[] => {
     errors.push('加仓触发间距必须在0.1%-50%之间');
   }
 
-  if (params.strategy === PyramidStrategy.EQUAL_RATIO) {
-    const ratioMultiplier = typeof params.ratioMultiplier === 'number' ? params.ratioMultiplier : parseFloat(params.ratioMultiplier as string);
-    if (isNaN(ratioMultiplier) || ratioMultiplier <= 1 || ratioMultiplier > 5) {
-      errors.push('仓位递增倍数必须在1.1-5倍之间');
-    }
+  const ratioMultiplier = typeof params.ratioMultiplier === 'number'
+    ? params.ratioMultiplier
+    : parseFloat(params.ratioMultiplier as string);
+  if (isNaN(ratioMultiplier) || ratioMultiplier <= 1 || ratioMultiplier > 5) {
+    errors.push(
+      params.strategy === PyramidStrategy.DOUBLE_DOWN
+        ? '倍数递增的倍率必须在1.1-5倍之间'
+        : '仓位递增倍数必须在1.1-5倍之间'
+    );
   }
 
   return errors;
@@ -75,6 +79,10 @@ export const validatePyramidParams = (params: PyramidParams): string[] => {
  * 转换参数为数值类型
  */
 export const convertToNumericParams = (params: PyramidParams): NumericPyramidParams => {
+  const parsedRatio = typeof params.ratioMultiplier === 'number'
+    ? params.ratioMultiplier
+    : parseFloat(params.ratioMultiplier as string);
+
   return {
     symbol: params.symbol,
     side: params.side,
@@ -85,7 +93,7 @@ export const convertToNumericParams = (params: PyramidParams): NumericPyramidPar
     pyramidLevels: typeof params.pyramidLevels === 'number' ? params.pyramidLevels : parseInt(params.pyramidLevels as string),
     strategy: params.strategy,
     priceDropPercent: typeof params.priceDropPercent === 'number' ? params.priceDropPercent : parseFloat(params.priceDropPercent as string),
-    ratioMultiplier: typeof params.ratioMultiplier === 'number' ? params.ratioMultiplier : parseFloat(params.ratioMultiplier as string),
+    ratioMultiplier: Number.isFinite(parsedRatio) && parsedRatio > 0 ? parsedRatio : 2,
   };
 };
 
@@ -121,7 +129,7 @@ export const calculatePyramidLevels = (numericParams: NumericPyramidParams): Pyr
       if (numericParams.strategy === PyramidStrategy.EQUAL_RATIO) {
         quantity = numericParams.initialQuantity * Math.pow(numericParams.ratioMultiplier, level - 1);
       } else { // DOUBLE_DOWN
-        quantity = numericParams.initialQuantity * Math.pow(2, level - 1);
+        quantity = numericParams.initialQuantity * Math.pow(numericParams.ratioMultiplier, level - 1);
       }
 
       // 计算保证金

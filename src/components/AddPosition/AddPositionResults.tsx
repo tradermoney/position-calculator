@@ -9,15 +9,12 @@ import {
   Card,
   CardContent,
   Grid,
-  Button,
   Divider,
 } from '@mui/material';
-import { Save as SaveIcon } from '@mui/icons-material';
 import { AddPositionResult } from '../../types/addPosition';
 
 interface AddPositionResultsProps {
   result: AddPositionResult | null;
-  onApply: () => void;
 }
 
 /**
@@ -39,7 +36,6 @@ const formatPercentage = (value: number, decimals: number = 2): string => {
 
 export default function AddPositionResults({
   result,
-  onApply,
 }: AddPositionResultsProps) {
   return (
     <Card>
@@ -134,18 +130,6 @@ export default function AddPositionResults({
                 </Typography>
               </Grid>
             </Grid>
-
-            <Box mt={3}>
-              <Button
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={onApply}
-                fullWidth
-                color="success"
-              >
-                应用补仓方案
-              </Button>
-            </Box>
           </Box>
         )}
       </CardContent>

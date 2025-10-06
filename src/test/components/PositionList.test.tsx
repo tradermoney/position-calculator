@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AppProvider, AppContext } from '../../contexts/AppContext';
+import { AppContext } from '../../contexts/AppContext';
 import PositionList from '../../components/Position/PositionList';
 import { Position } from '../../types';
 

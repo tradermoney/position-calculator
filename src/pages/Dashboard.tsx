@@ -42,8 +42,8 @@ const featureItems: FeatureItem[] = [
   },
   {
     id: 'pyramid',
-    title: '金字塔委托单',
-    description: '生成金字塔加仓计划，分层委托更灵活地管理仓位。',
+    title: '金子塔委托单',
+    description: '生成金子塔加仓计划，分层委托更灵活地管理仓位。',
     path: '/pyramid',
     icon: PyramidIcon,
   },
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Stack spacing={1} mb={4}>
+      <Stack spacing={1} mb={{ xs: 1, sm: 2, md: 4 }}>
         <Typography variant="h4" component="h1">
           功能索引
         </Typography>
@@ -121,7 +121,7 @@ export default function Dashboard() {
         </Typography>
       </Stack>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
         {featureItems.map(({ id, title, description, path, icon: Icon }) => (
           <Grid item xs={12} sm={6} md={4} key={id}>
             <Card sx={{ height: '100%' }}>

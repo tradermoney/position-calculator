@@ -2,7 +2,14 @@
  * 补仓计算相关函数
  */
 
-import { PositionSide, Position, AddPositionParams, AddPositionResult } from '../types/addPosition';
+import {
+  PositionSide,
+  Position,
+  PositionStatus,
+  AddPositionParams,
+  AddPositionResult,
+  ManualPositionInputs,
+} from '../types/addPosition';
 
 /**
  * 计算平均成本价
@@ -39,19 +46,81 @@ export const calculateLiquidationPrice = (
   }
 };
 
+const toNumber = (value: number | ''): number => {
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (value === '') {
+    return NaN;
+  }
+  return Number(value);
+};
+
+/**
+ * 校验手动输入的原始仓位信息
+ */
+export const validateManualPosition = (position: ManualPositionInputs): string[] => {
+  const errors: string[] = [];
+
+  if (!position.symbol.trim()) {
+    errors.push('请输入当前仓位的交易对名称');
+  }
+
+  const leverage = toNumber(position.leverage);
+  if (!Number.isFinite(leverage) || leverage <= 0) {
+    errors.push('请输入有效的杠杆倍数');
+  }
+
+  const entryPrice = toNumber(position.entryPrice);
+  if (!Number.isFinite(entryPrice) || entryPrice <= 0) {
+    errors.push('请输入正确的开仓价格');
+  }
+
+  const quantity = toNumber(position.quantity);
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    errors.push('请输入有效的持仓数量');
+  }
+
+  const margin = toNumber(position.margin);
+  if (!Number.isFinite(margin) || margin <= 0) {
+    errors.push('请输入正确的保证金数值');
+  }
+
+  return errors;
+};
+
+/**
+ * 将手动输入的仓位信息转换为标准仓位对象
+ */
+export const buildPositionFromManualInputs = (position: ManualPositionInputs): Position => {
+  const leverage = toNumber(position.leverage);
+  const entryPrice = toNumber(position.entryPrice);
+  const quantity = toNumber(position.quantity);
+  const margin = toNumber(position.margin);
+  const now = new Date();
+
+  return {
+    id: 'manual-position',
+    symbol: position.symbol.trim(),
+    side: position.side,
+    leverage,
+    entryPrice,
+    quantity,
+    margin,
+    status: PositionStatus.ACTIVE,
+    createdAt: now,
+    updatedAt: now,
+  };
+};
+
 /**
  * 验证补仓参数
  */
 export const validateAddParams = (
-  selectedPosition: Position | undefined,
+  selectedPosition: Position,
   addParams: AddPositionParams
 ): string[] => {
   const errors: string[] = [];
-
-  if (!selectedPosition) {
-    errors.push('请选择要补仓的仓位');
-    return errors;
-  }
 
   if (addParams.addPrice <= 0) {
     errors.push('补仓价格必须大于0');

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import { Position } from '../types/basic';
 import {
   IndexedDBPositionStorage,
@@ -49,7 +49,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         positions: [...state.positions, action.payload]
       };
 
-    case 'UPDATE_POSITION':
+    case 'UPDATE_POSITION': {
       const updatedPositions = state.positions.map(position =>
         position.id === action.payload.id ? action.payload : position
       );
@@ -60,8 +60,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
           ? action.payload
           : state.selectedPosition
       };
+    }
 
-    case 'DELETE_POSITION':
+    case 'DELETE_POSITION': {
       const filteredPositions = state.positions.filter(
         position => position.id !== action.payload
       );
@@ -72,6 +73,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           ? null
           : state.selectedPosition
       };
+    }
 
     case 'SELECT_POSITION':
       return {
@@ -118,7 +120,7 @@ interface AppProviderProps {
 }
 
 // Provider组件
-export function AppProvider({ children }: AppProviderProps) {
+export default function AppProvider({ children }: AppProviderProps) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // 异步便捷方法
@@ -227,46 +229,5 @@ export function AppProvider({ children }: AppProviderProps) {
   );
 }
 
-// Hook for using the context
-export function useAppContext() {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppProvider');
-  }
-  return context;
-}
-
-// 选择器Hook - 用于获取特定的状态片段
-export function usePositions() {
-  const { state } = useAppContext();
-  return state.positions;
-}
-
-export function useSelectedPosition() {
-  const { state } = useAppContext();
-  return state.selectedPosition;
-}
-
-export function useTheme() {
-  const { state } = useAppContext();
-  return state.theme;
-}
-
-// 计算派生状态的Hook
-export function usePositionStats() {
-  const positions = usePositions();
-  
-  return React.useMemo(() => {
-    const totalPositions = positions.length;
-    const longPositions = positions.filter(p => p.side === 'long').length;
-    const shortPositions = positions.filter(p => p.side === 'short').length;
-    const totalMargin = positions.reduce((sum, p) => sum + p.margin, 0);
-    
-    return {
-      totalPositions,
-      longPositions,
-      shortPositions,
-      totalMargin
-    };
-  }, [positions]);
-}
+// 导出AppContext供hooks使用
+export { AppContext };

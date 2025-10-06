@@ -68,7 +68,7 @@ export default function PyramidCalculator() {
         finalLiquidationPrice: finalLevel.liquidationPrice,
         maxDrawdown,
       });
-    } catch (error) {
+    } catch {
       setErrors(['计算过程中发生错误，请检查参数设置']);
       setResult(null);
     }
@@ -101,7 +101,8 @@ export default function PyramidCalculator() {
         alignItems: 'center',
         justifyContent: 'flex-start',
         backgroundColor: '#fafafa',
-        py: 4
+        py: { xs: 0.5, sm: 2, md: 4 },
+        px: { xs: 0.5, sm: 2, md: 3 }
       }}
     >
       <Box maxWidth="xl" width="100%">

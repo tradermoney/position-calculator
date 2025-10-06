@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { AppProvider, useAppContext } from '../../contexts/AppContext';
+import { AppProvider, useAppContext } from '../../contexts/appContextHooks';
 import AppLayout from '../Layout/AppLayout';
 import Dashboard from '../../pages/Dashboard';
-import PositionManagement from '../../pages/PositionManagement';
 import AddPositionCalculator from '../../pages/AddPositionCalculator';
 import PyramidCalculator from '../../pages/PyramidCalculator';
 import PnLCalculatorPage from '../../pages/PnLCalculatorPage';
@@ -15,13 +14,13 @@ import MaxPositionCalculatorPage from '../../pages/MaxPositionCalculatorPage';
 import EntryPriceCalculatorPage from '../../pages/EntryPriceCalculatorPage';
 import VolatilityCalculator from '../../pages/VolatilityCalculator';
 import CalculatorPage from '../../pages/CalculatorPage';
+import KellyCalculatorPage from '../../pages/KellyCalculatorPage';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
 const routePathMap = {
-  '/': 'positions',
+  '/': 'dashboard',
   '/dashboard': 'dashboard',
-  '/positions': 'positions',
   '/add-position': 'add-position',
   '/pyramid': 'pyramid',
   '/pnl-calculator': 'pnl-calculator',
@@ -30,12 +29,13 @@ const routePathMap = {
   '/max-position-calculator': 'max-position-calculator',
   '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
+  '/kelly-calculator': 'kelly-calculator',
   '/calculator': 'calculator',
 } as const;
 
 // 根据路径获取页面键名
 function getPageKeyFromPath(pathname: string): PageKey {
-  return (routePathMap[pathname as keyof typeof routePathMap] || 'positions') as PageKey;
+  return (routePathMap[pathname as keyof typeof routePathMap] || 'dashboard') as PageKey;
 }
 
 function AppContent() {
@@ -68,11 +68,60 @@ function AppContent() {
           },
         },
       },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 600px)': {
+              padding: '8px',
+              '&:last-child': {
+                paddingBottom: '8px',
+              },
+            },
+          },
+        },
+      },
       MuiButton: {
         styleOverrides: {
           root: {
             borderRadius: 8,
             textTransform: 'none',
+          },
+        },
+      },
+      MuiContainer: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 600px)': {
+              paddingLeft: '4px',
+              paddingRight: '4px',
+            },
+          },
+        },
+      },
+      MuiGrid: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 600px)': {
+              '&.MuiGrid-container': {
+                margin: '-4px',
+                width: 'calc(100% + 8px)',
+                '& > .MuiGrid-item': {
+                  padding: '4px',
+                },
+              },
+            },
+          },
+        },
+      },
+      // @ts-expect-error - MuiBox type definition issue
+      MuiBox: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 600px)': {
+              '& .MuiBox-root': {
+                gap: '8px',
+              },
+            },
           },
         },
       },
@@ -84,9 +133,8 @@ function AppContent() {
       <CssBaseline />
       <AppLayout>
         <Routes>
-          <Route path="/" element={<Navigate to="/positions" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/positions" element={<PositionManagement />} />
           <Route path="/add-position" element={<AddPositionCalculator />} />
           <Route path="/pyramid" element={<PyramidCalculator />} />
           <Route path="/pnl-calculator" element={<PnLCalculatorPage />} />
@@ -95,6 +143,7 @@ function AppContent() {
           <Route path="/max-position-calculator" element={<MaxPositionCalculatorPage />} />
           <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
+          <Route path="/kelly-calculator" element={<KellyCalculatorPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
 
           {/* 向后兼容性重定向 */}
@@ -105,8 +154,11 @@ function AppContent() {
           <Route path="/contract-calculator/max-position" element={<Navigate to="/max-position-calculator" replace />} />
           <Route path="/contract-calculator/entry-price" element={<Navigate to="/entry-price-calculator" replace />} />
 
-          {/* 404 重定向到仓位管理页面 */}
-          <Route path="*" element={<Navigate to="/positions" replace />} />
+          {/* 删除的仓位管理页面重定向到仪表盘 */}
+          <Route path="/positions" element={<Navigate to="/dashboard" replace />} />
+
+          {/* 404 重定向到仪表盘页面 */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AppLayout>
     </ThemeProvider>

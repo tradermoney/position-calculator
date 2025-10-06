@@ -35,8 +35,33 @@ export default function PyramidCalculatorForm({
   onCalculate,
   onReset,
 }: PyramidCalculatorFormProps) {
-  const handleParamChange = (field: keyof PyramidParams, value: any) => {
+  const handleParamChange = (field: keyof PyramidParams, value: number | PyramidStrategy | string | PositionSide | '') => {
     onParamsChange({ ...params, [field]: value });
+  };
+
+  const isDoubleStrategy = params.strategy === PyramidStrategy.DOUBLE_DOWN;
+
+  const handleStrategyChange = (strategy: PyramidStrategy) => {
+    const rawMultiplier = params.ratioMultiplier;
+    const currentMultiplier = typeof rawMultiplier === 'number'
+      ? rawMultiplier
+      : parseFloat(rawMultiplier as string);
+
+    let nextMultiplier: number;
+
+    if (strategy === PyramidStrategy.DOUBLE_DOWN) {
+      const safeMultiplier = Number.isFinite(currentMultiplier) ? currentMultiplier : 2;
+      nextMultiplier = safeMultiplier >= 2 ? safeMultiplier : 2;
+    } else {
+      const safeMultiplier = Number.isFinite(currentMultiplier) ? currentMultiplier : 1.5;
+      nextMultiplier = safeMultiplier > 1 ? safeMultiplier : 1.5;
+    }
+
+    onParamsChange({
+      ...params,
+      strategy,
+      ratioMultiplier: nextMultiplier,
+    });
   };
 
   return (
@@ -166,7 +191,7 @@ export default function PyramidCalculatorForm({
               <Select
                 value={params.strategy}
                 label="仓位递增策略"
-                onChange={(e) => handleParamChange('strategy', e.target.value as PyramidStrategy)}
+                onChange={(e) => handleStrategyChange(e.target.value as PyramidStrategy)}
               >
                 <MenuItem value={PyramidStrategy.EQUAL_RATIO}>等比递增</MenuItem>
                 <MenuItem value={PyramidStrategy.DOUBLE_DOWN}>倍数递增</MenuItem>
@@ -193,26 +218,24 @@ export default function PyramidCalculatorForm({
             />
           </Grid>
 
-          {params.strategy === PyramidStrategy.EQUAL_RATIO && (
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="仓位递增倍数"
-                type="number"
-                value={params.ratioMultiplier}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleParamChange('ratioMultiplier', value === '' ? '' : parseFloat(value) || '');
-                }}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">x</InputAdornment>,
-                }}
-                inputProps={{ min: 1.1, max: 5, step: 0.1 }}
-                required
-                helperText="每档仓位大小的递增倍数"
-              />
-            </Grid>
-          )}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label={isDoubleStrategy ? '委托倍率' : '仓位递增倍数'}
+              type="number"
+              value={params.ratioMultiplier}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleParamChange('ratioMultiplier', value === '' ? '' : parseFloat(value) || '');
+              }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">x</InputAdornment>,
+              }}
+              inputProps={{ min: 1.1, max: 5, step: 0.1 }}
+              required
+              helperText={isDoubleStrategy ? '倍数递增模式下每档委托相对上一档的倍数（默认为2倍）' : '每档仓位大小的递增倍数'}
+            />
+          </Grid>
         </Grid>
 
         <Box mt={3} display="flex" gap={2}>

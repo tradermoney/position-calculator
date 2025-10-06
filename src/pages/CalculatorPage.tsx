@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Container } from '@mui/material';
 import { usePageTitle } from '../utils/titleManager';
-import Calculator from '../components/Calculator/Calculator';
+import Calculator from '../components/Calculator';
 
 export default function CalculatorPage() {
   usePageTitle('calculator');

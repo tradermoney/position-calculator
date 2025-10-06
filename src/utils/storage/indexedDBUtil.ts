@@ -19,7 +19,7 @@ export class IndexedDBUtil {
       const tx = db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
 
-      await store.put({ key, value: data } as any);
+      await store.put({ key, value: data } as { key: string; value: unknown });
       await tx.done;
     } catch (error) {
       console.error(`保存数据到IndexedDB失败 (${storeName}):`, error);
@@ -39,7 +39,7 @@ export class IndexedDBUtil {
       const store = tx.objectStore(storeName);
 
       const result = await store.get(key);
-      return result?.value || null;
+      return (result as { key: string; value: T })?.value || null;
     } catch (error) {
       console.error(`从IndexedDB读取数据失败 (${storeName}):`, error);
       return null;
@@ -94,7 +94,7 @@ export class IndexedDBUtil {
       const store = tx.objectStore(storeName);
 
       const results = await store.getAll();
-      return results.map(item => item.value);
+      return results.map(item => (item as { key: string; value: T }).value);
     } catch (error) {
       console.error(`获取IndexedDB存储表所有数据失败 (${storeName}):`, error);
       return [];

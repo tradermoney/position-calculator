@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
 import { Box, Typography, Grid } from '@mui/material';
-import { useAppContext } from '../contexts/AppContext';
 import { usePageTitle } from '../utils/titleManager';
 import {
-  Position,
-  PositionStatus,
   AddPositionParams,
-  AddPositionResult
+  AddPositionResult,
+  ManualPositionInputs,
+  PositionSide,
 } from '../types/addPosition';
 import {
   validateAddParams,
-  calculateAddPositionResult
+  calculateAddPositionResult,
+  buildPositionFromManualInputs,
+  validateManualPosition,
 } from '../utils/addPositionCalculations';
 import AddPositionForm from '../components/AddPosition/AddPositionForm';
 import AddPositionResults from '../components/AddPosition/AddPositionResults';
 
 export default function AddPositionCalculator() {
-  const { state, updatePosition } = useAppContext();
-  const [selectedPositionId, setSelectedPositionId] = useState<string>('');
+  const [positionInputs, setPositionInputs] = useState<ManualPositionInputs>({
+    symbol: '',
+    side: PositionSide.LONG,
+    leverage: '',
+    entryPrice: '',
+    quantity: '',
+    margin: '',
+  });
   const [addParams, setAddParams] = useState<AddPositionParams>({
     addPrice: 0,
     addQuantity: 0,
@@ -29,51 +36,40 @@ export default function AddPositionCalculator() {
   // 设置页面标题
   usePageTitle('add-position');
 
-  // 获取活跃仓位
-  const activePositions = state.positions.filter(p => p.status === PositionStatus.ACTIVE);
-  const selectedPosition = activePositions.find(p => p.id === selectedPositionId);
-
   // 计算补仓结果
   const calculateAddPosition = (): void => {
-    const validationErrors = validateAddParams(selectedPosition, addParams);
+    const baseErrors = validateManualPosition(positionInputs);
+    if (baseErrors.length > 0) {
+      setErrors(baseErrors);
+      setResult(null);
+      return;
+    }
+
+    const currentPosition = buildPositionFromManualInputs(positionInputs);
+
+    const validationErrors = validateAddParams(currentPosition, addParams);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       setResult(null);
       return;
     }
 
-    if (!selectedPosition) return;
-
     setErrors([]);
 
-    const calculationResult = calculateAddPositionResult(selectedPosition, addParams);
+    const calculationResult = calculateAddPositionResult(currentPosition, addParams);
     setResult(calculationResult);
-  };
-
-  // 应用补仓方案
-  const applyAddPosition = (): void => {
-    if (!result || !selectedPosition) return;
-
-    const updatedPosition: Position = {
-      ...selectedPosition,
-      entryPrice: result.newAveragePrice,
-      quantity: result.newTotalQuantity,
-      margin: result.newTotalMargin,
-      updatedAt: new Date(),
-    };
-
-    updatePosition(updatedPosition);
-
-    // 重置表单
-    resetForm();
-
-    // 显示成功消息
-    alert('补仓方案已应用成功！');
   };
 
   // 重置表单
   const resetForm = (): void => {
-    setSelectedPositionId('');
+    setPositionInputs({
+      symbol: '',
+      side: PositionSide.LONG,
+      leverage: '',
+      entryPrice: '',
+      quantity: '',
+      margin: '',
+    });
     setAddParams({
       addPrice: 0,
       addQuantity: 0,
@@ -101,19 +97,17 @@ export default function AddPositionCalculator() {
         </Typography>
 
         <Typography variant="body1" color="textSecondary" textAlign="center" paragraph>
-          选择已有仓位，计算补仓后的成本价和风险变化
+          输入当前仓位信息以及计划补仓数据，快速评估补仓后的成本与风险
         </Typography>
 
         <Grid container spacing={3}>
           {/* 左侧：补仓参数输入 */}
           <Grid item xs={12} md={6}>
             <AddPositionForm
-              activePositions={activePositions}
-              selectedPositionId={selectedPositionId}
-              selectedPosition={selectedPosition}
+              positionInputs={positionInputs}
               addParams={addParams}
               errors={errors}
-              onPositionSelect={setSelectedPositionId}
+              onPositionChange={(field, value) => setPositionInputs(prev => ({ ...prev, [field]: value }))}
               onParamsChange={setAddParams}
               onCalculate={calculateAddPosition}
               onReset={resetForm}
@@ -124,7 +118,6 @@ export default function AddPositionCalculator() {
           <Grid item xs={12} md={6}>
             <AddPositionResults
               result={result}
-              onApply={applyAddPosition}
             />
           </Grid>
         </Grid>

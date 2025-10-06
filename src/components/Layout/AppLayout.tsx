@@ -15,7 +15,6 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  Container,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -33,7 +32,7 @@ import {
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
-import { useAppContext } from '../../contexts/AppContext';
+import { useAppContext } from '../../contexts/appContextHooks';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -62,12 +61,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { state, setTheme } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
-
-  // 根据当前路径获取当前页面ID
-  const getCurrentPageId = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname);
-    return currentItem?.id || 'dashboard';
-  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -214,17 +207,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
         component="main"
         sx={{
           flexGrow: 1,
-          width: '100%',
-          maxWidth: { md: `calc(100vw - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
+          width: { xs: '100%', md: `calc(100vw - ${drawerWidth}px)` },
           backgroundColor: theme.palette.background.default,
           overflowX: 'hidden',
         }}
       >
         <Toolbar />
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box
+          sx={{
+            py: { xs: 0.5, sm: 1 },
+            px: 0,
+            width: '100%',
+            maxWidth: '100%',
+          }}
+        >
           {children}
-        </Container>
+        </Box>
       </Box>
     </Box>
   );

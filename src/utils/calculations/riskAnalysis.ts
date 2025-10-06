@@ -2,7 +2,7 @@
  * 风险分析计算函数
  */
 
-import { Position, RiskLevel, RiskAnalysisResult, PositionSide } from '../../types';
+import { Position, RiskLevel, RiskAnalysisResult } from '../../types';
 import { 
   calculateTotalValue, 
   calculateMarginRatioOriginal, 

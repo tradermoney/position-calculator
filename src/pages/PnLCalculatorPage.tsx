@@ -4,8 +4,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Container,
-  Paper,
 } from '@mui/material';
 import { Calculate as CalculateIcon } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
@@ -15,9 +13,9 @@ export default function PnLCalculatorPage() {
   usePageTitle('pnl-calculator');
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%', px: 0 }}>
       {/* 页面标题 */}
-      <Box mb={3}>
+      <Box mb={3} px={1}>
         <Box display="flex" alignItems="center" mb={2}>
           <CalculateIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" component="h1" fontWeight="bold">
@@ -30,14 +28,12 @@ export default function PnLCalculatorPage() {
       </Box>
 
       {/* 主要内容 */}
-      <Paper elevation={1}>
-        <Box p={3}>
-          <PnLCalculator />
-        </Box>
-      </Paper>
+      <Box px={0}>
+        <PnLCalculator />
+      </Box>
 
       {/* 使用说明 */}
-      <Box mt={3}>
+      <Box mt={3} px={1}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -66,7 +62,7 @@ export default function PnLCalculatorPage() {
       </Box>
 
       {/* 计算公式说明 */}
-      <Box mt={3}>
+      <Box mt={3} px={1}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -93,6 +89,6 @@ export default function PnLCalculatorPage() {
           </CardContent>
         </Card>
       </Box>
-    </Container>
+    </Box>
   );
 }

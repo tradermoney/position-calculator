@@ -253,7 +253,7 @@ export function validateNumberRange(
  * @param fieldName 字段名
  * @returns 验证错误或null
  */
-export function validateRequired(value: any, fieldName: string): ValidationError | null {
+export function validateRequired(value: unknown, fieldName: string): ValidationError | null {
   if (value === undefined || value === null || value === '') {
     return { field: fieldName, message: `${fieldName}不能为空` };
   }

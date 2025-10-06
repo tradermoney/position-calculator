@@ -62,12 +62,11 @@ export function formatLargeNumber(value: number, decimals: number = 2): string {
 /**
  * 格式化价格显示
  * @param value 价格
- * @param decimals 小数位数
  * @returns 格式化后的价格字符串
  */
-export function formatPrice(value: number, decimals: number = 4): string {
+export function formatPrice(value: number): string {
   if (isNaN(value) || !isFinite(value)) return '0.0000';
-  
+
   // 根据价格大小自动调整小数位数
   if (value >= 1000) {
     return value.toFixed(2);

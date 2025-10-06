@@ -7,7 +7,7 @@
 export const PAGE_TITLES = {
   dashboard: '功能索引 - 合约计算器',
   'add-position': '补仓计算 - 合约计算器',
-  pyramid: '金字塔委托单计算器 - 合约计算器',
+  pyramid: '金子塔委托单计算器 - 合约计算器',
   'pnl-calculator': '盈亏计算器 - 合约计算器',
   'target-price-calculator': '目标价格计算器 - 合约计算器',
   'liquidation-calculator': '强平价格计算器 - 合约计算器',
@@ -49,7 +49,7 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
   const descriptions = {
     dashboard: '快速了解各个工具的功能定位，便捷跳转到目标页面',
     'add-position': '智能补仓计算器，帮您制定最优的补仓策略，降低平均成本',
-    pyramid: '金字塔委托单计算器，制定分层加仓计划，优化仓位管理',
+    pyramid: '金子塔委托单计算器，制定分层加仓计划，优化仓位管理',
     'pnl-calculator': '合约盈亏计算器，计算交易盈利/亏损、回报率和起始保证金',
     'target-price-calculator': '目标价格计算器，根据期望回报率计算目标价格',
     'liquidation-calculator': '强平价格计算器，计算仓位的强制平仓价格，管理交易风险',
@@ -94,7 +94,7 @@ function updateMetaTag(name: string, content: string, attribute: 'name' | 'prope
  */
 export function resetTitle(): void {
   document.title = DEFAULT_TITLE;
-  updateMetaTag('description', '专业的加密货币合约交易和计算工具，提供合约分析、补仓计算、金字塔委托单等功能');
+  updateMetaTag('description', '专业的加密货币合约交易和计算工具，提供合约分析、补仓计算、金子塔委托单等功能');
 }
 
 /**

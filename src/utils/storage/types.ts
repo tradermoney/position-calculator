@@ -44,7 +44,7 @@ export interface PositionCalculatorDB extends DBSchema {
   };
   settings: {
     key: string;
-    value: any;
+    value: unknown;
   };
   theme: {
     key: string;
