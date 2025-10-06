@@ -119,22 +119,55 @@ export const calculatePositionUsage = (positions: Position[], capital: number): 
   return (totalMargin / capital) * 100;
 };
 
-export const buildPositionStats = (positions: Position[], side: PositionSide, capital: number = 0): Map<number, PositionStat> => {
+// 计算爆仓价格（包含2%强平清算费用）
+export const calculateLiquidationPrice = (
+  entryPrice: number,
+  leverage: number,
+  side: PositionSide,
+  liquidationFeeRate: number = 0.02 // 2%强平清算费用
+): number => {
+  if (leverage <= 0 || entryPrice <= 0) return 0;
+
+  // 计算维持保证金率（1/杠杆 - 强平清算费用）
+  const maintenanceMarginRate = (1 / leverage) - liquidationFeeRate;
+  
+  if (maintenanceMarginRate <= 0) return 0;
+
+  if (side === PositionSide.LONG) {
+    // 做多爆仓价格 = 开仓价格 × (1 - 维持保证金率)
+    return entryPrice * (1 - maintenanceMarginRate);
+  } else {
+    // 做空爆仓价格 = 开仓价格 × (1 + 维持保证金率)
+    return entryPrice * (1 + maintenanceMarginRate);
+  }
+};
+
+export const buildPositionStats = (positions: Position[], side: PositionSide, capital: number = 0, leverage: number = 10): Map<number, PositionStat> => {
   let currentQuantity = 0;
   let totalCost = 0;
   let cumulativePnL = 0;
   let usedCapital = 0; // 累计已使用的保证金
   let totalOpenQuantity = 0; // 累计开仓数量，用于计算平仓时释放的保证金比例
   let totalOpenMargin = 0; // 累计开仓保证金
+  let lastPrice: number | null = null; // 上一个仓位的价格，用于计算波动率
   const stats = new Map<number, PositionStat>();
 
   const getAveragePrice = () => (currentQuantity > 0 ? totalCost / currentQuantity : null);
 
   positions.forEach((position) => {
     let isActive = false;
+    let priceVolatility: number | null = null;
 
     if (position.enabled && position.price > 0 && position.quantity > 0) {
       isActive = true;
+      
+      // 计算币价波动率（相对于上一个仓位的价格波动百分比）
+      if (lastPrice !== null && lastPrice > 0) {
+        priceVolatility = ((position.price - lastPrice) / lastPrice) * 100;
+      }
+      
+      // 更新上一个价格
+      lastPrice = position.price;
 
       if (position.type === PositionType.OPEN) {
         totalCost += position.price * position.quantity;
@@ -180,6 +213,12 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
     }
 
     const capitalUsageRate = capital > 0 ? usedCapital / capital : 0;
+    
+    // 计算爆仓价格（仅对开仓仓位计算）
+    let liquidationPrice: number | null = null;
+    if (isActive && position.type === PositionType.OPEN && position.price > 0) {
+      liquidationPrice = calculateLiquidationPrice(position.price, leverage, side);
+    }
 
     stats.set(position.id, {
       holdings: side === PositionSide.SHORT ? -currentQuantity : currentQuantity,
@@ -188,6 +227,8 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
       isActive,
       usedCapital, // 当前累计占用的保证金
       capitalUsageRate, // 使用率
+      priceVolatility, // 币价波动率
+      liquidationPrice, // 爆仓价格
     });
   });
 

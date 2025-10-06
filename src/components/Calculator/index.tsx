@@ -26,6 +26,7 @@ export default function Calculator() {
     exitEditMode,
     setCursorPosition,
     handleRestoreFromHistory,
+    handleDeleteRecord,
     handleClearHistory,
   } = useCalculator();
 
@@ -64,6 +65,7 @@ export default function Calculator() {
           <HistoryPanel
             history={history}
             handleRestoreFromHistory={handleRestoreFromHistory}
+            handleDeleteRecord={handleDeleteRecord}
             handleClearHistory={handleClearHistory}
             formatTime={formatTime}
           />

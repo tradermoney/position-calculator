@@ -4,6 +4,7 @@
 
 import { AppSettings } from './types';
 import { IndexedDBUtil } from './indexedDBUtil';
+import { waitForDatabaseInit } from './databaseInit';
 
 export class IndexedDBSettingsStorage {
   private static readonly SETTINGS_KEY = 'app-settings';
@@ -21,6 +22,7 @@ export class IndexedDBSettingsStorage {
    */
   static async saveSettings(settings: AppSettings): Promise<void> {
     try {
+      await waitForDatabaseInit();
       await IndexedDBUtil.save('settings', this.SETTINGS_KEY, settings);
     } catch (error) {
       console.error('保存设置到IndexedDB失败:', error);
@@ -34,6 +36,7 @@ export class IndexedDBSettingsStorage {
    */
   static async loadSettings(): Promise<AppSettings> {
     try {
+      await waitForDatabaseInit();
       const settings = await IndexedDBUtil.load<AppSettings>('settings', this.SETTINGS_KEY);
       return settings || this.defaultSettings;
     } catch (error) {

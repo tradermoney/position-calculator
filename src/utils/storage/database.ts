@@ -9,11 +9,29 @@ import { PositionCalculatorDB, DB_NAME, DB_VERSION } from './types';
 let dbInstance: IDBPDatabase<PositionCalculatorDB> | null = null;
 
 /**
+ * 检查IndexedDB是否可用
+ */
+export function isIndexedDBAvailable(): boolean {
+  try {
+    return typeof window !== 'undefined' && 'indexedDB' in window;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 初始化IndexedDB数据库
  */
 export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
   if (dbInstance) {
     return dbInstance;
+  }
+
+  // 检查IndexedDB是否可用
+  if (!isIndexedDBAvailable()) {
+    const error = new Error('IndexedDB is not available in this environment');
+    console.warn('IndexedDB不可用，将使用localStorage作为降级方案:', error);
+    throw error;
   }
 
   try {
@@ -64,12 +82,42 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
             });
           }
         }
+
+        // 创建PnL计算器状态表
+        if (!db.objectStoreNames.contains('pnlCalculator')) {
+          db.createObjectStore('pnlCalculator', {
+            keyPath: 'key'
+          });
+        }
+
+        // 创建保存的仓位表
+        if (!db.objectStoreNames.contains('savedPositions')) {
+          const savedPositionsStore = db.createObjectStore('savedPositions', {
+            keyPath: 'id'
+          });
+          savedPositionsStore.createIndex('by-created', 'createdAt');
+          savedPositionsStore.createIndex('by-updated', 'updatedAt');
+          savedPositionsStore.createIndex('by-name', 'name');
+        }
+
+        // 版本3新增：创建计算器记录表
+        if (oldVersion < 3) {
+          if (!db.objectStoreNames.contains('calculatorRecords')) {
+            const calculatorStore = db.createObjectStore('calculatorRecords', {
+              keyPath: 'id'
+            });
+            calculatorStore.createIndex('by-calculated', 'calculatedAt');
+          }
+        }
       },
     });
 
+    console.log('IndexedDB数据库初始化成功');
     return dbInstance;
   } catch (error) {
     console.error('初始化IndexedDB失败:', error);
+    // 重置实例，避免缓存失败的连接
+    dbInstance = null;
     throw error;
   }
 }

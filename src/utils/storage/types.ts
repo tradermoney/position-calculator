@@ -22,6 +22,27 @@ export interface VolatilityInputState {
   lastUpdated: Date;
 }
 
+// 计算器记录接口
+export interface CalculatorRecord {
+  id: string;
+  expression: string;
+  result: string;
+  calculatedAt: Date;
+}
+
+// 保存的仓位接口
+export interface SavedPosition {
+  id: string;
+  name: string;
+  side: 'long' | 'short';
+  capital: number;
+  leverage: number;
+  positions: any[];
+  inputValues: any;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // 应用设置接口
 export interface AppSettings {
   defaultLeverage: number;
@@ -61,8 +82,28 @@ export interface PositionCalculatorDB extends DBSchema {
     key: string;
     value: VolatilityInputState;
   };
+  pnlCalculator: {
+    key: string;
+    value: unknown;
+  };
+  savedPositions: {
+    key: string;
+    value: SavedPosition;
+    indexes: {
+      'by-created': Date;
+      'by-updated': Date;
+      'by-name': string;
+    };
+  };
+  calculatorRecords: {
+    key: string;
+    value: CalculatorRecord;
+    indexes: {
+      'by-calculated': Date;
+    };
+  };
 }
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;

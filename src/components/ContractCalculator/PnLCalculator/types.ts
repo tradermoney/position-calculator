@@ -41,6 +41,8 @@ export interface PositionStat {
   isActive: boolean;
   usedCapital: number; // 当前占用本金（累计已使用的保证金）
   capitalUsageRate: number; // 本金使用率 (0-1)
+  priceVolatility: number | null; // 币价波动率（相对于上一个仓位的价格波动百分比）
+  liquidationPrice: number | null; // 爆仓价格（仅对开仓仓位有效）
 }
 
 export interface InputValueMap {

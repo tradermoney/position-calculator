@@ -28,6 +28,17 @@ export function useCalculatorHistory() {
     }
   }, []);
 
+  // 删除单个历史记录
+  const handleDeleteRecord = useCallback(async (recordId: string) => {
+    try {
+      await CalculatorStorage.deleteRecord(recordId);
+      const updatedHistory = await CalculatorStorage.getRecords(20);
+      setHistory(updatedHistory);
+    } catch (error) {
+      console.error('删除历史记录失败:', error);
+    }
+  }, []);
+
   // 清空历史记录
   const handleClearHistory = useCallback(async () => {
     try {
@@ -41,6 +52,7 @@ export function useCalculatorHistory() {
   return {
     history,
     addHistoryRecord,
+    handleDeleteRecord,
     handleClearHistory,
   };
 }

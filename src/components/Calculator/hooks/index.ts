@@ -23,7 +23,7 @@ export function useCalculator() {
   } = useCalculatorState();
 
   // 历史记录管理
-  const { history, addHistoryRecord, handleClearHistory } = useCalculatorHistory();
+  const { history, addHistoryRecord, handleDeleteRecord, handleClearHistory } = useCalculatorHistory();
 
   // 编辑模式管理
   const { setCursorPositionInInput, enterEditMode, exitEditMode } = useCalculatorEditing({
@@ -91,6 +91,7 @@ export function useCalculator() {
     exitEditMode,
     setCursorPosition,
     handleRestoreFromHistory,
+    handleDeleteRecord,
     handleClearHistory,
   };
 }

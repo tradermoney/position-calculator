@@ -3,6 +3,7 @@
  */
 
 import { IndexedDBUtil } from './indexedDBUtil';
+import { waitForDatabaseInit } from './databaseInit';
 
 export class IndexedDBThemeStorage {
   private static readonly THEME_KEY = 'app-theme';
@@ -13,6 +14,7 @@ export class IndexedDBThemeStorage {
    */
   static async saveTheme(theme: 'light' | 'dark'): Promise<void> {
     try {
+      await waitForDatabaseInit();
       await IndexedDBUtil.save('theme', this.THEME_KEY, theme);
     } catch (error) {
       console.error('保存主题到IndexedDB失败:', error);
@@ -26,6 +28,7 @@ export class IndexedDBThemeStorage {
    */
   static async loadTheme(): Promise<'light' | 'dark'> {
     try {
+      await waitForDatabaseInit();
       const theme = await IndexedDBUtil.load<'light' | 'dark'>('theme', this.THEME_KEY);
       return theme || 'light';
     } catch (error) {

@@ -3,7 +3,6 @@
  */
 
 import { IndexedDBUtil } from './indexedDBUtil';
-import { IndexedDBPositionStorage } from './positionStorage';
 import { IndexedDBThemeStorage } from './themeStorage';
 import { IndexedDBSettingsStorage } from './settingsStorage';
 
@@ -30,17 +29,16 @@ export class DataMigration {
     try {
       console.log('开始数据迁移：从localStorage到IndexedDB...');
 
-      // 迁移仓位数据
+      // 迁移仓位数据 - 暂时跳过，因为仓位存储已重构
       const positionsData = localStorage.getItem('position-calculator-positions');
       if (positionsData) {
         try {
           const positions = JSON.parse(positionsData);
           if (Array.isArray(positions) && positions.length > 0) {
-            await IndexedDBPositionStorage.savePositions(positions);
-            console.log(`已迁移 ${positions.length} 个仓位`);
+            console.log(`发现 ${positions.length} 个旧仓位数据，但仓位存储已重构，跳过迁移`);
           }
         } catch (error) {
-          console.error('迁移仓位数据失败:', error);
+          console.error('检查仓位数据失败:', error);
         }
       }
 

@@ -1,7 +1,6 @@
 import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import { Position } from '../types/basic';
 import {
-  IndexedDBPositionStorage,
   IndexedDBThemeStorage,
   DataMigration
 } from '../utils/indexedDBStorage';
@@ -127,7 +126,8 @@ export default function AppProvider({ children }: AppProviderProps) {
   const addPosition = async (position: Position) => {
     try {
       dispatch({ type: 'ADD_POSITION', payload: position });
-      await IndexedDBPositionStorage.addPosition(position);
+      // 注意：具体的存储逻辑已移至专门的存储服务中
+      console.log('仓位已添加到状态，具体存储由专门的存储服务处理');
     } catch (error) {
       console.error('添加仓位失败:', error);
       // 回滚状态
@@ -140,7 +140,8 @@ export default function AppProvider({ children }: AppProviderProps) {
     const originalPosition = state.positions.find(p => p.id === position.id);
     try {
       dispatch({ type: 'UPDATE_POSITION', payload: position });
-      await IndexedDBPositionStorage.updatePosition(position);
+      // 注意：具体的存储逻辑已移至专门的存储服务中
+      console.log('仓位已更新到状态，具体存储由专门的存储服务处理');
     } catch (error) {
       console.error('更新仓位失败:', error);
       // 回滚状态
@@ -155,7 +156,8 @@ export default function AppProvider({ children }: AppProviderProps) {
     const originalPosition = state.positions.find(p => p.id === positionId);
     try {
       dispatch({ type: 'DELETE_POSITION', payload: positionId });
-      await IndexedDBPositionStorage.deletePosition(positionId);
+      // 注意：具体的存储逻辑已移至专门的存储服务中
+      console.log('仓位已从状态删除，具体存储由专门的存储服务处理');
     } catch (error) {
       console.error('删除仓位失败:', error);
       // 回滚状态
@@ -193,12 +195,12 @@ export default function AppProvider({ children }: AppProviderProps) {
       }
 
       // 加载数据
-      const [positions, theme] = await Promise.all([
-        IndexedDBPositionStorage.loadPositions(),
+      const [theme] = await Promise.all([
         IndexedDBThemeStorage.loadTheme()
       ]);
 
-      dispatch({ type: 'SET_POSITIONS', payload: positions });
+      // 注意：仓位数据现在由专门的存储服务管理，这里只加载主题
+      dispatch({ type: 'SET_POSITIONS', payload: [] });
       dispatch({ type: 'SET_THEME', payload: theme });
     } catch (error) {
       console.error('加载数据失败:', error);

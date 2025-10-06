@@ -12,10 +12,10 @@ export { initDB, getDB, closeDB } from './database';
 export { IndexedDBUtil } from './indexedDBUtil';
 
 // 专用存储类
-export { IndexedDBPositionStorage } from './positionStorage';
 export { IndexedDBThemeStorage } from './themeStorage';
 export { IndexedDBSettingsStorage } from './settingsStorage';
 export { IndexedDBVolatilityStorage } from './volatilityStorage';
+export { SavedPositionStorage } from './savedPositionStorage';
 
 // 数据迁移
 export { DataMigration } from './dataMigration';

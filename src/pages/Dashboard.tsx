@@ -119,7 +119,7 @@ export default function Dashboard() {
   usePageTitle('dashboard');
 
   return (
-    <Box sx={{ px: { xs: 0, sm: 3 } }}>
+    <Box sx={{ px: { xs: 0, sm: 3, md: 6, lg: 8, xl: 10 } }}>
       <Stack spacing={1} mb={{ xs: 1, sm: 2, md: 4 }}>
         <Typography variant="h4" component="h1">
           功能索引

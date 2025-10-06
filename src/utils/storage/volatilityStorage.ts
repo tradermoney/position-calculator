@@ -3,8 +3,8 @@
  */
 
 import { VolatilityRecord, VolatilityInputState } from './types';
-import { initDB } from './database';
 import { IndexedDBUtil } from './indexedDBUtil';
+import { waitForDatabaseInit } from './databaseInit';
 
 export class IndexedDBVolatilityStorage {
   private static readonly INPUT_STATE_KEY = 'volatility-input-state';
@@ -15,12 +15,8 @@ export class IndexedDBVolatilityStorage {
    */
   static async saveRecord(record: VolatilityRecord): Promise<void> {
     try {
-      const db = await initDB();
-      const tx = db.transaction('volatilityRecords', 'readwrite');
-      const store = tx.objectStore('volatilityRecords');
-
-      await store.put(record);
-      await tx.done;
+      await waitForDatabaseInit();
+      await IndexedDBUtil.save('volatilityRecords', record.id, record);
     } catch (error) {
       console.error('保存波动率记录到IndexedDB失败:', error);
       throw error;
@@ -34,16 +30,15 @@ export class IndexedDBVolatilityStorage {
    */
   static async getRecords(limit: number = 10): Promise<VolatilityRecord[]> {
     try {
-      const db = await initDB();
-      const tx = db.transaction('volatilityRecords', 'readonly');
-      const store = tx.objectStore('volatilityRecords');
-      const index = store.index('by-calculated');
+      await waitForDatabaseInit();
+      const records = await IndexedDBUtil.getAll<VolatilityRecord>('volatilityRecords');
+      
+      // 按时间倒序排列并限制数量
+      const sortedRecords = records
+        .sort((a, b) => new Date(b.calculatedAt).getTime() - new Date(a.calculatedAt).getTime())
+        .slice(0, limit);
 
-      // 获取所有记录并按时间倒序排列
-      const records = await index.getAll();
-      records.sort((a, b) => new Date(b.calculatedAt).getTime() - new Date(a.calculatedAt).getTime());
-
-      return records.slice(0, limit);
+      return sortedRecords;
     } catch (error) {
       console.error('从IndexedDB加载波动率记录失败:', error);
       return [];
@@ -56,12 +51,8 @@ export class IndexedDBVolatilityStorage {
    */
   static async deleteRecord(recordId: string): Promise<void> {
     try {
-      const db = await initDB();
-      const tx = db.transaction('volatilityRecords', 'readwrite');
-      const store = tx.objectStore('volatilityRecords');
-
-      await store.delete(recordId);
-      await tx.done;
+      await waitForDatabaseInit();
+      await IndexedDBUtil.delete('volatilityRecords', recordId);
     } catch (error) {
       console.error('删除波动率记录失败:', error);
       throw error;
@@ -73,12 +64,8 @@ export class IndexedDBVolatilityStorage {
    */
   static async clearAllRecords(): Promise<void> {
     try {
-      const db = await initDB();
-      const tx = db.transaction('volatilityRecords', 'readwrite');
-      const store = tx.objectStore('volatilityRecords');
-
-      await store.clear();
-      await tx.done;
+      await waitForDatabaseInit();
+      await IndexedDBUtil.clear('volatilityRecords');
     } catch (error) {
       console.error('清空波动率记录失败:', error);
       throw error;
@@ -91,6 +78,7 @@ export class IndexedDBVolatilityStorage {
    */
   static async saveInputState(inputState: VolatilityInputState): Promise<void> {
     try {
+      await waitForDatabaseInit();
       await IndexedDBUtil.save('volatilityInputs', this.INPUT_STATE_KEY, inputState);
     } catch (error) {
       console.error('保存波动率输入状态到IndexedDB失败:', error);
@@ -110,6 +98,7 @@ export class IndexedDBVolatilityStorage {
         lastUpdated: new Date()
       };
 
+      await waitForDatabaseInit();
       const state = await IndexedDBUtil.load<VolatilityInputState>('volatilityInputs', this.INPUT_STATE_KEY);
       return state || defaultState;
     } catch (error) {

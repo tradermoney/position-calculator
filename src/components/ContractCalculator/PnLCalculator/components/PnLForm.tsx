@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -20,6 +20,8 @@ import {
 import type { DndContextProps, DragEndEvent } from '@dnd-kit/core';
 import { PositionSide, formatPercentage } from '../../../../utils/contractCalculations';
 import PositionTable from './PositionTable';
+import ImportExportDialog from './ImportExportDialog';
+import TooltipIcon from '../../../common/TooltipIcon';
 import { Position, PositionStat } from '../types';
 
 interface PnLFormProps {
@@ -46,6 +48,13 @@ interface PnLFormProps {
   handleCalculate: () => void;
   handleReset: () => void;
   errors: string[];
+  onImportPositions: (positions: Position[]) => void;
+  onImportConfig: (config: {
+    side: PositionSide;
+    capital: number;
+    leverage: number;
+    positions: Position[];
+  }) => void;
 }
 
 export default function PnLForm({
@@ -72,18 +81,44 @@ export default function PnLForm({
   handleCalculate,
   handleReset,
   errors,
+  onImportPositions,
+  onImportConfig,
 }: PnLFormProps) {
+  const [importExportOpen, setImportExportOpen] = useState(false);
+
+  const handleImportExport = () => {
+    setImportExportOpen(true);
+  };
+
+  const handleImport = (importedPositions: Position[]) => {
+    onImportPositions(importedPositions);
+    setImportExportOpen(false);
+  };
+
+  const handleImportConfig = (config: {
+    side: PositionSide;
+    capital: number;
+    leverage: number;
+    positions: Position[];
+  }) => {
+    onImportConfig(config);
+    setImportExportOpen(false);
+  };
   return (
-    <Card>
-        <CardContent sx={{ p: { xs: 1, sm: 2 }, '&:last-child': { pb: { xs: 1, sm: 2 } } }}>
+    <>
+      <Card>
+        <CardContent sx={{ p: { xs: 1, sm: 1.5 }, '&:last-child': { pb: { xs: 1, sm: 1.5 } } }}>
           <Typography variant="h6" gutterBottom>
             仓位信息
           </Typography>
 
           <Box mb={3}>
-            <Typography variant="subtitle2" gutterBottom>
-              仓位方向
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2">
+                仓位方向
+              </Typography>
+              <TooltipIcon title="选择交易方向：做多表示看涨，做空表示看跌" />
+            </Box>
             <Box display="flex" gap={1}>
               <Button
                 variant={side === PositionSide.LONG ? 'contained' : 'outlined'}
@@ -107,9 +142,12 @@ export default function PnLForm({
           </Box>
 
           <Box mb={3}>
-            <Typography variant="subtitle2" gutterBottom>
-              总资金（可选）
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2">
+                总资金（可选）
+              </Typography>
+              <TooltipIcon title="输入您的总资金，用于计算仓位使用率。不填写则不会显示使用率信息" />
+            </Box>
             <TextField
               fullWidth
               type="text"
@@ -130,9 +168,12 @@ export default function PnLForm({
           </Box>
 
           <Box mb={3}>
-            <Typography variant="subtitle2" gutterBottom>
-              杠杆倍数
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2">
+                杠杆倍数
+              </Typography>
+              <TooltipIcon title="杠杆倍数决定资金放大比例。例如10倍杠杆意味着用1元可以控制10元的仓位" />
+            </Box>
             <Box display="flex" gap={2} alignItems="center">
               <TextField
                 type="text"
@@ -195,6 +236,7 @@ export default function PnLForm({
             registerInputRef={registerInputRef}
             handleInputFocus={handleInputFocus}
             handleInputBlur={handleInputBlur}
+            onImportExport={handleImportExport}
           />
 
           <Box mt={3} display="flex" gap={2}>
@@ -217,5 +259,17 @@ export default function PnLForm({
           )}
         </CardContent>
       </Card>
+
+      <ImportExportDialog
+        open={importExportOpen}
+        onClose={() => setImportExportOpen(false)}
+        side={side}
+        capital={capital}
+        leverage={leverage}
+        positions={positions}
+        onImportPositions={handleImport}
+        onImportConfig={handleImportConfig}
+      />
+    </>
   );
 }

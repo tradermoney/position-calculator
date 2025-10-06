@@ -10,13 +10,16 @@ import type { DndContextProps } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { PositionSide } from '../../../utils/contractCalculations';
 import { InputValueMap, PnLResult, Position, PositionType } from './types';
-import { createEmptyPosition, generateId } from './helpers';
+import { RestorePositionParams } from '../../../types/position';
+import { createEmptyPosition, generateId, parseValueWithUnit } from './helpers';
 import { buildPositionStats, calculatePnL, calculatePositionUsage, validatePositions } from './calculations';
-import { saveState, loadState, StoredState } from './storage';
+import { PnLCalculatorStorageService, StoredState } from '../../../services/pnlCalculatorStorage';
 import { useFocusManager } from './focusManager';
 import { createCapitalChangeHandler, createGetInputValue, createInputChangeHandler } from './inputHandlers';
+import { useStorageReady } from '../../../contexts/StorageContext';
 
 export function usePnLCalculator() {
+  const { isStorageReady } = useStorageReady();
   const [isLoaded, setIsLoaded] = useState(false);
   const [side, setSide] = useState<PositionSide>(PositionSide.LONG);
   const [capital, setCapital] = useState<number>(0);
@@ -37,9 +40,13 @@ export function usePnLCalculator() {
     maintainFocus,
   } = useFocusManager();
 
-  // 从 IndexedDB 加载初始状态
+  // 从 IndexedDB 加载初始状态（等待存储就绪）
   useEffect(() => {
-    loadState().then(state => {
+    if (!isStorageReady) {
+      return;
+    }
+
+    PnLCalculatorStorageService.loadState().then(state => {
       if (state) {
         setSide(state.side);
         setCapital(state.capital);
@@ -54,12 +61,15 @@ export function usePnLCalculator() {
         setInputValues(state.inputValues);
       }
       setIsLoaded(true);
+    }).catch(error => {
+      console.error('Failed to load PnL calculator state:', error);
+      setIsLoaded(true);
     });
-  }, []);
+  }, [isStorageReady]);
 
   // 保存状态到 IndexedDB（防抖）
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !isStorageReady) return;
 
     const timer = setTimeout(() => {
       const state: StoredState = {
@@ -69,11 +79,13 @@ export function usePnLCalculator() {
         positions,
         inputValues,
       };
-      saveState(state);
+      PnLCalculatorStorageService.saveState(state).catch(error => {
+        console.error('Failed to save PnL calculator state:', error);
+      });
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [side, capital, leverage, positions, inputValues, isLoaded]);
+  }, [side, capital, leverage, positions, inputValues, isLoaded, isStorageReady]);
 
   // 拖拽传感器
   const sensors = useSensors(
@@ -223,7 +235,75 @@ export function usePnLCalculator() {
 
   const positionUsage = useCallback(() => calculatePositionUsage(positions, capital), [positions, capital]);
 
-  const positionStats = useMemo(() => buildPositionStats(positions, side, capital), [positions, side, capital]);
+  const positionStats = useMemo(() => buildPositionStats(positions, side, capital, leverage), [positions, side, capital, leverage]);
+
+  // 恢复仓位
+  const restorePosition = useCallback((params: RestorePositionParams) => {
+    setSide(params.side);
+    setCapital(params.capital);
+    setLeverage(params.leverage);
+    setPositions(params.positions);
+    setInputValues(params.inputValues);
+    setResult(null);
+    setErrors([]);
+  }, []);
+
+  // 导入仓位数据
+  const importPositions = useCallback((importedPositions: Position[]) => {
+    // 为导入的仓位生成新的ID，避免冲突
+    const newPositions = importedPositions.map((pos, index) => ({
+      ...pos,
+      id: generateId() + index,
+      // 解析可能包含单位的数值字段
+      price: typeof pos.price === 'string' ? parseValueWithUnit(pos.price) : pos.price,
+      quantity: typeof pos.quantity === 'string' ? parseValueWithUnit(pos.quantity) : pos.quantity,
+      quantityUsdt: typeof pos.quantityUsdt === 'string' ? parseValueWithUnit(pos.quantityUsdt) : pos.quantityUsdt,
+      marginUsdt: typeof pos.marginUsdt === 'string' ? parseValueWithUnit(pos.marginUsdt) : pos.marginUsdt,
+    }));
+    
+    setPositions(newPositions);
+    setResult(null);
+    setErrors([]);
+  }, []);
+
+  // 导入完整仓位配置
+  const importPositionConfig = useCallback((config: {
+    side: PositionSide;
+    capital: number;
+    leverage: number;
+    positions: Position[];
+  }) => {
+    setSide(config.side);
+    setCapital(config.capital);
+    setLeverage(config.leverage);
+    
+    // 为导入的仓位生成新的ID，避免冲突
+    const newPositions = config.positions.map((pos, index) => ({
+      ...pos,
+      id: generateId() + index,
+      // 解析可能包含单位的数值字段
+      price: typeof pos.price === 'string' ? parseValueWithUnit(pos.price) : pos.price,
+      quantity: typeof pos.quantity === 'string' ? parseValueWithUnit(pos.quantity) : pos.quantity,
+      quantityUsdt: typeof pos.quantityUsdt === 'string' ? parseValueWithUnit(pos.quantityUsdt) : pos.quantityUsdt,
+      marginUsdt: typeof pos.marginUsdt === 'string' ? parseValueWithUnit(pos.marginUsdt) : pos.marginUsdt,
+    }));
+    
+    setPositions(newPositions);
+    setResult(null);
+    setErrors([]);
+  }, []);
+
+  // 导出完整仓位配置
+  const exportPositionConfig = useCallback(() => {
+    return {
+      side,
+      capital,
+      leverage,
+      positions,
+      exportedAt: new Date().toISOString(),
+      version: '1.0.0'
+    };
+  }, [side, capital, leverage, positions]);
 
   return {
     side,
@@ -250,6 +330,11 @@ export function usePnLCalculator() {
     errors,
     handleCalculate,
     handleReset,
+    inputValues,
+    restorePosition,
+    importPositions,
+    importPositionConfig,
+    exportPositionConfig,
   };
 }
 

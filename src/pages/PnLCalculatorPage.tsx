@@ -13,7 +13,7 @@ export default function PnLCalculatorPage() {
   usePageTitle('pnl-calculator');
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '100%', px: { xs: 0, sm: 3 } }}>
+    <Box sx={{ width: '100%', maxWidth: '100%', px: { xs: 0, sm: 1, md: 2, lg: 3, xl: 4 } }}>
       {/* 页面标题 */}
       <Box mb={3} sx={{ px: { xs: 1, sm: 0 } }}>
         <Box display="flex" alignItems="center" mb={2}>

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Paper, Box, Typography, IconButton, Tooltip, Divider } from '@mui/material';
-import { History as HistoryIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { History as HistoryIcon, Delete as DeleteIcon, DeleteOutline as DeleteOutlineIcon } from '@mui/icons-material';
 import { CalculatorRecord } from '../../../utils/calculatorStorage';
 import { HistorySection } from '../../../styles/calculator';
 
 interface HistoryPanelProps {
   history: CalculatorRecord[];
   handleRestoreFromHistory: (record: CalculatorRecord) => void;
+  handleDeleteRecord: (recordId: string) => void;
   handleClearHistory: () => void;
   formatTime: (date: Date) => string;
 }
@@ -14,6 +15,7 @@ interface HistoryPanelProps {
 export function HistoryPanel({
   history,
   handleRestoreFromHistory,
+  handleDeleteRecord,
   handleClearHistory,
   formatTime,
 }: HistoryPanelProps) {
@@ -53,25 +55,61 @@ export function HistoryPanel({
                 borderColor: 'divider',
                 borderRadius: 1,
                 cursor: 'pointer',
+                position: 'relative',
                 '&:hover': {
                   backgroundColor: 'action.hover',
+                  '& .delete-button': {
+                    opacity: 1,
+                  },
                 },
               }}
               onClick={() => handleRestoreFromHistory(record)}
             >
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 0.5 }}>
-                {record.expression}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="primary"
-                sx={{ fontFamily: 'monospace', fontWeight: 'bold', mb: 0.5 }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  mb: 1,
+                }}
               >
-                = {record.result}
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                {formatTime(record.calculatedAt)}
-              </Typography>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 0.5 }}>
+                    {record.expression}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="primary"
+                    sx={{ fontFamily: 'monospace', fontWeight: 'bold', mb: 0.5 }}
+                  >
+                    = {record.result}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {formatTime(record.calculatedAt)}
+                  </Typography>
+                </Box>
+                <Tooltip title="删除此记录">
+                  <IconButton
+                    className="delete-button"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteRecord(record.id);
+                    }}
+                    sx={{
+                      opacity: 0,
+                      transition: 'opacity 0.2s',
+                      color: 'error.main',
+                      '&:hover': {
+                        backgroundColor: 'error.light',
+                        color: 'error.contrastText',
+                      },
+                    }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
           ))
         )}

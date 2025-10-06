@@ -169,3 +169,30 @@ comprehensive-test-suite.js
 *-focused-test.js
 *-comprehensive-test.js
 test-report.*
+quick-test.*
+manual-test-*.js
+
+# Screenshots and test images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+
+# Test results and reports
+test-results/
+playwright-report/
+logs/playwright/
+
+# Generated documentation
+TEST-SUMMARY.md
+README-testing.md
+manual-testing-guide.md
+test-plan-*.md
+mathematical-verification.md
+PRICE_RANGE_EXAMPLE.md
+价格波动范围功能.md
+
+# Temporary and generated files
+*.cjs
+*.mjs

@@ -4,12 +4,13 @@ import {
   TableCell,
   IconButton,
   Checkbox,
-  FormControl,
   Select,
   MenuItem,
   TextField,
   Box,
   Typography,
+  Chip,
+  FormControl,
 } from '@mui/material';
 import { DragIndicator as DragIcon, Delete as DeleteIcon, KeyboardArrowDown as ArrowDownIcon, KeyboardArrowUp as ArrowUpIcon } from '@mui/icons-material';
 import { useSortable } from '@dnd-kit/sortable';
@@ -54,36 +55,56 @@ export default function PositionRow({
     opacity: isDragging ? 0.5 : 1,
   } as const;
 
+  // 根据波动率确定颜色
+  const getVolatilityColor = (volatility: number | null) => {
+    if (volatility === null) return 'text.secondary';
+    const absVolatility = Math.abs(volatility);
+    if (absVolatility <= 5) return 'success.main';
+    if (absVolatility <= 10) return 'warning.main';
+    return 'error.main';
+  };
+
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes}>
-      <TableCell sx={{ padding: '4px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', textAlign: 'center', whiteSpace: 'nowrap', width: '50px' }}>
         <IconButton size="small" {...listeners}>
           <DragIcon fontSize="small" />
         </IconButton>
       </TableCell>
-      <TableCell sx={{ padding: '4px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', textAlign: 'center', whiteSpace: 'nowrap', width: '50px' }}>
         <Checkbox
           size="small"
           checked={position.enabled}
           onChange={(e) => updatePosition(position.id, 'enabled', e.target.checked)}
         />
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', textAlign: 'center', whiteSpace: 'nowrap', width: '40px' }}>
         {index + 1}
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
-        <FormControl size="small" sx={{ minWidth: '80px' }}>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '70px' }}>
+        <FormControl size="small" fullWidth>
           <Select
             value={position.type}
             onChange={(e) => updatePosition(position.id, 'type', e.target.value)}
-            sx={{ fontSize: '0.875rem' }}
+            displayEmpty
+            sx={{
+              fontSize: '0.75rem',
+              '& .MuiSelect-select': {
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+              },
+            }}
           >
-            <MenuItem value={PositionType.OPEN}>开仓</MenuItem>
-            <MenuItem value={PositionType.CLOSE}>平仓</MenuItem>
+            <MenuItem value={PositionType.OPEN} sx={{ fontSize: '0.75rem' }}>
+              开仓
+            </MenuItem>
+            <MenuItem value={PositionType.CLOSE} sx={{ fontSize: '0.75rem' }}>
+              平仓
+            </MenuItem>
           </Select>
         </FormControl>
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '96px' }}>
         <TextField
           size="small"
           type="text"
@@ -94,10 +115,10 @@ export default function PositionRow({
           inputRef={registerInputRef(`${position.id}-price`)}
           onFocus={() => handleInputFocus(`${position.id}-price`)}
           onBlur={() => handleInputBlur(`${position.id}-price`)}
-          sx={{ minWidth: '90px' }}
+          sx={{ minWidth: '86px' }}
         />
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '96px' }}>
         <TextField
           size="small"
           type="text"
@@ -108,10 +129,10 @@ export default function PositionRow({
           inputRef={registerInputRef(`${position.id}-quantity`)}
           onFocus={() => handleInputFocus(`${position.id}-quantity`)}
           onBlur={() => handleInputBlur(`${position.id}-quantity`)}
-          sx={{ minWidth: '90px' }}
+          sx={{ minWidth: '86px' }}
         />
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '96px' }}>
         <TextField
           size="small"
           type="text"
@@ -122,10 +143,10 @@ export default function PositionRow({
           inputRef={registerInputRef(`${position.id}-marginUsdt`)}
           onFocus={() => handleInputFocus(`${position.id}-marginUsdt`)}
           onBlur={() => handleInputBlur(`${position.id}-marginUsdt`)}
-          sx={{ minWidth: '90px' }}
+          sx={{ minWidth: '86px' }}
         />
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '112px' }}>
         <TextField
           size="small"
           type="text"
@@ -136,10 +157,26 @@ export default function PositionRow({
           inputRef={registerInputRef(`${position.id}-quantityUsdt`)}
           onFocus={() => handleInputFocus(`${position.id}-quantityUsdt`)}
           onBlur={() => handleInputBlur(`${position.id}-quantityUsdt`)}
-          sx={{ minWidth: '90px' }}
+          sx={{ minWidth: '102px' }}
         />
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
+        {stats && stats.isActive && stats.priceVolatility !== null ? (
+          <Typography
+            variant="body2"
+            fontSize="0.875rem"
+            sx={{
+              color: getVolatilityColor(stats.priceVolatility),
+              fontWeight: Math.abs(stats.priceVolatility) > 10 ? 600 : Math.abs(stats.priceVolatility) > 5 ? 500 : 400
+            }}
+          >
+            {stats.priceVolatility > 0 ? '+' : ''}{formatNumber(stats.priceVolatility, 2)}%
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
+        )}
+      </TableCell>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '160px' }}>
         {stats && stats.isActive ? (
           <Box display="flex" flexDirection="column">
             <Typography variant="body2" fontSize="0.875rem">{formatNumber(Math.abs(stats.holdings), 4)} 币</Typography>
@@ -151,7 +188,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
         {stats && stats.isActive ? (
           <Typography variant="body2" fontSize="0.875rem">
             {formatNumber(stats.usedCapital, 2)} USDT
@@ -160,7 +197,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '80px' }}>
         {stats && stats.isActive ? (
           <Typography
             variant="body2"
@@ -179,7 +216,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
         {stats && stats.isActive ? (
           <Typography
             variant="body2"
@@ -198,7 +235,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
         {stats && stats.isActive ? (
           <Typography variant="body2" fontSize="0.875rem" color={stats.cumulativePnL >= 0 ? 'success.main' : 'error.main'}>
             {stats.cumulativePnL >= 0 ? '+' : ''}{formatNumber(stats.cumulativePnL, 2)} USDT
@@ -207,7 +244,23 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
+        {stats && stats.isActive && stats.liquidationPrice !== null ? (
+          <Typography
+            variant="body2"
+            fontSize="0.875rem"
+            sx={{
+              color: getVolatilityColor(stats.priceVolatility),
+              fontWeight: Math.abs(stats.priceVolatility || 0) > 10 ? 600 : Math.abs(stats.priceVolatility || 0) > 5 ? 500 : 400
+            }}
+          >
+            {formatNumber(stats.liquidationPrice, 2)} USDT
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
+        )}
+      </TableCell>
+      <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '100px' }}>
         <Box display="flex" gap={0.5}>
           <IconButton size="small" onClick={() => insertPosition(index, 'above')} title="在上方插入">
             <ArrowUpIcon />
