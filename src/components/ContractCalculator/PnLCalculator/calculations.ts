@@ -1,6 +1,9 @@
 import { PositionSide } from '../../../utils/contractCalculations';
 import { PnLResult, Position, PositionStat, PositionType } from './types';
 
+// 浮点数比较的容差值（epsilon），用于处理浮点数精度问题
+const EPSILON = 1e-8;
+
 const getValidPositions = (positions: Position[]) =>
   positions.filter((position) => position.enabled && position.price > 0 && position.quantity > 0);
 
@@ -46,7 +49,8 @@ export const validatePositions = (positions: Position[], capital?: number): stri
         }
       } else {
         // 平仓：减少持仓，释放资金（不检查资金，因为平仓是释放资金）
-        if (position.quantity > currentHoldings) {
+        // 使用 EPSILON 容差处理浮点数精度问题
+        if (position.quantity > currentHoldings + EPSILON) {
           const deficit = position.quantity - currentHoldings;
           errors.push(
             `第${positionIndex}个仓位(平仓)：平仓数量 ${position.quantity.toFixed(4)} 超过当前持仓 ${currentHoldings.toFixed(4)}，超出 ${deficit.toFixed(4)}`
@@ -140,6 +144,21 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
             usedCapital -= releasedMargin;
             totalOpenQuantity -= executableQuantity;
             totalOpenMargin -= releasedMargin;
+            
+            // 处理浮点数精度：如果剩余量非常小，清零
+            if (Math.abs(currentQuantity) < EPSILON) {
+              currentQuantity = 0;
+              totalCost = 0;
+            }
+            if (Math.abs(totalOpenQuantity) < EPSILON) {
+              totalOpenQuantity = 0;
+            }
+            if (Math.abs(totalOpenMargin) < EPSILON) {
+              totalOpenMargin = 0;
+            }
+            if (Math.abs(usedCapital) < EPSILON) {
+              usedCapital = 0;
+            }
           }
         }
       }
