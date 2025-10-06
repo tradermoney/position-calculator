@@ -105,6 +105,8 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
   let totalCost = 0;
   let cumulativePnL = 0;
   let usedCapital = 0; // 累计已使用的保证金
+  let totalOpenQuantity = 0; // 累计开仓数量，用于计算平仓时释放的保证金比例
+  let totalOpenMargin = 0; // 累计开仓保证金
   const stats = new Map<number, PositionStat>();
 
   const getAveragePrice = () => (currentQuantity > 0 ? totalCost / currentQuantity : null);
@@ -119,6 +121,8 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
         totalCost += position.price * position.quantity;
         currentQuantity += position.quantity;
         usedCapital += position.marginUsdt; // 累加保证金
+        totalOpenQuantity += position.quantity; // 累计开仓数量
+        totalOpenMargin += position.marginUsdt; // 累计开仓保证金
       } else {
         const averagePrice = getAveragePrice() ?? position.price;
         const executableQuantity = Math.min(position.quantity, currentQuantity);
@@ -128,7 +132,15 @@ export const buildPositionStats = (positions: Position[], side: PositionSide, ca
           cumulativePnL += pnlDelta;
           totalCost -= averagePrice * executableQuantity;
           currentQuantity -= executableQuantity;
-          // 平仓不释放保证金，因为保证金在开仓时已经占用
+          
+          // 平仓时释放相应比例的保证金
+          // 释放的保证金 = 总保证金 × (平仓数量 / 总开仓数量)
+          if (totalOpenQuantity > 0) {
+            const releasedMargin = totalOpenMargin * (executableQuantity / totalOpenQuantity);
+            usedCapital -= releasedMargin;
+            totalOpenQuantity -= executableQuantity;
+            totalOpenMargin -= releasedMargin;
+          }
         }
       }
     }
