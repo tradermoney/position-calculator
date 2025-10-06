@@ -2,8 +2,8 @@ import { PositionSide } from '../../../utils/contractCalculations';
 import { PnLResult, Position, PositionStat, PositionType } from './types';
 
 // 浮点数比较的容差值（epsilon），用于处理浮点数精度问题
-// 版本：2025-10-06 修复浮点数精度边界问题
-const EPSILON = 1e-8;
+// 版本：2025-10-06-v4 修复浮点数精度边界问题，进一步调整容差值
+const EPSILON = 1e-4;
 
 const getValidPositions = (positions: Position[]) =>
   positions.filter((position) => position.enabled && position.price > 0 && position.quantity > 0);
