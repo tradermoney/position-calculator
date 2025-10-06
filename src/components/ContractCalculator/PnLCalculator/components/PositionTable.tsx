@@ -64,7 +64,7 @@ export default function PositionTable({
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto', overflowX: 'auto', width: '100%' }}>
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
         <DndContext sensors={sensors} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
           <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%', minWidth: '1600px' }}>
             <TableHead>
