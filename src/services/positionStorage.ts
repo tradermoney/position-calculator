@@ -204,7 +204,8 @@ class PositionStorageService {
   // localStorage降级方案
   private saveToLocalStorage(position: SavedPosition): string {
     try {
-      const existing = this.getFromLocalStorage();
+      const data = localStorage.getItem(LOCALSTORAGE_KEY);
+      const existing: SavedPosition[] = data ? JSON.parse(data) : [];
       existing.unshift(position);
       localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(existing));
       console.log('仓位已保存到localStorage');
@@ -215,19 +216,28 @@ class PositionStorageService {
     }
   }
 
-  private getFromLocalStorage(): SavedPosition[] {
+  private getFromLocalStorage(): PositionListItem[] {
     try {
       const data = localStorage.getItem(LOCALSTORAGE_KEY);
       if (!data) return [];
       
       const positions: SavedPosition[] = JSON.parse(data);
       
-      // 转换日期字符串为Date对象
-      return positions.map(pos => ({
-        ...pos,
+      // 转换日期字符串为Date对象并转换为PositionListItem
+      const listItems: PositionListItem[] = positions.map(pos => ({
+        id: pos.id,
+        name: pos.name,
+        side: pos.side,
+        capital: pos.capital,
+        leverage: pos.leverage,
+        positionCount: pos.positions.length,
         createdAt: new Date(pos.createdAt),
         updatedAt: new Date(pos.updatedAt)
       }));
+      
+      // 按更新时间倒序排列
+      listItems.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      return listItems;
     } catch (error) {
       console.error('从localStorage加载失败:', error);
       return [];
@@ -235,13 +245,32 @@ class PositionStorageService {
   }
 
   private getByIdFromLocalStorage(id: string): SavedPosition | null {
-    const positions = this.getFromLocalStorage();
-    return positions.find(pos => pos.id === id) || null;
+    try {
+      const data = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!data) return null;
+      
+      const positions: SavedPosition[] = JSON.parse(data);
+      
+      // 转换日期字符串为Date对象
+      const convertedPositions = positions.map(pos => ({
+        ...pos,
+        createdAt: new Date(pos.createdAt),
+        updatedAt: new Date(pos.updatedAt)
+      }));
+      
+      return convertedPositions.find(pos => pos.id === id) || null;
+    } catch (error) {
+      console.error('从localStorage加载失败:', error);
+      return null;
+    }
   }
 
   private updateInLocalStorage(position: SavedPosition): void {
     try {
-      const positions = this.getFromLocalStorage();
+      const data = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!data) return;
+      
+      const positions: SavedPosition[] = JSON.parse(data);
       const index = positions.findIndex(pos => pos.id === position.id);
       if (index !== -1) {
         positions[index] = position;
@@ -255,7 +284,10 @@ class PositionStorageService {
 
   private deleteFromLocalStorage(id: string): void {
     try {
-      const positions = this.getFromLocalStorage();
+      const data = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!data) return;
+      
+      const positions: SavedPosition[] = JSON.parse(data);
       const filtered = positions.filter(pos => pos.id !== id);
       localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(filtered));
       console.log('仓位已从localStorage删除');
@@ -274,8 +306,16 @@ class PositionStorageService {
   }
 
   private getCountFromLocalStorage(): number {
-    const positions = this.getFromLocalStorage();
-    return positions.length;
+    try {
+      const data = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!data) return 0;
+      
+      const positions: SavedPosition[] = JSON.parse(data);
+      return positions.length;
+    } catch (error) {
+      console.error('从localStorage获取数量失败:', error);
+      return 0;
+    }
   }
 }
 

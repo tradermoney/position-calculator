@@ -19,7 +19,7 @@ export interface CalculatorRecord {
 }
 
 class CalculatorStorageClass {
-  async saveRecord(record: CalculatorRecord): Promise<void> {
+  async saveRecord(record: CalculatorRecord): Promise<string> {
     return saveCalculatorRecord(record);
   }
 
