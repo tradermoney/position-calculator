@@ -21,6 +21,7 @@ import { Position, PositionStat } from '../types';
 interface PositionTableProps {
   positions: Position[];
   positionStats: Map<number, PositionStat>;
+  leverage: number;
   sensors: DndContextProps['sensors'];
   onDragEnd: (event: DragEndEvent) => void;
   onAddPosition: () => void;
@@ -37,6 +38,7 @@ interface PositionTableProps {
 export default function PositionTable({
   positions,
   positionStats,
+  leverage,
   sensors,
   onDragEnd,
   onAddPosition,
@@ -73,7 +75,8 @@ export default function PositionTable({
                 <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>杠杆后数量 (U)</TableCell>
                 <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>持有币 / 币成本价</TableCell>
                 <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>占用本金 (U)</TableCell>
-                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>使用率</TableCell>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>资金使用率</TableCell>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>实际资金使用率</TableCell>
                 <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>盈亏计算</TableCell>
                 <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>操作</TableCell>
               </TableRow>
@@ -86,6 +89,7 @@ export default function PositionTable({
                     position={position}
                     index={index}
                     stats={positionStats.get(position.id)}
+                    leverage={leverage}
                     getInputValue={getInputValue}
                     handleInputChange={handleInputChange}
                     updatePosition={updatePosition}

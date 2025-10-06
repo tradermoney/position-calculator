@@ -21,6 +21,7 @@ interface PositionRowProps {
   position: Position;
   index: number;
   stats?: PositionStat;
+  leverage: number;
   getInputValue: (id: number, field: 'price' | 'quantity' | 'quantityUsdt' | 'marginUsdt', fallbackValue: number) => string;
   handleInputChange: (id: number, field: 'price' | 'quantity' | 'quantityUsdt' | 'marginUsdt', value: string) => void;
   updatePosition: (id: number, field: keyof Position, value: unknown) => void;
@@ -35,6 +36,7 @@ export default function PositionRow({
   position,
   index,
   stats,
+  leverage,
   getInputValue,
   handleInputChange,
   updatePosition,
@@ -172,6 +174,25 @@ export default function PositionRow({
             }}
           >
             {stats.capitalUsageRate > 0 ? `${formatNumber(stats.capitalUsageRate * 100, 1)}%` : '--'}
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
+        )}
+      </TableCell>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+        {stats && stats.isActive ? (
+          <Typography
+            variant="body2"
+            fontSize="0.875rem"
+            sx={{
+              color: (stats.capitalUsageRate * leverage) > 1 ? 'error.main' :
+                     (stats.capitalUsageRate * leverage) > 0.9 ? 'error.main' :
+                     (stats.capitalUsageRate * leverage) > 0.7 ? 'warning.main' :
+                     (stats.capitalUsageRate * leverage) > 0.5 ? 'info.main' : 'success.main',
+              fontWeight: (stats.capitalUsageRate * leverage) > 0.8 ? 600 : 400
+            }}
+          >
+            {(stats.capitalUsageRate * leverage) > 0 ? `${formatNumber(stats.capitalUsageRate * leverage * 100, 1)}%` : '--'}
           </Typography>
         ) : (
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>

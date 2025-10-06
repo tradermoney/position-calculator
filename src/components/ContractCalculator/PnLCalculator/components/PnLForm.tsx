@@ -183,6 +183,7 @@ export default function PnLForm({
           <PositionTable
             positions={positions}
             positionStats={positionStats}
+            leverage={leverage}
             sensors={sensors}
             onDragEnd={onDragEnd}
             onAddPosition={addPosition}
