@@ -20,6 +20,7 @@ import {
   PriceChange as PriceChangeIcon,
   TrendingUp as VolatilityIcon,
   ShowChart as KellyIcon,
+  TrendingUp as BreakEvenIcon,
   Functions as FunctionsIcon,
 } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
@@ -97,6 +98,13 @@ const featureItems: FeatureItem[] = [
     icon: KellyIcon,
   },
   {
+    id: 'break-even-calculator',
+    title: '保本回报率计算器',
+    description: '计算合约交易需要多少浮盈才能保本，包含手续费和资金费率。',
+    path: '/break-even-calculator',
+    icon: BreakEvenIcon,
+  },
+  {
     id: 'calculator',
     title: '科学计算器',
     description: '快捷完成基础运算和公式计算，保留运算历史。',
@@ -111,7 +119,7 @@ export default function Dashboard() {
   usePageTitle('dashboard');
 
   return (
-    <Box>
+    <Box sx={{ px: { xs: 0, sm: 3 } }}>
       <Stack spacing={1} mb={{ xs: 1, sm: 2, md: 4 }}>
         <Typography variant="h4" component="h1">
           功能索引

@@ -15,6 +15,7 @@ import EntryPriceCalculatorPage from '../../pages/EntryPriceCalculatorPage';
 import VolatilityCalculator from '../../pages/VolatilityCalculator';
 import CalculatorPage from '../../pages/CalculatorPage';
 import KellyCalculatorPage from '../../pages/KellyCalculatorPage';
+import BreakEvenCalculatorPage from '../../pages/BreakEvenCalculatorPage';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
@@ -30,6 +31,7 @@ const routePathMap = {
   '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
   '/kelly-calculator': 'kelly-calculator',
+  '/break-even-calculator': 'break-even-calculator',
   '/calculator': 'calculator',
 } as const;
 
@@ -88,16 +90,7 @@ function AppContent() {
           },
         },
       },
-      MuiContainer: {
-        styleOverrides: {
-          root: {
-            '@media (max-width: 600px)': {
-              paddingLeft: '4px',
-              paddingRight: '4px',
-            },
-          },
-        },
-      },
+      // MuiContainer: 移除全局样式覆盖，让页面级别的响应式设置生效
       MuiGrid: {
         styleOverrides: {
           root: {
@@ -144,6 +137,7 @@ function AppContent() {
           <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
           <Route path="/kelly-calculator" element={<KellyCalculatorPage />} />
+          <Route path="/break-even-calculator" element={<BreakEvenCalculatorPage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
 
           {/* 向后兼容性重定向 */}

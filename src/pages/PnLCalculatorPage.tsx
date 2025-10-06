@@ -13,9 +13,9 @@ export default function PnLCalculatorPage() {
   usePageTitle('pnl-calculator');
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '100%', px: 0 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%', px: { xs: 0, sm: 3 } }}>
       {/* 页面标题 */}
-      <Box mb={3} px={1}>
+      <Box mb={3} sx={{ px: { xs: 1, sm: 0 } }}>
         <Box display="flex" alignItems="center" mb={2}>
           <CalculateIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" component="h1" fontWeight="bold">
@@ -28,12 +28,12 @@ export default function PnLCalculatorPage() {
       </Box>
 
       {/* 主要内容 */}
-      <Box px={0}>
+      <Box sx={{ px: { xs: 0, sm: 0 } }}>
         <PnLCalculator />
       </Box>
 
       {/* 使用说明 */}
-      <Box mt={3} px={1}>
+      <Box mt={3} sx={{ px: { xs: 1, sm: 0 } }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -62,7 +62,7 @@ export default function PnLCalculatorPage() {
       </Box>
 
       {/* 计算公式说明 */}
-      <Box mt={3} px={1}>
+      <Box mt={3} sx={{ px: { xs: 1, sm: 0 } }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

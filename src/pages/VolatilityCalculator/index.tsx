@@ -59,10 +59,25 @@ export default function VolatilityCalculator() {
   return (
     <VolatilityContainer>
       {/* 页面标题 */}
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        gutterBottom 
+        sx={{ 
+          mb: 3,
+          px: { xs: 2, sm: 0 }, // 移动端添加左右边距
+        }}
+      >
         波动率计算器
       </Typography>
-      <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
+      <Typography 
+        variant="body1" 
+        color="textSecondary" 
+        sx={{ 
+          mb: 4,
+          px: { xs: 2, sm: 0 }, // 移动端添加左右边距
+        }}
+      >
         计算两个价格之间的波动率百分比，支持历史记录和数据持久化
       </Typography>
 

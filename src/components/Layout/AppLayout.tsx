@@ -29,6 +29,7 @@ import {
   TrendingUp as VolatilityIcon,
   ShowChart as KellyIcon,
   Functions as CalculatorIcon,
+  TrendingUp as BreakEvenIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
@@ -51,6 +52,7 @@ const menuItems = [
   { id: 'entry-price-calculator', label: '开仓价格计算器', icon: <PriceChangeIcon />, path: '/entry-price-calculator' },
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
   { id: 'kelly-calculator', label: '凯利公式计算器', icon: <KellyIcon />, path: '/kelly-calculator' },
+  { id: 'break-even-calculator', label: '保本回报率计算器', icon: <BreakEvenIcon />, path: '/break-even-calculator' },
   { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
 ];
 

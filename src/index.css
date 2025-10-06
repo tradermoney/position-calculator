@@ -66,3 +66,17 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* 移动端边距 */
+.mobile-padding {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* 强制应用移动端边距 */
+@media (max-width: 599px) {
+  .MuiBox-root.css-1coeexk {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}

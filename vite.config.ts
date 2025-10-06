@@ -7,11 +7,11 @@ export default defineConfig({
   // 统一使用 /position-calculator/ 路径，开发和生产环境保持一致
   base: '/position-calculator/',
   server: {
-    port: 5173,
+    port: 57319,
     host: '0.0.0.0'
   },
   preview: {
-    port: 5173,
+    port: 57319,
     host: '0.0.0.0'
   },
   build: {

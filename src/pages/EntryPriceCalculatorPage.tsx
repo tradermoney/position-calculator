@@ -6,6 +6,8 @@ import {
   CardContent,
   Container,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { PriceChange as PriceChangeIcon } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
@@ -13,11 +15,24 @@ import EntryPriceCalculator from '../components/ContractCalculator/EntryPriceCal
 
 export default function EntryPriceCalculatorPage() {
   usePageTitle('entry-price-calculator');
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ 
+      mt: 4, 
+      mb: 4, 
+      px: 0,
+      '@media (min-width: 600px)': {
+        px: 3,
+      },
+    }}>
       {/* 页面标题 */}
-      <Box mb={3}>
+      <Box mb={3} style={{ 
+        paddingLeft: '16px',
+        paddingRight: '16px',
+      }}>
         <Box display="flex" alignItems="center" mb={2}>
           <PriceChangeIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" component="h1" fontWeight="bold">
@@ -37,7 +52,7 @@ export default function EntryPriceCalculatorPage() {
       </Paper>
 
       {/* 使用说明 */}
-      <Box mt={3}>
+      <Box mt={3} px={{ xs: 2, sm: 0 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -63,7 +78,7 @@ export default function EntryPriceCalculatorPage() {
       </Box>
 
       {/* 计算公式说明 */}
-      <Box mt={3}>
+      <Box mt={3} px={{ xs: 2, sm: 0 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -86,7 +101,7 @@ export default function EntryPriceCalculatorPage() {
       </Box>
 
       {/* 应用场景 */}
-      <Box mt={3}>
+      <Box mt={3} px={{ xs: 2, sm: 0 }}>
         <Card sx={{ backgroundColor: 'success.light', color: 'success.contrastText' }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>

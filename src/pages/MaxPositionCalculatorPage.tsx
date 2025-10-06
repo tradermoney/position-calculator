@@ -15,9 +15,12 @@ export default function MaxPositionCalculatorPage() {
   usePageTitle('max-position-calculator');
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4, px: { xs: 0, sm: 3 } }}>
       {/* 页面标题 */}
-      <Box mb={3}>
+      <Box mb={3} style={{ 
+        paddingLeft: '16px',
+        paddingRight: '16px',
+      }}>
         <Box display="flex" alignItems="center" mb={2}>
           <AccountBalanceIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" component="h1" fontWeight="bold">

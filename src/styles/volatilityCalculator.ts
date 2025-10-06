@@ -3,14 +3,19 @@ import { Box, Card, Typography, TextField } from '@mui/material';
 
 // 主容器样式
 export const VolatilityContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: 0, // 移动端无边距
   maxWidth: '1200px',
   margin: '0 auto',
+  
+  // PC端正常边距
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3),
+  },
 }));
 
 // 计算器卡片样式
 export const CalculatorCard = styled(Card)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: theme.spacing(2), // 移动端较小边距
   marginBottom: theme.spacing(3),
   borderRadius: 16,
   boxShadow: theme.shadows[2],
@@ -18,6 +23,11 @@ export const CalculatorCard = styled(Card)(({ theme }) => ({
     ? 'linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)'
     : 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
   border: `1px solid ${theme.palette.divider}`,
+  
+  // PC端正常边距
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3),
+  },
 }));
 
 // 输入区域样式
@@ -146,6 +156,12 @@ export const HistoryCard = styled(Card)(({ theme }) => ({
   borderRadius: 12,
   boxShadow: theme.shadows[1],
   border: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(2), // 移动端较小边距
+  
+  // PC端正常边距
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3),
+  },
 }));
 
 // 历史记录项样式
