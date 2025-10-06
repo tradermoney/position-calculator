@@ -96,7 +96,7 @@ export default function PnLForm({
               <Typography variant="subtitle2">
                 仓位方向
               </Typography>
-              <TooltipIcon title="选择交易方向：做多表示看涨，做空表示看跌" />
+              <TooltipIcon title="选择交易方向：做多表示看涨，做空表示看跌。做多（Long）是指预期价格上涨，买入后等待价格上涨卖出获利，盈亏计算公式为(平仓价-开仓价)×数量。做空（Short）是指预期价格下跌，先卖出后等待价格下跌买入获利，盈亏计算公式为(开仓价-平仓价)×数量。交易方向直接影响盈亏计算逻辑，选择错误会导致盈亏计算相反。建议根据市场分析和技术指标选择合适的交易方向。" />
             </Box>
             <Box display="flex" gap={1}>
               <Button
@@ -125,7 +125,7 @@ export default function PnLForm({
               <Typography variant="subtitle2">
                 总资金（可选）
               </Typography>
-              <TooltipIcon title="输入您的总资金，用于计算仓位使用率。不填写则不会显示使用率信息" />
+              <TooltipIcon title="输入您的总资金，用于计算仓位使用率。不填写则不会显示使用率信息。总资金是您可用于交易的全部资金，包括现金和已投入的保证金。系统会根据总资金计算仓位使用率，帮助您控制风险。建议输入真实的总资金金额，这样可以看到每个委托单占用的资金比例，避免过度杠杆。如果不填写，系统将只显示盈亏金额，不显示资金使用率等风险指标。" />
             </Box>
             <TextField
               fullWidth
@@ -151,7 +151,7 @@ export default function PnLForm({
               <Typography variant="subtitle2">
                 杠杆倍数
               </Typography>
-              <TooltipIcon title="杠杆倍数决定资金放大比例。例如10倍杠杆意味着用1元可以控制10元的仓位" />
+              <TooltipIcon title="杠杆倍数决定资金放大比例。例如10倍杠杆意味着用1元可以控制10元的仓位。杠杆倍数直接影响盈亏幅度和爆仓风险，杠杆越高，盈亏幅度越大，风险也越高。计算公式：实际控制资金 = 本金 × 杠杆倍数。例如：1000U本金，10倍杠杆，可控制10000U的仓位。杠杆倍数还影响爆仓价格计算，杠杆越高，爆仓价格越接近开仓价格。建议根据风险承受能力和市场波动选择合适的杠杆倍数，新手建议使用较低杠杆。" />
             </Box>
             <Box display="flex" gap={2} alignItems="center">
               <TextField

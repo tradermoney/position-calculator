@@ -27,6 +27,8 @@ export interface PnLResult {
   totalInvestment: number;
   totalReturn: number;
   roe: number;
+  totalMargin: number; // 总保证金（杠杆前的本金）
+  returnRate: number; // 回报率（总盈亏/总保证金）
   openPositions: Position[];
   closePositions: Position[];
 }

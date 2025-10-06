@@ -100,12 +100,16 @@ export const calculatePnL = (positions: Position[], side: PositionSide): PnLResu
   const totalInvestment = totalOpenCost;
   // ROE = 盈亏 / 保证金 × 100%
   const roe = totalMargin > 0 ? (totalPnL / totalMargin) * 100 : 0;
+  // 回报率 = 总盈亏 / 总保证金 × 100%
+  const returnRate = totalMargin > 0 ? (totalPnL / totalMargin) * 100 : 0;
 
   return {
     totalPnL,
     totalInvestment,
     totalReturn: totalInvestment + totalPnL,
     roe,
+    totalMargin,
+    returnRate,
     openPositions,
     closePositions,
   };
