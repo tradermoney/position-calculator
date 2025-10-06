@@ -27,6 +27,13 @@ export interface VolatilityResult {
   investmentVolatility?: InvestmentVolatility;
 }
 
+// 价格波动范围接口
+export interface PriceVolatilityRange {
+  upperPrice: number;  // 上限价格
+  lowerPrice: number;  // 下限价格
+  startPrice: number;  // 起始价格
+}
+
 // 反向计算结果接口
 export interface ReverseCalculationResult {
   targetPrice: number;
@@ -34,5 +41,6 @@ export interface ReverseCalculationResult {
   sign: '+' | '-';
   difference: number;
   formula: string;
+  priceRange: PriceVolatilityRange;  // 价格波动范围
   investmentVolatility?: InvestmentVolatility;
 }

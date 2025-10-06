@@ -150,9 +150,10 @@ export const HistoryCard = styled(Card)(({ theme }) => ({
 
 // 历史记录项样式
 export const HistoryItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   padding: theme.spacing(2),
   borderBottom: `1px solid ${theme.palette.divider}`,
-  cursor: 'pointer',
   transition: 'all 0.2s ease',
   
   '&:hover': {

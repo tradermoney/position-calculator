@@ -42,6 +42,7 @@ export default function VolatilityCalculator() {
     history,
     saveRecord,
     restoreFromHistory,
+    deleteRecord,
     clearHistory,
     clearInputsWithStorage,
   } = useHistory({
@@ -113,6 +114,7 @@ export default function VolatilityCalculator() {
           <HistorySidebar
             history={history}
             onRestore={restoreFromHistory}
+            onDelete={deleteRecord}
             onClearHistory={clearHistory}
           />
         </HistorySidebarStyled>

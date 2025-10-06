@@ -1,6 +1,6 @@
 import React from 'react';
-import { Typography, Divider, IconButton, Tooltip } from '@mui/material';
-import { History as HistoryIcon, Clear as ClearIcon } from '@mui/icons-material';
+import { Typography, Divider, IconButton, Tooltip, Box } from '@mui/material';
+import { History as HistoryIcon, Clear as ClearIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { VolatilityRecord } from '../types';
 import { formatTime, formatNumber } from '../utils/formatting';
 import {
@@ -15,12 +15,14 @@ import {
 interface HistorySidebarProps {
   history: VolatilityRecord[];
   onRestore: (record: VolatilityRecord) => void;
+  onDelete: (recordId: string) => void;
   onClearHistory: () => void;
 }
 
 export const HistorySidebar: React.FC<HistorySidebarProps> = ({
   history,
   onRestore,
+  onDelete,
   onClearHistory,
 }) => {
   return (
@@ -52,27 +54,51 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
         </EmptyState>
       ) : (
         history.map((record) => (
-          <HistoryItem
-            key={record.id}
-            onClick={() => onRestore(record)}
-          >
-            <HistoryContent>
-              <HistoryData>
-                <Typography variant="body2" fontWeight={500}>
-                  {formatNumber(record.price1)} → {formatNumber(record.price2)}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color={record.sign === '+' ? 'success.main' : 'error.main'}
-                  fontWeight={600}
-                >
-                  {record.sign}{formatNumber(record.volatility, 2)}%
-                </Typography>
-              </HistoryData>
-              <HistoryTime>
-                {formatTime(record.calculatedAt)}
-              </HistoryTime>
-            </HistoryContent>
+          <HistoryItem key={record.id}>
+            <Box
+              sx={{
+                flex: 1,
+                cursor: 'pointer',
+              }}
+              onClick={() => onRestore(record)}
+            >
+              <HistoryContent>
+                <HistoryData>
+                  <Typography variant="body2" fontWeight={500}>
+                    {formatNumber(record.price1)} → {formatNumber(record.price2)}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color={record.sign === '+' ? 'success.main' : 'error.main'}
+                    fontWeight={600}
+                  >
+                    {record.sign}{formatNumber(record.volatility, 2)}%
+                  </Typography>
+                </HistoryData>
+                <HistoryTime>
+                  {formatTime(record.calculatedAt)}
+                </HistoryTime>
+              </HistoryContent>
+            </Box>
+            <Tooltip title="删除此记录">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(record.id);
+                }}
+                sx={{
+                  ml: 1,
+                  color: 'error.main',
+                  '&:hover': {
+                    backgroundColor: 'error.light',
+                    color: 'error.dark',
+                  },
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </HistoryItem>
         ))
       )}

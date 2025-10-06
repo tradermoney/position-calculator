@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 配置
-FRONTEND_PORT=57319
+FRONTEND_PORT=5173
 FRONTEND_PID_FILE=".frontend.pid"
 LOG_DIR="logs"
 FRONTEND_LOG="$LOG_DIR/frontend.log"

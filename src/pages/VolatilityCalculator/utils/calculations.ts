@@ -88,7 +88,7 @@ export const calculateTargetPrice = (
 
   // 计算两种可能的目标价格
   const targetPriceUp = p1 / (1 - vol / 100);   // 上涨情况
-  // const targetPriceDown = p1 * (1 - vol / 100); // 下跌情况
+  const targetPriceDown = p1 * (1 - vol / 100); // 下跌情况
 
   // 默认选择上涨情况，用户可以通过符号选择器来切换
   const targetPrice = targetPriceUp;
@@ -97,6 +97,15 @@ export const calculateTargetPrice = (
 
   // 生成计算公式
   const formula = `${p1} / (1 - ${vol}/100) = ${p1} / ${(1 - vol/100).toFixed(4)} = ${targetPrice.toFixed(4)}`;
+
+  // 计算价格波动范围：起始价格的上下波动范围
+  // 上限：起始价格上涨 vol%
+  // 下限：起始价格下跌 vol%
+  const priceRange = {
+    upperPrice: targetPriceUp,    // 上涨到的价格
+    lowerPrice: targetPriceDown,  // 下跌到的价格
+    startPrice: p1                // 起始价格
+  };
 
   // 计算投资金额波动
   const investmentVolatility = calculateInvestmentVolatility(investmentAmount, vol);
@@ -107,6 +116,7 @@ export const calculateTargetPrice = (
     sign,
     difference,
     formula,
+    priceRange,
     investmentVolatility
   };
 };

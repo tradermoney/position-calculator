@@ -166,8 +166,8 @@ function AppContent() {
 }
 
 export default function AppRouter() {
-  // GitHub Pages 部署時需要設置 basename
-  const basename = process.env.NODE_ENV === 'production' ? '/position-calculator' : '';
+  // 统一使用 /position-calculator 路径，开发和生产环境保持一致
+  const basename = '/position-calculator';
   
   return (
     <BrowserRouter basename={basename}>

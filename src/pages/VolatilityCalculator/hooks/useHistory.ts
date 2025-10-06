@@ -108,6 +108,18 @@ export const useHistory = ({
     setPrice2(record.price2.toString());
   }, [setPrice1, setPrice2]);
 
+  // 删除单个历史记录
+  const deleteRecord = useCallback(async (recordId: string) => {
+    try {
+      await IndexedDBVolatilityStorage.deleteRecord(recordId);
+      // 重新加载历史记录
+      const updatedRecords = await IndexedDBVolatilityStorage.getRecords(10);
+      setHistory(updatedRecords);
+    } catch (error) {
+      console.error('删除历史记录失败:', error);
+    }
+  }, []);
+
   // 清空历史记录
   const clearHistory = useCallback(async () => {
     try {
@@ -134,6 +146,7 @@ export const useHistory = ({
     isLoading,
     saveRecord,
     restoreFromHistory,
+    deleteRecord,
     clearHistory,
     clearInputsWithStorage,
   };

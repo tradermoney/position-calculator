@@ -4,14 +4,14 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // GitHub Pages 部署配置
-  base: process.env.NODE_ENV === 'production' ? '/position-calculator/' : '/',
+  // 统一使用 /position-calculator/ 路径，开发和生产环境保持一致
+  base: '/position-calculator/',
   server: {
-    port: 57319,
+    port: 5173,
     host: '0.0.0.0'
   },
   preview: {
-    port: 57319,
+    port: 5173,
     host: '0.0.0.0'
   },
   build: {
