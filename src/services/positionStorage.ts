@@ -1,4 +1,4 @@
-import { SavedPosition, PositionListItem, SavePositionParams, RestorePositionParams } from '../types/position';
+import { SavedPosition, PositionListItem, SavePositionParams } from '../types/position';
 import { IndexedDBUtil } from '../utils/storage/indexedDBUtil';
 import { waitForDatabaseInit } from '../utils/storage/databaseInit';
 

@@ -16,7 +16,7 @@ import { buildPositionStats, calculatePnL, calculatePositionUsage, validatePosit
 import { PnLCalculatorStorageService, StoredState } from '../../../services/pnlCalculatorStorage';
 import { useFocusManager } from './focusManager';
 import { createCapitalChangeHandler, createGetInputValue, createInputChangeHandler } from './inputHandlers';
-import { useStorageReady } from '../../../contexts/StorageContext';
+import { useStorageReady } from '../../../hooks/useStorage';
 
 export function usePnLCalculator() {
   const { isStorageReady } = useStorageReady();

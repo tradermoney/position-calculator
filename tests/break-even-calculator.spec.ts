@@ -15,18 +15,6 @@ async function takeScreenshot(page: Page, name: string) {
   screenshotCounter++;
 }
 
-// 辅助函数：获取输入元素
-async function getInput(page: Page, label: string) {
-  return page.locator(`input[type="number"]`).filter({ hasText: label }).or(
-    page.locator(`input[type="number"]`).nth(
-      label === '杠杆倍数' ? 0 :
-      label === '开仓手续费率' ? 1 :
-      label === '平仓手续费率' ? 2 :
-      label === '资金费率' ? 3 :
-      label === '持仓时间' ? 4 : 0
-    )
-  );
-}
 
 // 辅助函数：设置输入值
 async function setInputValue(page: Page, inputSelector: string, value: string) {

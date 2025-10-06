@@ -9,7 +9,6 @@ import {
   TextField,
   Box,
   Typography,
-  Chip,
   FormControl,
 } from '@mui/material';
 import { DragIndicator as DragIcon, Delete as DeleteIcon, KeyboardArrowDown as ArrowDownIcon, KeyboardArrowUp as ArrowUpIcon } from '@mui/icons-material';

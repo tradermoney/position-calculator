@@ -37,8 +37,8 @@ export interface SavedPosition {
   side: 'long' | 'short';
   capital: number;
   leverage: number;
-  positions: any[];
-  inputValues: any;
+  positions: unknown[];
+  inputValues: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }

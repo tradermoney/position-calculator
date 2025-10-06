@@ -1,6 +1,7 @@
 import React from 'react';
 import AppRouter from './components/Router/AppRouter';
-import { StorageProvider, useStorageReady } from './contexts/StorageContext';
+import { StorageProvider } from './contexts/StorageContext';
+import { useStorageReady } from './hooks/useStorage';
 
 function AppContent() {
   const { isStorageReady, error } = useStorageReady();

@@ -1,5 +1,5 @@
 import { PositionSide } from '../utils/contractCalculations';
-import { Position, PositionType } from '../components/ContractCalculator/PnLCalculator/types';
+import { Position } from '../components/ContractCalculator/PnLCalculator/types';
 
 /**
  * 保存的仓位数据

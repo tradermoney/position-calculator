@@ -6,8 +6,6 @@ import {
   CardContent,
   Container,
   Paper,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import { PriceChange as PriceChangeIcon } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
@@ -16,8 +14,6 @@ import EntryPriceCalculator from '../components/ContractCalculator/EntryPriceCal
 export default function EntryPriceCalculatorPage() {
   usePageTitle('entry-price-calculator');
   
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Container maxWidth="lg" sx={{ 

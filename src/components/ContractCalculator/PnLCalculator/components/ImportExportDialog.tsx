@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
-  DialogContent,
   DialogActions,
   Button,
   Box,
@@ -117,8 +116,8 @@ export default function ImportExportDialog({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       setSuccess('仓位配置已导出到文件');
-    } catch (err) {
-      setError('导出失败：' + (err as Error).message);
+    } catch (error) {
+      setError('导出失败：' + (error as Error).message);
     }
   };
 
@@ -138,8 +137,8 @@ export default function ImportExportDialog({
       }).catch(() => {
         setError('复制到剪切板失败');
       });
-    } catch (err) {
-      setError('复制失败：' + (err as Error).message);
+    } catch (error) {
+      setError('复制失败：' + (error as Error).message);
     }
   };
 
@@ -162,8 +161,8 @@ export default function ImportExportDialog({
       } else {
         setError('无效的JSON格式：数据必须是完整配置或委托单数组');
       }
-    } catch (err) {
-      setError('JSON解析失败：' + (err as Error).message);
+    } catch (error) {
+      setError('JSON解析失败：' + (error as Error).message);
     }
   };
 
@@ -191,8 +190,8 @@ export default function ImportExportDialog({
         } else {
           setError('无效的JSON格式：数据必须是完整配置或委托单数组');
         }
-      } catch (err) {
-        setError('文件解析失败：' + (err as Error).message);
+      } catch (error) {
+        setError('文件解析失败：' + (error as Error).message);
       }
     };
     reader.readAsText(file);
@@ -202,7 +201,7 @@ export default function ImportExportDialog({
     try {
       const text = await navigator.clipboard.readText();
       setJsonText(text);
-    } catch (err) {
+    } catch {
       setError('无法读取剪切板内容');
     }
   };

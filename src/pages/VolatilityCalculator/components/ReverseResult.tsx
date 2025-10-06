@@ -6,7 +6,6 @@ import {
   CalculatorCard,
   ResultSection,
   ResultLabel,
-  VolatilityResult as VolatilityResultStyled,
   CalculationDetails,
 } from '../../../styles/volatilityCalculator';
 

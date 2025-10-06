@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -68,7 +66,7 @@ export default function PositionManager({
   const [error, setError] = useState<string | null>(null);
 
   // 加载保存的仓位列表
-  const loadSavedPositions = async () => {
+  const loadSavedPositions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -81,7 +79,7 @@ export default function PositionManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
 
   // 保存当前仓位
   const handleSavePosition = async () => {
@@ -202,7 +200,7 @@ export default function PositionManager({
   // 初始化时加载仓位列表
   useEffect(() => {
     loadSavedPositions();
-  }, []);
+  }, [loadSavedPositions]);
 
   return (
     <Box>

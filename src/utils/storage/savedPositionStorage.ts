@@ -2,7 +2,7 @@
  * 保存的仓位数据IndexedDB存储管理
  */
 
-import { SavedPosition, PositionListItem, SavePositionParams, RestorePositionParams } from '../../types/position';
+import { SavedPosition, PositionListItem, SavePositionParams } from '../../types/position';
 import { IndexedDBUtil } from './indexedDBUtil';
 import { waitForDatabaseInit } from './databaseInit';
 

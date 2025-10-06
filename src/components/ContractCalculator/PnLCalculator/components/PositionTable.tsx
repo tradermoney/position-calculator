@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Add as AddIcon, FileDownload as FileDownloadIcon, FileUpload as FileUploadIcon } from '@mui/icons-material';
+import { Add as AddIcon, FileDownload as FileDownloadIcon } from '@mui/icons-material';
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
 import type { DndContextProps } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';

@@ -3,7 +3,7 @@
  * 管理数据库初始化状态，确保所有组件都能安全访问存储
  */
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { initializeDatabase, isDatabaseInitialized } from '../utils/storage/databaseInit';
 
 interface StorageContextType {
@@ -12,7 +12,7 @@ interface StorageContextType {
   error: string | null;
 }
 
-const StorageContext = createContext<StorageContextType | undefined>(undefined);
+export const StorageContext = createContext<StorageContextType | undefined>(undefined);
 
 interface StorageProviderProps {
   children: ReactNode;
@@ -70,19 +70,3 @@ export function StorageProvider({ children }: StorageProviderProps) {
   );
 }
 
-export function useStorage() {
-  const context = useContext(StorageContext);
-  if (context === undefined) {
-    throw new Error('useStorage must be used within a StorageProvider');
-  }
-  return context;
-}
-
-/**
- * 等待存储就绪的Hook
- * 在存储未就绪时返回loading状态
- */
-export function useStorageReady() {
-  const { isStorageReady, error } = useStorage();
-  return { isStorageReady, error };
-}

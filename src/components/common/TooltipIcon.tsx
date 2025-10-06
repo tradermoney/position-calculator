@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Tooltip, Box } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { HelpOutline as HelpIcon } from '@mui/icons-material';
 
 interface TooltipIconProps {
