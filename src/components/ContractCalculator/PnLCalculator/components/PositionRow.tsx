@@ -123,6 +123,14 @@ export default function PositionRow({
           type="text"
           value={getInputValue(position.id, 'quantity', position.quantity)}
           onChange={(e) => handleInputChange(position.id, 'quantity', e.target.value)}
+          onPaste={(e) => {
+            const pastedText = e.clipboardData.getData('text');
+            // 如果粘贴的文本包含单位，直接处理
+            if (pastedText.includes('币') || pastedText.includes('USDT') || pastedText.includes('usdt')) {
+              e.preventDefault();
+              handleInputChange(position.id, 'quantity', pastedText);
+            }
+          }}
           placeholder="0.00"
           inputProps={{ pattern: '[0-9]*\\.?[0-9]*', inputMode: 'decimal', style: { fontSize: '0.875rem', padding: '4px 8px' } }}
           inputRef={registerInputRef(`${position.id}-quantity`)}

@@ -6,7 +6,11 @@ import PnLResultPanel from './components/PnLResultPanel';
 import PositionManager from '../../PositionManager/PositionManager';
 import { RestorePositionParams } from '../../../types/position';
 
-export default function PnLCalculator() {
+interface PnLCalculatorProps {
+  onReset?: React.MutableRefObject<(() => void) | null>;
+}
+
+export default function PnLCalculator({ onReset }: PnLCalculatorProps = {}) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
@@ -71,6 +75,13 @@ export default function PnLCalculator() {
     setSnackbarSeverity('error');
     setSnackbarOpen(true);
   };
+
+  // 暴露重置函数给父组件
+  React.useEffect(() => {
+    if (onReset) {
+      onReset.current = handleReset;
+    }
+  }, [handleReset, onReset]);
 
   return (
     <Stack spacing={2} sx={{ width: '100%', maxWidth: '100%', px: 0 }}>

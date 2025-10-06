@@ -4,23 +4,46 @@ import {
   Typography,
   Card,
   CardContent,
+  Button,
 } from '@mui/material';
-import { Calculate as CalculateIcon } from '@mui/icons-material';
+import { Calculate as CalculateIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { usePageTitle } from '../utils/titleManager';
 import PnLCalculator from '../components/ContractCalculator/PnLCalculator';
 
 export default function PnLCalculatorPage() {
   usePageTitle('pnl-calculator');
+  const resetRef = React.useRef<(() => void) | null>(null);
+
+  const handleReset = () => {
+    if (resetRef.current) {
+      resetRef.current();
+    }
+  };
 
   return (
     <Box sx={{ width: '100%', maxWidth: '100%', px: { xs: 0, sm: 1, md: 2, lg: 3, xl: 4 } }}>
       {/* 页面标题 */}
       <Box mb={3} sx={{ px: { xs: 1, sm: 0 } }}>
-        <Box display="flex" alignItems="center" mb={2}>
-          <CalculateIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            盈亏计算器
-          </Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center">
+            <CalculateIcon sx={{ mr: 2, fontSize: 32, color: 'primary.main' }} />
+            <Typography variant="h4" component="h1" fontWeight="bold">
+              盈亏计算器
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={handleReset}
+            sx={{ 
+              minWidth: 120,
+              height: 40,
+              fontSize: '0.875rem',
+              fontWeight: 500
+            }}
+          >
+            重置
+          </Button>
         </Box>
         <Typography variant="body1" color="textSecondary">
           计算合约交易的盈利/亏损、回报率和起始保证金，帮助您评估交易风险和收益
@@ -29,7 +52,7 @@ export default function PnLCalculatorPage() {
 
       {/* 主要内容 */}
       <Box sx={{ px: { xs: 0, sm: 0 } }}>
-        <PnLCalculator />
+        <PnLCalculator onReset={resetRef} />
       </Box>
 
       {/* 使用说明 */}

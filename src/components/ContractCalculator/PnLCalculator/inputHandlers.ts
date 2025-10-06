@@ -1,5 +1,8 @@
 import { InputValueMap, Position } from './types';
-import { NUMBER_REGEX, parseNumericInput } from './helpers';
+import { NUMBER_REGEX, parseNumericInput, parseValueWithUnit } from './helpers';
+
+// 支持带单位的数量输入正则表达式
+const QUANTITY_WITH_UNIT_REGEX = /^-?\d*\.?\d*\s*(币|USDT|usdt)?$/;
 
 /**
  * 处理资金输入变化
@@ -41,8 +44,13 @@ export function createInputChangeHandler(
   return (id: number, field: 'price' | 'quantity' | 'quantityUsdt' | 'marginUsdt', value: string) => {
     const key = `${id}-${field}`;
 
-    if (value === '' || NUMBER_REGEX.test(value)) {
-      const numValue = parseNumericInput(value);
+    // 对于数量字段，支持带单位的输入
+    const isValidInput = value === '' || 
+      (field === 'quantity' ? QUANTITY_WITH_UNIT_REGEX.test(value) : NUMBER_REGEX.test(value));
+    
+    if (isValidInput) {
+      // 对于数量字段，使用带单位解析函数；其他字段使用普通解析函数
+      const numValue = field === 'quantity' ? parseValueWithUnit(value) : parseNumericInput(value);
 
       // 更新当前字段
       setInputValues(prev => ({ ...prev, [key]: value }));
