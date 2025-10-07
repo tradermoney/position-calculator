@@ -4,6 +4,10 @@
 export enum PositionType {
   OPEN = 'open',
   CLOSE = 'close',
+  CLOSE_25 = 'close_25',
+  CLOSE_50 = 'close_50',
+  CLOSE_75 = 'close_75',
+  CLOSE_100 = 'close_100',
 }
 
 /**
@@ -45,6 +49,7 @@ export interface PositionStat {
   capitalUsageRate: number; // 本金使用率 (0-1)
   priceVolatility: number | null; // 币价波动率（相对于上一个仓位的价格波动百分比）
   liquidationPrice: number | null; // 爆仓价格（仅对开仓仓位有效）
+  positionValue: number; // 持有仓位总值（USDT）
 }
 
 export interface InputValueMap {

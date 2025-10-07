@@ -63,6 +63,11 @@ export default function PositionRow({
     return 'error.main';
   };
 
+  // 检查是否是百分比平仓类型
+  const isPercentageClose = (type: PositionType) => {
+    return [PositionType.CLOSE_25, PositionType.CLOSE_50, PositionType.CLOSE_75, PositionType.CLOSE_100].includes(type);
+  };
+
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes}>
       <TableCell sx={{ padding: '4px', textAlign: 'center', whiteSpace: 'nowrap', width: '50px' }}>
@@ -99,6 +104,18 @@ export default function PositionRow({
             </MenuItem>
             <MenuItem value={PositionType.CLOSE} sx={{ fontSize: '0.75rem' }}>
               平仓
+            </MenuItem>
+            <MenuItem value={PositionType.CLOSE_25} sx={{ fontSize: '0.75rem' }}>
+              平仓25%
+            </MenuItem>
+            <MenuItem value={PositionType.CLOSE_50} sx={{ fontSize: '0.75rem' }}>
+              平仓50%
+            </MenuItem>
+            <MenuItem value={PositionType.CLOSE_75} sx={{ fontSize: '0.75rem' }}>
+              平仓75%
+            </MenuItem>
+            <MenuItem value={PositionType.CLOSE_100} sx={{ fontSize: '0.75rem' }}>
+              平仓100%
             </MenuItem>
           </Select>
         </FormControl>
@@ -137,6 +154,7 @@ export default function PositionRow({
           onFocus={() => handleInputFocus(`${position.id}-quantity`)}
           onBlur={() => handleInputBlur(`${position.id}-quantity`)}
           sx={{ minWidth: '86px' }}
+          disabled={isPercentageClose(position.type)}
         />
       </TableCell>
       <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '96px' }}>
@@ -151,6 +169,7 @@ export default function PositionRow({
           onFocus={() => handleInputFocus(`${position.id}-marginUsdt`)}
           onBlur={() => handleInputBlur(`${position.id}-marginUsdt`)}
           sx={{ minWidth: '86px' }}
+          disabled={isPercentageClose(position.type)}
         />
       </TableCell>
       <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', width: '112px' }}>
@@ -165,6 +184,7 @@ export default function PositionRow({
           onFocus={() => handleInputFocus(`${position.id}-quantityUsdt`)}
           onBlur={() => handleInputBlur(`${position.id}-quantityUsdt`)}
           sx={{ minWidth: '102px' }}
+          disabled={isPercentageClose(position.type)}
         />
       </TableCell>
       <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
@@ -183,7 +203,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '160px' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '128px' }}>
         {stats && stats.isActive ? (
           <Box display="flex" flexDirection="column">
             <Typography variant="body2" fontSize="0.875rem">{formatNumber(Math.abs(stats.holdings), 4)} 币</Typography>
@@ -191,6 +211,15 @@ export default function PositionRow({
               {stats.averagePrice !== null ? `${formatNumber(stats.averagePrice, 2)} USDT` : '--'}
             </Typography>
           </Box>
+        ) : (
+          <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
+        )}
+      </TableCell>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '106px' }}>
+        {stats && stats.isActive ? (
+          <Typography variant="body2" fontSize="0.875rem">
+            {formatNumber(stats.positionValue, 2)} USDT
+          </Typography>
         ) : (
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
@@ -204,7 +233,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '80px' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '61px' }}>
         {stats && stats.isActive ? (
           <Typography
             variant="body2"
@@ -223,7 +252,7 @@ export default function PositionRow({
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">--</Typography>
         )}
       </TableCell>
-      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '100px' }}>
+      <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', width: '72px' }}>
         {stats && stats.isActive ? (
           <Typography
             variant="body2"

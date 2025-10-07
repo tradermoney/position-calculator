@@ -105,6 +105,13 @@ const featureItems: FeatureItem[] = [
     icon: BreakEvenIcon,
   },
   {
+    id: 'fee-comparison',
+    title: 'Maker/Taker费率对比',
+    description: '对比不同交易所的Maker和Taker手续费率，计算实际交易成本。',
+    path: '/fee-comparison',
+    icon: CalculateIcon,
+  },
+  {
     id: 'calculator',
     title: '科学计算器',
     description: '快捷完成基础运算和公式计算，保留运算历史。',

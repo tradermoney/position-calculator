@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -47,13 +47,6 @@ interface PnLFormProps {
   handleCalculate: () => void;
   handleReset: () => void;
   errors: string[];
-  onImportPositions: (positions: Position[]) => void;
-  onImportConfig: (config: {
-    side: PositionSide;
-    capital: number;
-    leverage: number;
-    positions: Position[];
-  }) => void;
 }
 
 export default function PnLForm({
@@ -80,8 +73,6 @@ export default function PnLForm({
   handleCalculate,
   handleReset,
   errors,
-  onImportPositions,
-  onImportConfig,
 }: PnLFormProps) {
   return (
     <>

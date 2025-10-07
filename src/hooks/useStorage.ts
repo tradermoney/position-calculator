@@ -3,7 +3,7 @@
  */
 
 import { useContext } from 'react';
-import { StorageContext } from '../contexts/StorageContext';
+import { StorageContext } from '../contexts/StorageContextInstance';
 
 export function useStorage() {
   const context = useContext(StorageContext);

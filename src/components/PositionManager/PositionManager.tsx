@@ -34,7 +34,7 @@ import {
   Edit as EditIcon,
 } from '@mui/icons-material';
 import { PositionSide } from '../../utils/contractCalculations';
-import { PositionListItem, SavePositionParams, RestorePositionParams, SavedPosition } from '../../types/position';
+import { PositionListItem, SavePositionParams, RestorePositionParams } from '../../types/position';
 import { SavedPositionStorage } from '../../utils/storage/savedPositionStorage';
 import { Position } from '../ContractCalculator/PnLCalculator/types';
 import { 
@@ -66,7 +66,12 @@ interface PositionManagerProps {
   
   // 导入导出功能
   onImportPositions?: (positions: Position[]) => void;
-  onImportConfig?: (config: any) => void;
+  onImportConfig?: (config: {
+    side: PositionSide;
+    capital: number;
+    leverage: number;
+    positions: Position[];
+  }) => void;
 }
 
 export default function PositionManager({
@@ -315,7 +320,12 @@ export default function PositionManager({
   };
 
   // 处理导入配置
-  const handleImportConfig = (config: any) => {
+  const handleImportConfig = (config: {
+    side: PositionSide;
+    capital: number;
+    leverage: number;
+    positions: Position[];
+  }) => {
     if (onImportConfig) {
       onImportConfig(config);
       setSuccessMessage('仓位配置导入成功');

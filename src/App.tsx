@@ -1,6 +1,6 @@
 import React from 'react';
 import AppRouter from './components/Router/AppRouter';
-import { StorageProvider } from './contexts/StorageContext';
+import { StorageProvider } from './contexts/StorageProvider';
 import { useStorageReady } from './hooks/useStorage';
 
 function AppContent() {

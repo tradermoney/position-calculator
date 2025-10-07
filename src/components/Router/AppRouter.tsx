@@ -16,6 +16,7 @@ import VolatilityCalculator from '../../pages/VolatilityCalculator';
 import CalculatorPage from '../../pages/CalculatorPage';
 import KellyCalculatorPage from '../../pages/KellyCalculatorPage';
 import BreakEvenCalculatorPage from '../../pages/BreakEvenCalculatorPage';
+import FeeComparison from '../../pages/FeeComparison';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
@@ -32,6 +33,7 @@ const routePathMap = {
   '/volatility-calculator': 'volatility-calculator',
   '/kelly-calculator': 'kelly-calculator',
   '/break-even-calculator': 'break-even-calculator',
+  '/fee-comparison': 'fee-comparison',
   '/calculator': 'calculator',
 } as const;
 
@@ -138,6 +140,7 @@ function AppContent() {
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
           <Route path="/kelly-calculator" element={<KellyCalculatorPage />} />
           <Route path="/break-even-calculator" element={<BreakEvenCalculatorPage />} />
+          <Route path="/fee-comparison" element={<FeeComparison />} />
           <Route path="/calculator" element={<CalculatorPage />} />
 
           {/* 向后兼容性重定向 */}

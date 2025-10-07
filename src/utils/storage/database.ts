@@ -115,6 +115,14 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           calculatorStore.createIndex('by-calculated', 'calculatedAt');
           console.log('创建calculatorRecords对象存储');
         }
+
+        // 创建保本计算器状态表
+        if (!db.objectStoreNames.contains('breakEvenCalculator')) {
+          db.createObjectStore('breakEvenCalculator', {
+            keyPath: 'key'
+          });
+          console.log('创建breakEvenCalculator对象存储');
+        }
       },
     });
 

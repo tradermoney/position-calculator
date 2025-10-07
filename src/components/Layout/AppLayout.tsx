@@ -54,6 +54,7 @@ const menuItems = [
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
   { id: 'kelly-calculator', label: '凯利公式计算器', icon: <KellyIcon />, path: '/kelly-calculator' },
   { id: 'break-even-calculator', label: '保本回报率计算器', icon: <BreakEvenIcon />, path: '/break-even-calculator' },
+  { id: 'fee-comparison', label: 'Maker/Taker费率对比', icon: <CalculateIcon />, path: '/fee-comparison' },
   { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
 ];
 

@@ -13,9 +13,7 @@ export const validateForwardInputs = (price1: string, price2: string): string[] 
     errors.push('目标价格必须是大于0的有效数字');
   }
 
-  if (p1 === p2 && !isNaN(p1) && !isNaN(p2)) {
-    errors.push('两个价格不能相同');
-  }
+  // 移除价格相同的限制，允许计算波动率为0的情况
 
   return errors;
 };

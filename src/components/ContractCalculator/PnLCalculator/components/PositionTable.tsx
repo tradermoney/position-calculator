@@ -66,7 +66,7 @@ export default function PositionTable({
 
       <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
         <DndContext sensors={sensors} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
-          <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%', minWidth: '1600px' }}>
+          <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%', minWidth: '1569px' }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ padding: '4px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '50px' }}>
@@ -117,16 +117,22 @@ export default function PositionTable({
                     <TooltipIcon title="使用杠杆后的总资金数量，即杠杆前资金 × 杠杆倍数。这表示您实际控制的资金规模。例如：1000U本金，10倍杠杆，杠杆后数量为10000U。杠杆后数量决定您的盈亏幅度，价格每变动1%，您的盈亏就是杠杆后数量的1%。杠杆越高，盈亏幅度越大，风险也越高。此数值用于计算实际盈亏金额。" />
                   </Box>
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '100px' }}>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '80px' }}>
                   <Box display="flex" alignItems="center">
                     币价波动率
                     <TooltipIcon title="当前价格相对于开仓价格的涨跌幅百分比。计算公式：波动率 = (当前价格 - 开仓价格) / 开仓价格 × 100%。正值表示价格上涨，负值表示价格下跌。此指标帮助您快速了解价格变动幅度，结合杠杆倍数可以估算盈亏情况。例如：10倍杠杆下，价格波动1%，您的盈亏就是10%。波动率越高，风险越大，需要密切关注市场动态。" />
                   </Box>
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '160px' }}>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '90px' }}>
                   <Box display="flex" alignItems="center">
-                    持有币 / 币成本价
+                    持有币及成本价
                     <TooltipIcon title="当前持有的币数量和平均成本价格。持有币数量 = 累计开仓数量 - 累计平仓数量。平均成本价 = 累计开仓成本 / 累计开仓数量。此信息帮助您了解当前仓位状态，当持有币数量为0时表示已完全平仓。平均成本价是盈亏计算的重要参考，当前价格高于平均成本价时盈利，低于时亏损。系统会自动计算和更新这些数值。" />
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '106px' }}>
+                  <Box display="flex" alignItems="center">
+                    持有仓位总值
+                    <TooltipIcon title="当前持有仓位的USDT价值。计算公式：持有仓位总值 = 当前价格 × 持有币数量。此数值表示如果按当前价格全部卖出，能够获得多少USDT。对于做多仓位，持有仓位总值随价格上涨而增加；对于做空仓位，持有仓位总值随价格下跌而增加。此指标帮助您了解当前仓位的市场价值，是风险管理的重要参考。" />
                   </Box>
                 </TableCell>
                 <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '100px' }}>
@@ -135,13 +141,13 @@ export default function PositionTable({
                     <TooltipIcon title="此委托单占用的实际资金数量。对于开仓单，占用本金 = 杠杆前资金；对于平仓单，占用本金 = 0（平仓不占用新资金）。占用本金是您实际投入的资金，直接影响资金使用率计算。总占用本金不能超过您的总资金，否则会出现资金不足的情况。此数值帮助您管理资金分配，避免过度杠杆。" />
                   </Box>
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '80px', lineHeight: 1.2 }}>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '61px', lineHeight: 1.2 }}>
                   <Box display="flex" alignItems="center">
                     资金使用率
                     <TooltipIcon title="占用本金占总资金的比例。计算公式：资金使用率 = 占用本金 / 总资金 × 100%。此指标帮助您了解资金利用情况，建议保持在80%以下以留有余地。资金使用率过高会增加爆仓风险，因为剩余资金不足以应对价格波动。系统会实时计算并显示当前资金使用率，帮助您合理分配资金。" />
                   </Box>
                 </TableCell>
-                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '100px', lineHeight: 1.2 }}>
+                <TableCell sx={{ padding: '4px 8px', whiteSpace: 'nowrap', fontSize: '0.875rem', width: '72px', lineHeight: 1.2 }}>
                   <Box display="flex" alignItems="center">
                     实际资金使用率
                     <TooltipIcon title="考虑杠杆后的实际资金使用率，即资金使用率 × 杠杆倍数。此指标反映您实际控制的资金规模相对于总资金的比例。例如：1000U总资金，10倍杠杆，实际控制10000U，实际资金使用率为1000%。此数值帮助您了解杠杆放大效果，数值越高表示杠杆使用越充分，但风险也越大。建议根据风险承受能力合理控制实际资金使用率。" />

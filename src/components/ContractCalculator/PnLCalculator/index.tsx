@@ -125,8 +125,6 @@ export default function PnLCalculator({ onReset }: PnLCalculatorProps = {}) {
         handleCalculate={handleCalculate}
         handleReset={handleReset}
         errors={errors}
-        onImportPositions={importPositions}
-        onImportConfig={importPositionConfig}
       />
       <PnLResultPanel result={result} />
 

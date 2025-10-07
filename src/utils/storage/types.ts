@@ -30,6 +30,17 @@ export interface CalculatorRecord {
   calculatedAt: Date;
 }
 
+// 保本计算器输入状态接口
+export interface BreakEvenInputState {
+  leverage: number;
+  openFeeRate: number;
+  closeFeeRate: number;
+  fundingRate: number;
+  fundingPeriod: number;
+  holdingTime: number;
+  lastUpdated: Date;
+}
+
 // 保存的仓位接口
 export interface SavedPosition {
   id: string;
@@ -102,8 +113,12 @@ export interface PositionCalculatorDB extends DBSchema {
       'by-calculated': Date;
     };
   };
+  breakEvenCalculator: {
+    key: string;
+    value: BreakEvenInputState & { key: string };
+  };
 }
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;

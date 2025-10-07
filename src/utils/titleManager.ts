@@ -16,6 +16,7 @@ export const PAGE_TITLES = {
   'break-even-calculator': '保本回报率计算器 - 合约计算器',
   'volatility-calculator': '波动率计算器 - 合约计算器',
   'kelly-calculator': '凯利公式计算器 - 合约计算器',
+  'fee-comparison': 'Maker/Taker费率对比 - 合约计算器',
   'calculator': '计算器 - 合约计算器',
 } as const;
 
@@ -59,6 +60,7 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     'break-even-calculator': '保本回报率计算器，计算合约交易需要多少浮盈才能覆盖交易成本，包括手续费和资金费率',
     'volatility-calculator': '价格波动率计算器，计算两个价格之间的波动率百分比，支持历史记录',
     'kelly-calculator': '凯利公式计算器，使用Kelly Criterion计算最优仓位比例，科学管理投资风险',
+    'fee-comparison': 'Maker/Taker费率对比工具，对比不同交易所的手续费率，计算实际交易成本',
     'calculator': '科学计算器，支持基础运算和括号运算，自动保存计算历史记录',
   };
   

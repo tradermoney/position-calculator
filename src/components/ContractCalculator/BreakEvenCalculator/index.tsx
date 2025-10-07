@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack } from '@mui/material';
+import { Stack, CircularProgress, Box } from '@mui/material';
 import { useBreakEvenCalculator } from './useBreakEvenCalculator';
 import InputForm from './components/InputForm';
 import ResultPanel from './components/ResultPanel';
@@ -9,6 +9,7 @@ export default function BreakEvenCalculator() {
     inputs,
     errors,
     result,
+    isLoading,
     updateLeverage,
     updateOpenFeeRate,
     updateCloseFeeRate,
@@ -17,6 +18,14 @@ export default function BreakEvenCalculator() {
     updateHoldingTime,
     reset,
   } = useBreakEvenCalculator();
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Stack spacing={3} sx={{ width: '100%', maxWidth: '100%', px: 0 }}>

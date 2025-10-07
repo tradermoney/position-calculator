@@ -129,14 +129,68 @@ export function usePnLCalculator() {
     [inputValues]
   );
 
+  // 获取平仓百分比
+  const getClosePercentage = (type: PositionType): number => {
+    switch (type) {
+      case PositionType.CLOSE_25: return 0.25;
+      case PositionType.CLOSE_50: return 0.5;
+      case PositionType.CLOSE_75: return 0.75;
+      case PositionType.CLOSE_100: return 1.0;
+      default: return 0;
+    }
+  };
+
   // 更新仓位
   const updatePosition = useCallback((id: number, field: keyof Position, value: unknown) => {
-    setPositions(prev => prev.map(position => {
+    setPositions(prev => prev.map((position, index) => {
       if (position.id !== id) {
         return position;
       }
 
       const updated = { ...position, [field]: value } as Position;
+
+      // 如果更新的是委托单类型，且是百分比平仓，则自动计算数量
+      if (field === 'type' && [PositionType.CLOSE_25, PositionType.CLOSE_50, PositionType.CLOSE_75, PositionType.CLOSE_100].includes(value as PositionType)) {
+        // 手动计算当前持仓（避免依赖calculateCurrentHoldings的闭包问题）
+        let holdings = 0;
+        let totalCost = 0;
+
+        for (let i = 0; i < index; i++) {
+          const prevPosition = positions[i];
+          if (prevPosition.enabled) {
+            if (prevPosition.type === PositionType.OPEN) {
+              holdings += prevPosition.quantity;
+              totalCost += prevPosition.quantity * prevPosition.price;
+            } else if ([PositionType.CLOSE_25, PositionType.CLOSE_50, PositionType.CLOSE_75, PositionType.CLOSE_100].includes(prevPosition.type)) {
+              holdings -= prevPosition.quantity; // 使用prevPosition.quantity，因为它已经被计算过了
+            } else {
+              holdings -= prevPosition.quantity;
+            }
+          }
+        }
+
+        const averagePrice = holdings > 0 ? totalCost / holdings : 0;
+        const percentage = getClosePercentage(value as PositionType);
+        const closeQuantity = Math.abs(holdings) * percentage;
+
+        if (closeQuantity > 0 && averagePrice > 0) {
+          updated.price = averagePrice;
+          updated.quantity = closeQuantity;
+          updated.quantityUsdt = closeQuantity * averagePrice;
+          updated.marginUsdt = updated.quantityUsdt / leverage;
+
+          console.log(`自动计算: 持仓=${holdings}, 平均价格=${averagePrice}, 百分比=${percentage}, 平仓数量=${closeQuantity}`);
+
+          // 更新输入值
+          setInputValues(prevInputs => ({
+            ...prevInputs,
+            [`${position.id}-price`]: averagePrice.toString(),
+            [`${position.id}-quantity`]: closeQuantity.toString(),
+            [`${position.id}-quantityUsdt`]: (closeQuantity * averagePrice).toString(),
+            [`${position.id}-marginUsdt`]: ((closeQuantity * averagePrice) / leverage).toString(),
+          }));
+        }
+      }
 
       if (field === 'quantity' && typeof value === 'number' && value > 0 && updated.price > 0) {
         updated.quantityUsdt = updated.price * value;
@@ -152,7 +206,7 @@ export function usePnLCalculator() {
 
       return updated;
     }));
-  }, []);
+  }, [leverage, positions, setInputValues]);
 
   // 处理输入变化
   const handleInputChange = useMemo(

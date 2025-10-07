@@ -1,29 +1,22 @@
 /**
- * 存储上下文
- * 管理数据库初始化状态，确保所有组件都能安全访问存储
+ * 存储提供者组件
  */
 
-import React, { createContext, useEffect, useState, ReactNode } from 'react';
+import React from 'react';
+import { StorageContext } from './StorageContextInstance';
+import { StorageContextType } from './StorageContext';
 import { initializeDatabase, isDatabaseInitialized } from '../utils/storage/databaseInit';
 
-interface StorageContextType {
-  isStorageReady: boolean;
-  isIndexedDBAvailable: boolean;
-  error: string | null;
-}
-
-export const StorageContext = createContext<StorageContextType | undefined>(undefined);
-
 interface StorageProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function StorageProvider({ children }: StorageProviderProps) {
-  const [isStorageReady, setIsStorageReady] = useState(false);
-  const [isIndexedDBAvailable, setIsIndexedDBAvailable] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isStorageReady, setIsStorageReady] = React.useState(false);
+  const [isIndexedDBAvailable, setIsIndexedDBAvailable] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const initStorage = async () => {
       try {
         // 检查IndexedDB是否可用
