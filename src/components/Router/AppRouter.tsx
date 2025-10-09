@@ -31,6 +31,7 @@ const routePathMap = {
   '/max-position-calculator': 'max-position-calculator',
   '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
+  '/volatility-calculator/binance': 'volatility-calculator-binance',
   '/kelly-calculator': 'kelly-calculator',
   '/break-even-calculator': 'break-even-calculator',
   '/fee-comparison': 'fee-comparison',
@@ -138,6 +139,7 @@ function AppContent() {
           <Route path="/max-position-calculator" element={<MaxPositionCalculatorPage />} />
           <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
+          <Route path="/volatility-calculator/binance" element={<VolatilityCalculator />} />
           <Route path="/kelly-calculator" element={<KellyCalculatorPage />} />
           <Route path="/break-even-calculator" element={<BreakEvenCalculatorPage />} />
           <Route path="/fee-comparison" element={<FeeComparison />} />

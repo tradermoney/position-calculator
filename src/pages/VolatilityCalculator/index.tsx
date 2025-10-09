@@ -19,6 +19,7 @@ import {
   Timeline as TimelineIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { usePageTitle } from '../../utils/titleManager';
 import { useCalculation } from './hooks/useCalculation';
 import { useHistory } from './hooks/useHistory';
@@ -32,12 +33,14 @@ import { SymbolSelector } from './components/SymbolSelector';
 import { IntervalSelector } from './components/IntervalSelector';
 import { PeriodSelector } from './components/PeriodSelector';
 import { VolatilityChart } from './components/VolatilityChart';
+import { EChartsVolatilityChart } from './components/EChartsVolatilityChart';
 import { VolatilityStatsCard } from './components/VolatilityStatsCard';
 import {
   binanceDataService,
   type VolatilityStats,
   KlineInterval,
 } from '../../services/binance';
+import { BinanceDataStorageService } from '../../utils/storage/binanceDataStorage';
 import {
   VolatilityContainer,
   ResponsiveGrid,
@@ -69,10 +72,17 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function VolatilityCalculator() {
-  usePageTitle('volatility-calculator');
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // 根据URL确定初始标签页
+  const isBinanceRoute = location.pathname.includes('/binance');
+  const initialTabValue = isBinanceRoute ? 1 : 0;
+  
+  usePageTitle(isBinanceRoute ? 'volatility-calculator-binance' : 'volatility-calculator');
 
   // Tab 状态
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(initialTabValue);
 
   // 手动计算相关 hooks
   const {
@@ -118,6 +128,50 @@ export default function VolatilityCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 加载保存的输入状态
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        const savedState = await BinanceDataStorageService.getInputState();
+        setSelectedSymbol(savedState.selectedSymbol);
+        setSelectedInterval(savedState.selectedInterval as KlineInterval);
+        setSelectedPeriods(savedState.selectedPeriods);
+      } catch (error) {
+        console.error('加载保存的输入状态失败:', error);
+      }
+    };
+
+    loadSavedState();
+  }, []);
+
+  // 监听URL变化，更新标签页状态
+  useEffect(() => {
+    const newIsBinanceRoute = location.pathname.includes('/binance');
+    const newTabValue = newIsBinanceRoute ? 1 : 0;
+    if (newTabValue !== tabValue) {
+      setTabValue(newTabValue);
+    }
+  }, [location.pathname, tabValue]);
+
+  // 保存输入状态
+  useEffect(() => {
+    const saveState = async () => {
+      try {
+        await BinanceDataStorageService.saveAllInputs(
+          selectedSymbol,
+          selectedInterval,
+          selectedPeriods
+        );
+      } catch (error) {
+        console.error('保存输入状态失败:', error);
+      }
+    };
+
+    // 延迟保存，避免频繁保存
+    const timeoutId = setTimeout(saveState, 500);
+    return () => clearTimeout(timeoutId);
+  }, [selectedSymbol, selectedInterval, selectedPeriods]);
+
   // 自动加载币安数据
   useEffect(() => {
     if (tabValue === 1 && selectedSymbol) {
@@ -160,6 +214,13 @@ export default function VolatilityCalculator() {
   // Tab 切换
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+    
+    // 更新URL
+    if (newValue === 1) {
+      navigate('/volatility-calculator/binance');
+    } else {
+      navigate('/volatility-calculator');
+    }
   };
 
   return (
@@ -325,7 +386,7 @@ export default function VolatilityCalculator() {
                 <VolatilityStatsCard data={volatilityData} />
 
                 {/* 波动率图表 */}
-                <VolatilityChart data={volatilityData} height={400} />
+                <EChartsVolatilityChart data={volatilityData} height={400} />
 
                 {/* 使用说明 */}
                 <Paper elevation={2} sx={{ p: 3 }}>

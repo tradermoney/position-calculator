@@ -22,6 +22,14 @@ export interface VolatilityInputState {
   lastUpdated: Date;
 }
 
+// 币安数据输入状态接口
+export interface BinanceDataInputState {
+  selectedSymbol: string | null;
+  selectedInterval: string;
+  selectedPeriods: number;
+  lastUpdated: Date;
+}
+
 // 计算器记录接口
 export interface CalculatorRecord {
   id: string;
@@ -93,6 +101,10 @@ export interface PositionCalculatorDB extends DBSchema {
     key: string;
     value: VolatilityInputState;
   };
+  binanceDataInputs: {
+    key: string;
+    value: BinanceDataInputState;
+  };
   pnlCalculator: {
     key: string;
     value: unknown;
@@ -121,4 +133,4 @@ export interface PositionCalculatorDB extends DBSchema {
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 5;
+export const DB_VERSION = 6;

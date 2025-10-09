@@ -88,6 +88,14 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           console.log('创建volatilityInputs对象存储');
         }
 
+        // 创建币安数据输入状态表
+        if (!db.objectStoreNames.contains('binanceDataInputs')) {
+          db.createObjectStore('binanceDataInputs', {
+            keyPath: 'key'
+          });
+          console.log('创建binanceDataInputs对象存储');
+        }
+
         // 创建PnL计算器状态表
         if (!db.objectStoreNames.contains('pnlCalculator')) {
           db.createObjectStore('pnlCalculator', {

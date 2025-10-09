@@ -22,7 +22,7 @@ export class IndexedDBUtil {
    * @param key 数据键
    * @param data 要保存的数据
    */
-  static async save<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string, data: T): Promise<void> {
+  static async save<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string, data: T): Promise<void> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，跳过保存操作 (${storeName})`);
       return;
@@ -60,7 +60,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async load<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
+  static async load<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，无法读取数据 (${storeName})`);
       return null;
@@ -96,7 +96,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async remove(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
+  static async remove(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，跳过删除操作 (${storeName})`);
       return;
@@ -208,7 +208,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async get<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
+  static async get<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
     return this.load<T>(storeName, key);
   }
 
@@ -217,7 +217,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async delete(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
+  static async delete(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
     return this.remove(storeName, key);
   }
 }
