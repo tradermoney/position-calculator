@@ -196,3 +196,31 @@ PRICE_RANGE_EXAMPLE.md
 # Temporary and generated files
 *.cjs
 *.mjs
+
+# Development and debugging files
+dev-server.log
+page-html-debug.html
+page-state.png
+final-page-state.png
+debug-*.png
+*-test-error.png
+*-test.png
+entry-price-*.png
+liquidation-calculator-*.png
+max-position-calculator-*.png
+target-price-calculator-*.png
+pnl-page-state.png
+simple-test.png
+test-step-*.png
+test-disabled-logic.png
+test-auto-calculation-error.png
+break-even-test-error.png
+debug-select-*.png
+detailed-test-*.png
+
+# API documentation and changelog files
+BINANCE_API_IMPLEMENTATION.md
+CHANGELOG_BINANCE_API.md
+
+# Configuration files that might contain sensitive data
+nginx.conf
