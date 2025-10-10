@@ -6,7 +6,6 @@
 // 页面标题配置
 export const PAGE_TITLES = {
   dashboard: '功能索引 - 合约计算器',
-  'add-position': '补仓计算 - 合约计算器',
   pyramid: '金子塔委托单计算器 - 合约计算器',
   'pnl-calculator': '盈亏计算器 - 合约计算器',
   'target-price-calculator': '目标价格计算器 - 合约计算器',
@@ -15,8 +14,10 @@ export const PAGE_TITLES = {
   'entry-price-calculator': '开仓价格计算器 - 合约计算器',
   'break-even-calculator': '保本回报率计算器 - 合约计算器',
   'volatility-calculator': '波动率计算器 - 合约计算器',
+  'volatility-calculator-manual': '手动计算 - 波动率计算器',
   'volatility-calculator-binance': '币安数据分析 - 波动率计算器',
   'kelly-calculator': '凯利公式计算器 - 合约计算器',
+  'funding-rate-calculator': '资金费率计算器 - 合约计算器',
   'fee-comparison': 'Maker/Taker费率对比 - 合约计算器',
   'calculator': '计算器 - 合约计算器',
 } as const;
@@ -51,7 +52,6 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
   // 更新或创建meta description
   const descriptions = {
     dashboard: '快速了解各个工具的功能定位，便捷跳转到目标页面',
-    'add-position': '智能补仓计算器，帮您制定最优的补仓策略，降低平均成本',
     pyramid: '金子塔委托单计算器，制定分层加仓计划，优化仓位管理',
     'pnl-calculator': '合约盈亏计算器，计算交易盈利/亏损、回报率和起始保证金',
     'target-price-calculator': '目标价格计算器，根据期望回报率计算目标价格',
@@ -60,8 +60,10 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     'entry-price-calculator': '开仓价格计算器，计算多笔交易的平均开仓价格',
     'break-even-calculator': '保本回报率计算器，计算合约交易需要多少浮盈才能覆盖交易成本，包括手续费和资金费率',
     'volatility-calculator': '价格波动率计算器，计算两个价格之间的波动率百分比，支持历史记录',
+    'volatility-calculator-manual': '手动波动率计算工具，支持正向和反向计算，自动保存历史记录',
     'volatility-calculator-binance': '基于币安K线数据的波动率分析工具，支持实时数据获取和可视化分析',
     'kelly-calculator': '凯利公式计算器，使用Kelly Criterion计算最优仓位比例，科学管理投资风险',
+    'funding-rate-calculator': '资金费率计算器，基于币安API历史数据预估永续合约持仓成本，帮您合理规划持仓时间',
     'fee-comparison': 'Maker/Taker费率对比工具，对比不同交易所的手续费率，计算实际交易成本',
     'calculator': '科学计算器，支持基础运算和括号运算，自动保存计算历史记录',
   };
@@ -100,7 +102,7 @@ function updateMetaTag(name: string, content: string, attribute: 'name' | 'prope
  */
 export function resetTitle(): void {
   document.title = DEFAULT_TITLE;
-  updateMetaTag('description', '专业的加密货币合约交易和计算工具，提供合约分析、补仓计算、金子塔委托单等功能');
+  updateMetaTag('description', '专业的加密货币合约交易和计算工具，提供合约分析、金子塔委托单等功能');
 }
 
 /**

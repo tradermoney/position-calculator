@@ -213,9 +213,9 @@ export class BinanceDataService {
     const max = Math.max(...volatilities);
     const min = Math.min(...volatilities);
 
-    // 计算标准差
+    // 计算标准差（使用样本标准差，除以n-1）
     const squaredDiffs = volatilities.map(v => Math.pow(v - average, 2));
-    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / volatilities.length;
+    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / (volatilities.length - 1);
     const stdDev = Math.sqrt(variance);
 
     return {

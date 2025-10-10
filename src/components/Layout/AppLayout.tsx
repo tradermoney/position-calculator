@@ -33,6 +33,7 @@ import {
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
   GitHub as GitHubIcon,
+  AttachMoney as FundingRateIcon,
 } from '@mui/icons-material';
 import { useAppContext } from '../../contexts/appContextHooks';
 
@@ -44,7 +45,6 @@ const drawerWidth = 240;
 
 const menuItems = [
   { id: 'dashboard', label: '功能索引', icon: <DashboardIcon />, path: '/dashboard' },
-  { id: 'add-position', label: '补仓计算', icon: <AddIcon />, path: '/add-position' },
   { id: 'pyramid', label: '金字塔委托单计算器', icon: <PyramidIcon />, path: '/pyramid' },
   { id: 'pnl-calculator', label: '盈亏计算器', icon: <CalculateIcon />, path: '/pnl-calculator' },
   { id: 'target-price-calculator', label: '目标价格计算器', icon: <TrendingUpIcon />, path: '/target-price-calculator' },
@@ -54,6 +54,7 @@ const menuItems = [
   { id: 'volatility-calculator', label: '波动率计算器', icon: <VolatilityIcon />, path: '/volatility-calculator' },
   { id: 'kelly-calculator', label: '凯利公式计算器', icon: <KellyIcon />, path: '/kelly-calculator' },
   { id: 'break-even-calculator', label: '保本回报率计算器', icon: <BreakEvenIcon />, path: '/break-even-calculator' },
+  { id: 'funding-rate-calculator', label: '资金费率计算器', icon: <FundingRateIcon />, path: '/funding-rate-calculator' },
   { id: 'fee-comparison', label: 'Maker/Taker费率对比', icon: <CalculateIcon />, path: '/fee-comparison' },
   { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
 ];
@@ -231,7 +232,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <Toolbar />
         <Box
           sx={{
-            py: { xs: 0.5, sm: 1 },
+            py: 0,
             px: 0,
             width: '100%',
             maxWidth: '100%',

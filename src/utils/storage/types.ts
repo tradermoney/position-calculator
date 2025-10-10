@@ -46,6 +46,27 @@ export interface BreakEvenInputState {
   fundingRate: number;
   fundingPeriod: number;
   holdingTime: number;
+  symbol: string;
+  positionDirection: 'long' | 'short';
+  lastUpdated: Date;
+}
+
+// 资金费率计算器输入状态接口
+export interface FundingRateInputState {
+  symbol: string;
+  // 做多仓位
+  longInputMode: 'direct' | 'price'; // direct: 直接输入仓位大小, price: 价格×数量
+  longPositionSize: string; // 直接输入模式
+  longEntryPrice: string; // 价格模式 - 开仓价格
+  longQuantity: string; // 价格模式 - 数量
+  // 做空仓位
+  shortInputMode: 'direct' | 'price';
+  shortPositionSize: string;
+  shortEntryPrice: string;
+  shortQuantity: string;
+  // 持有时间
+  timeMode: 'historical' | 'future'; // historical: 已持有时间, future: 预估持有时间
+  holdingHours: string;
   lastUpdated: Date;
 }
 
@@ -129,8 +150,12 @@ export interface PositionCalculatorDB extends DBSchema {
     key: string;
     value: BreakEvenInputState & { key: string };
   };
+  fundingRateCalculator: {
+    key: string;
+    value: FundingRateInputState & { key: string };
+  };
 }
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 6;
+export const DB_VERSION = 7;

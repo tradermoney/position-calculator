@@ -3,13 +3,18 @@ import { Box, Card, Typography, TextField } from '@mui/material';
 
 // 主容器样式
 export const VolatilityContainer = styled(Box)(({ theme }) => ({
-  padding: 0, // 移动端无边距
-  maxWidth: '1200px',
-  margin: '0 auto',
+  padding: theme.spacing(1), // 移动端更小边距
+  width: '100%',
+  maxWidth: 'none', // 移除最大宽度限制
+  margin: 0,
   
-  // PC端正常边距
+  // PC端更小边距以充分利用空间
   [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
+  },
+  
+  [theme.breakpoints.up('md')]: {
+    padding: theme.spacing(2.5),
   },
 }));
 
@@ -250,11 +255,12 @@ export const InfoText = styled(Typography)(({ theme }) => ({
 // 响应式网格样式
 export const ResponsiveGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gap: theme.spacing(3),
+  gap: theme.spacing(2),
   gridTemplateColumns: '1fr',
+  width: '100%',
   
   [theme.breakpoints.up('lg')]: {
-    gridTemplateColumns: '2fr 1fr',
+    gridTemplateColumns: '4fr 1fr', // 进一步增加主内容区域比例，让内容更宽
   },
 }));
 

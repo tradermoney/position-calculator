@@ -41,7 +41,7 @@ export async function loadBreakEvenInputs(): Promise<BreakEvenInputs | null> {
     const result = await db.get('breakEvenCalculator', STORAGE_KEY);
 
     if (result) {
-      const { leverage, openFeeRate, closeFeeRate, fundingRate, fundingPeriod, holdingTime } = result as BreakEvenInputState;
+      const { leverage, openFeeRate, closeFeeRate, fundingRate, fundingPeriod, holdingTime, symbol, positionDirection } = result as BreakEvenInputState;
       return {
         leverage,
         openFeeRate,
@@ -49,6 +49,8 @@ export async function loadBreakEvenInputs(): Promise<BreakEvenInputs | null> {
         fundingRate,
         fundingPeriod,
         holdingTime,
+        symbol: symbol || 'BTCUSDT',
+        positionDirection: positionDirection || 'long',
       };
     }
 

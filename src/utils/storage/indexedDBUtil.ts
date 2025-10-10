@@ -22,7 +22,7 @@ export class IndexedDBUtil {
    * @param key 数据键
    * @param data 要保存的数据
    */
-  static async save<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string, data: T): Promise<void> {
+  static async save<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string, data: T): Promise<void> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，跳过保存操作 (${storeName})`);
       return;
@@ -38,7 +38,7 @@ export class IndexedDBUtil {
       // 根据表类型决定存储方式
       // 使用keyPath的表：直接存储数据对象
       // 其他表：使用 { key, value } 格式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'breakEvenCalculator', 'fundingRateCalculator'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接存储数据对象
@@ -60,7 +60,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async load<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
+  static async load<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string): Promise<T | null> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，无法读取数据 (${storeName})`);
       return null;
@@ -76,7 +76,7 @@ export class IndexedDBUtil {
       const result = await store.get(key);
       
       // 根据表类型决定读取方式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'breakEvenCalculator', 'fundingRateCalculator'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接返回数据对象
@@ -96,7 +96,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async remove(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
+  static async remove(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string): Promise<void> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，跳过删除操作 (${storeName})`);
       return;
@@ -121,7 +121,7 @@ export class IndexedDBUtil {
    * 清空指定存储表
    * @param storeName 存储表名
    */
-  static async clear(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords'): Promise<void> {
+  static async clear(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator'): Promise<void> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，跳过清空操作 (${storeName})`);
       return;
@@ -146,7 +146,7 @@ export class IndexedDBUtil {
    * 获取存储表中所有数据
    * @param storeName 存储表名
    */
-  static async getAll<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords'): Promise<T[]> {
+  static async getAll<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator'): Promise<T[]> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，无法获取数据 (${storeName})`);
       return [];
@@ -162,7 +162,7 @@ export class IndexedDBUtil {
       const results = await store.getAll();
       
       // 根据表类型决定读取方式
-      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords'];
+      const tablesWithKeyPath = ['savedPositions', 'volatilityRecords', 'calculatorRecords', 'breakEvenCalculator', 'fundingRateCalculator'];
       
       if (tablesWithKeyPath.includes(storeName)) {
         // 对于使用keyPath的表，直接返回数据对象数组
@@ -182,7 +182,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async exists(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<boolean> {
+  static async exists(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string): Promise<boolean> {
     if (!this.isAvailable()) {
       console.warn(`IndexedDB不可用，无法检查数据是否存在 (${storeName})`);
       return false;
@@ -208,7 +208,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async get<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<T | null> {
+  static async get<T>(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string): Promise<T | null> {
     return this.load<T>(storeName, key);
   }
 
@@ -217,7 +217,7 @@ export class IndexedDBUtil {
    * @param storeName 存储表名
    * @param key 数据键
    */
-  static async delete(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords', key: string): Promise<void> {
+  static async delete(storeName: 'settings' | 'theme' | 'volatilityInputs' | 'binanceDataInputs' | 'pnlCalculator' | 'savedPositions' | 'volatilityRecords' | 'calculatorRecords' | 'breakEvenCalculator' | 'fundingRateCalculator', key: string): Promise<void> {
     return this.remove(storeName, key);
   }
 }

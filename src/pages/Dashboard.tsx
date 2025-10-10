@@ -35,13 +35,6 @@ interface FeatureItem {
 
 const featureItems: FeatureItem[] = [
   {
-    id: 'add-position',
-    title: '补仓计算',
-    description: '规划分批补仓所需资金与仓位变化，快速评估补仓策略。',
-    path: '/add-position',
-    icon: AddIcon,
-  },
-  {
     id: 'pyramid',
     title: '金子塔委托单',
     description: '生成金子塔加仓计划，分层委托更灵活地管理仓位。',

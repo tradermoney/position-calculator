@@ -2,6 +2,7 @@ import { styled } from '@mui/material/styles';
 import { Card, Slider, Typography, Box } from '@mui/material';
 
 export const StyledCard = styled(Card)(({ theme }) => ({
+  width: '100%',
   borderRadius: 16,
   boxShadow: theme.shadows[3],
   transition: 'all 0.3s ease-in-out',

@@ -15,6 +15,10 @@ export interface BreakEvenInputs {
   fundingPeriod: number;
   /** 持仓时间（小时） */
   holdingTime: number;
+  /** 交易对 */
+  symbol: string;
+  /** 开仓方向：'long' | 'short' */
+  positionDirection: 'long' | 'short';
 }
 
 export interface BreakEvenResult {
@@ -117,6 +121,8 @@ export function getDefaultBreakEvenInputs(): BreakEvenInputs {
     fundingRate: 0.01, // 0.01%
     fundingPeriod: 8, // 8小时
     holdingTime: 24, // 24小时
+    symbol: 'BTCUSDT',
+    positionDirection: 'long',
   };
 }
 

@@ -2,7 +2,7 @@
  * 币安API基础使用示例
  */
 
-import { BinanceMarketDataAPI, BinanceError } from '../index';
+import { BinanceMarketDataAPI, BinanceError, KlineInterval } from '../index';
 
 /**
  * 示例1: 获取当前价格
@@ -15,9 +15,9 @@ export async function example1_getCurrentPrice() {
     const btcPrice = await client.getCurrentPrice('BTCUSDT');
     console.log('BTC现货价格:', btcPrice);
     
-    // 获取ETH合约价格
-    const ethPrice = await client.getCurrentPrice('ETHUSDT', 'perpetual');
-    console.log('ETH永续合约价格:', ethPrice);
+    // 获取ETH合约价格（注意：getCurrentPrice 只接受一个参数）
+    const ethPrice = await client.getCurrentPrice('ETHUSDT');
+    console.log('ETH合约价格:', ethPrice);
   } catch (error) {
     if (error instanceof BinanceError) {
       console.error('币安API错误:', error.getFriendlyMessage());
@@ -34,7 +34,7 @@ export async function example2_get24hrTicker() {
   const client = new BinanceMarketDataAPI();
   
   try {
-    const ticker = await client.get24hrTicker('BTCUSDT');
+    const ticker = await client.get24hrTickerSingle('BTCUSDT');
     
     console.log('24小时行情数据:');
     console.log('- 开盘价:', ticker.openPrice);
@@ -59,21 +59,21 @@ export async function example3_getKlines() {
     // 获取最近100根1小时K线
     const klines = await client.getKlines({
       symbol: 'BTCUSDT',
-      interval: '1h',
+      interval: KlineInterval['1h'],
       limit: 100,
     });
     
     console.log(`获取到 ${klines.length} 根K线数据`);
     
-    // 打印最后一根K线
+    // 打印最后一根K线 (Kline 是一个数组类型)
     const lastKline = klines[klines.length - 1];
     console.log('最新K线:');
-    console.log('- 时间:', new Date(lastKline.openTime));
-    console.log('- 开盘价:', lastKline.open);
-    console.log('- 最高价:', lastKline.high);
-    console.log('- 最低价:', lastKline.low);
-    console.log('- 收盘价:', lastKline.close);
-    console.log('- 成交量:', lastKline.volume);
+    console.log('- 时间:', new Date(lastKline[0]));
+    console.log('- 开盘价:', lastKline[1]);
+    console.log('- 最高价:', lastKline[2]);
+    console.log('- 最低价:', lastKline[3]);
+    console.log('- 收盘价:', lastKline[4]);
+    console.log('- 成交量:', lastKline[5]);
   } catch (error) {
     console.error('获取K线失败:', error);
   }
@@ -134,7 +134,8 @@ export async function example6_getMarkPrice() {
   const client = new BinanceMarketDataAPI();
   
   try {
-    const markPrice = await client.getMarkPrice('BTCUSDT');
+    const result = await client.getMarkPrice({ symbol: 'BTCUSDT' });
+    const markPrice = Array.isArray(result) ? result[0] : result;
     
     console.log('标记价格信息:');
     console.log('- 标记价格:', markPrice.markPrice);

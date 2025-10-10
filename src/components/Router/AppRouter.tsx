@@ -5,7 +5,6 @@ import { CssBaseline } from '@mui/material';
 import { AppProvider, useAppContext } from '../../contexts/appContextHooks';
 import AppLayout from '../Layout/AppLayout';
 import Dashboard from '../../pages/Dashboard';
-import AddPositionCalculator from '../../pages/AddPositionCalculator';
 import PyramidCalculator from '../../pages/PyramidCalculator';
 import PnLCalculatorPage from '../../pages/PnLCalculatorPage';
 import TargetPriceCalculatorPage from '../../pages/TargetPriceCalculatorPage';
@@ -17,13 +16,13 @@ import CalculatorPage from '../../pages/CalculatorPage';
 import KellyCalculatorPage from '../../pages/KellyCalculatorPage';
 import BreakEvenCalculatorPage from '../../pages/BreakEvenCalculatorPage';
 import FeeComparison from '../../pages/FeeComparison';
+import FundingRateCalculator from '../../pages/FundingRateCalculator';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
 const routePathMap = {
   '/': 'dashboard',
   '/dashboard': 'dashboard',
-  '/add-position': 'add-position',
   '/pyramid': 'pyramid',
   '/pnl-calculator': 'pnl-calculator',
   '/target-price-calculator': 'target-price-calculator',
@@ -31,10 +30,12 @@ const routePathMap = {
   '/max-position-calculator': 'max-position-calculator',
   '/entry-price-calculator': 'entry-price-calculator',
   '/volatility-calculator': 'volatility-calculator',
+  '/volatility-calculator/manual': 'volatility-calculator-manual',
   '/volatility-calculator/binance': 'volatility-calculator-binance',
   '/kelly-calculator': 'kelly-calculator',
   '/break-even-calculator': 'break-even-calculator',
   '/fee-comparison': 'fee-comparison',
+  '/funding-rate-calculator': 'funding-rate-calculator',
   '/calculator': 'calculator',
 } as const;
 
@@ -131,7 +132,6 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-position" element={<AddPositionCalculator />} />
           <Route path="/pyramid" element={<PyramidCalculator />} />
           <Route path="/pnl-calculator" element={<PnLCalculatorPage />} />
           <Route path="/target-price-calculator" element={<TargetPriceCalculatorPage />} />
@@ -139,10 +139,12 @@ function AppContent() {
           <Route path="/max-position-calculator" element={<MaxPositionCalculatorPage />} />
           <Route path="/entry-price-calculator" element={<EntryPriceCalculatorPage />} />
           <Route path="/volatility-calculator" element={<VolatilityCalculator />} />
+          <Route path="/volatility-calculator/manual" element={<VolatilityCalculator />} />
           <Route path="/volatility-calculator/binance" element={<VolatilityCalculator />} />
           <Route path="/kelly-calculator" element={<KellyCalculatorPage />} />
           <Route path="/break-even-calculator" element={<BreakEvenCalculatorPage />} />
           <Route path="/fee-comparison" element={<FeeComparison />} />
+          <Route path="/funding-rate-calculator" element={<FundingRateCalculator />} />
           <Route path="/calculator" element={<CalculatorPage />} />
 
           {/* 向后兼容性重定向 */}

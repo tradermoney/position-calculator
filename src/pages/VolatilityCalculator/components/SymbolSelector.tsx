@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { TrendingUp as TrendingUpIcon } from '@mui/icons-material';
 import { binanceDataService, type SymbolListItem, ContractType } from '../../../services/binance';
+import FieldTooltip from './FieldTooltip';
 
 export interface SymbolSelectorProps {
   /** 当前选中的交易对 */
@@ -85,8 +86,31 @@ export function SymbolSelector({
 
   return (
     <Box>
-      <Typography variant="subtitle2" gutterBottom>
+      <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         选择交易对
+        <FieldTooltip
+          title={
+            <Box sx={{ p: 0.5 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                交易对选择
+              </Typography>
+              <Typography variant="body2" paragraph>
+                选择要分析的币安永续合约交易对，如 BTC/USDT、ETH/USDT 等。
+              </Typography>
+              <Typography variant="body2" paragraph>
+                <strong>热门交易对：</strong><br/>
+                • BTCUSDT - 比特币/USDT<br/>
+                • ETHUSDT - 以太坊/USDT<br/>
+                • BNBUSDT - 币安币/USDT<br/>
+                • SOLUSDT - Solana/USDT
+              </Typography>
+              <Typography variant="body2">
+                <strong>💡 提示：</strong>可以输入代币名称快速搜索，如输入 "BTC" 查找比特币相关交易对。
+              </Typography>
+            </Box>
+          }
+          placement="right"
+        />
       </Typography>
 
       {/* 交易对选择器 */}

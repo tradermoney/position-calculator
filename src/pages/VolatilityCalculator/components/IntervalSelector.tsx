@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Timeline as TimelineIcon } from '@mui/icons-material';
 import { KlineInterval } from '../../../types/binance';
+import FieldTooltip from './FieldTooltip';
 
 export interface IntervalSelectorProps {
   /** 当前选中的周期 */
@@ -80,6 +81,29 @@ export function IntervalSelector({
       <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         <TimelineIcon sx={{ mr: 0.5, fontSize: 18 }} />
         K线周期
+        <FieldTooltip
+          title={
+            <Box sx={{ p: 0.5 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                K线周期设置
+              </Typography>
+              <Typography variant="body2" paragraph>
+                选择用于计算波动率的K线时间周期。不同周期反映不同时间尺度的价格波动特征。
+              </Typography>
+              <Typography variant="body2" paragraph>
+                <strong>常用周期建议：</strong><br/>
+                • 1分钟/5分钟 - 适合超短线交易，捕捉快速波动<br/>
+                • 15分钟/1小时 - 适合日内交易，观察短期趋势<br/>
+                • 4小时/1天 - 适合中长线交易，分析主要波动<br/>
+                • 1周/1月 - 适合长期投资，了解整体波动水平
+              </Typography>
+              <Typography variant="body2">
+                <strong>💡 提示：</strong>周期越短，数据越敏感但噪声越大；周期越长，趋势越稳定但反应越慢。
+              </Typography>
+            </Box>
+          }
+          placement="right"
+        />
       </Typography>
 
       {/* 热门周期快捷选择 */}

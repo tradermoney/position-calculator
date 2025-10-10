@@ -131,6 +131,14 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           });
           console.log('创建breakEvenCalculator对象存储');
         }
+
+        // 创建资金费率计算器状态表
+        if (!db.objectStoreNames.contains('fundingRateCalculator')) {
+          db.createObjectStore('fundingRateCalculator', {
+            keyPath: 'key'
+          });
+          console.log('创建fundingRateCalculator对象存储');
+        }
       },
     });
 

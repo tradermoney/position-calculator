@@ -42,7 +42,7 @@ export const ButtonSection = styled(Box)(({ theme }) => ({
 }));
 
 export const HistorySection = styled(Box)(({ theme }) => ({
-  maxHeight: '400px',
+  maxHeight: '800px',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     width: '6px',
