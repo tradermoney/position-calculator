@@ -35,13 +35,24 @@ export function StorageProvider({ children }: StorageProviderProps) {
           return;
         }
 
-        // 初始化数据库
-        await initializeDatabase();
+        // 使用超时机制初始化数据库（最多等待10秒）
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('数据库初始化超时（10秒），将跳过初始化'));
+          }, 10000);
+        });
+
+        await Promise.race([
+          initializeDatabase(),
+          timeoutPromise
+        ]);
+        
         setIsStorageReady(true);
         console.log('存储系统初始化完成');
       } catch (err) {
         console.error('存储系统初始化失败:', err);
-        setError(err instanceof Error ? err.message : '存储系统初始化失败');
+        const errorMessage = err instanceof Error ? err.message : '存储系统初始化失败';
+        setError(errorMessage);
         // 即使初始化失败，也标记为就绪，让应用继续运行
         setIsStorageReady(true);
       }
