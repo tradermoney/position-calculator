@@ -54,10 +54,13 @@ dev-server.log
 test-results/
 playwright-report/
 playwright/.cache/
+playwright/.auth/
 coverage/
 *.lcov
 .nyc_output/
 .c8_output/
+vitest-output/
+jest-output/
 
 # ===========================================
 # 环境变量和配置
@@ -141,19 +144,38 @@ Desktop.ini
 # ===========================================
 .cunzhi-memory/
 
+# MCP 和 Playwright 测试相关
+/var/folders/
+playwright-mcp-output/
+browser-data/
+browser-cache/
+
+# 示例和测试文件
+src/services/binance/examples/
+src/**/examples/quick-test.*
+
 # ===========================================
 # 测试文件和报告
 # ===========================================
-# 测试脚本
-*-test.js
-test-*.js
-comprehensive-test-suite.js
-*-focused-test.js
-*-comprehensive-test.js
-quick-test.*
-manual-test-*.js
-*.cjs
-*.mjs
+# 测试脚本（仅排除项目根目录下的测试脚本，不影响 src 目录下的测试文件）
+/*.test.js
+/*-test.js
+/test-*.js
+/test-*.cjs
+/test-*.mjs
+/comprehensive-test*.js
+/comprehensive-test*.cjs
+/comprehensive-test*.mjs
+/*-focused-test.js
+/*-comprehensive-test.js
+/*-comprehensive-test.cjs
+/quick-test*.*
+/manual-test-*.js
+/*-test.cjs
+/simple-test.*
+/detailed-test.*
+/debug-select.*
+/final-test.*
 
 # 测试报告
 *-test-report.json
@@ -190,14 +212,14 @@ debug-select-*.png
 detailed-test-*.png
 
 # ===========================================
-# 文档和说明文件
+# 文档和说明文件（临时文档）
 # ===========================================
-mathematical-verification.md
-PRICE_RANGE_EXAMPLE.md
-价格波动范围功能.md
-BINANCE_API_IMPLEMENTATION.md
-CHANGELOG_BINANCE_API.md
-BINANCE_API_TEST_REPORT.md
+/mathematical-verification.md
+/PRICE_RANGE_EXAMPLE.md
+/价格波动范围功能.md
+/BINANCE_API_IMPLEMENTATION.md
+/CHANGELOG_BINANCE_API.md
+/BINANCE_API_TEST_REPORT.md
 
 # ===========================================
 # 配置文件（可能包含敏感信息）

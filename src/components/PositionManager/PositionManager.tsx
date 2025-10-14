@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -19,6 +19,7 @@ import {
   Divider,
   Stack,
   Tooltip,
+  InputAdornment,
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -32,7 +33,29 @@ import {
   ContentCopy as ContentCopyIcon,
   FileDownload as FileDownloadIcon,
   Edit as EditIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+  DragIndicator as DragIndicatorIcon,
 } from '@mui/icons-material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { PositionSide } from '../../utils/contractCalculations';
 import { PositionListItem, SavePositionParams, RestorePositionParams } from '../../types/position';
 import { SavedPositionStorage } from '../../utils/storage/savedPositionStorage';
@@ -96,6 +119,15 @@ export default function PositionManager({
   const [savedPositions, setSavedPositions] = useState<PositionListItem[]>([]);
   const [importExportOpen, setImportExportOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // 拖拽传感器
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // 加载保存的仓位列表
   const loadSavedPositions = useCallback(async () => {
@@ -112,6 +144,176 @@ export default function PositionManager({
       setLoading(false);
     }
   }, [onError]);
+
+  // 过滤后的仓位列表
+  const filteredPositions = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return savedPositions;
+    }
+    return savedPositions.filter(position =>
+      position.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [savedPositions, searchQuery]);
+
+  // 处理拖拽结束
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = filteredPositions.findIndex(item => item.id === active.id);
+      const newIndex = filteredPositions.findIndex(item => item.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrder = arrayMove(filteredPositions, oldIndex, newIndex);
+        setSavedPositions(prev => {
+          // 更新本地状态
+          const newPositions = [...prev];
+          const reorderedIds = newOrder.map(item => item.id);
+          
+          // 重新排序
+          return newPositions.sort((a, b) => {
+            const aIndex = reorderedIds.indexOf(a.id);
+            const bIndex = reorderedIds.indexOf(b.id);
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+            return aIndex - bIndex;
+          });
+        });
+
+        try {
+          // 更新数据库中的排序
+          const reorderedIds = newOrder.map(item => item.id);
+          await SavedPositionStorage.updatePositionOrder(reorderedIds);
+        } catch (err) {
+          console.error('更新排序失败:', err);
+          // 重新加载以恢复正确的顺序
+          loadSavedPositions();
+        }
+      }
+    }
+  }, [filteredPositions, loadSavedPositions]);
+
+  // 可拖拽的列表项组件
+  const SortablePositionItem = ({ position, index }: { position: PositionListItem; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: position.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <ListItem
+        ref={setNodeRef}
+        style={style}
+        sx={{
+          cursor: isDragging ? 'grabbing' : 'grab',
+          '&:hover': {
+            backgroundColor: 'action.hover',
+          },
+        }}
+      >
+        <Box
+          {...attributes}
+          {...listeners}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mr: 2,
+            cursor: 'grab',
+            '&:active': {
+              cursor: 'grabbing',
+            },
+          }}
+        >
+          <DragIndicatorIcon color="action" />
+        </Box>
+        <ListItemText
+          primary={
+            <Box display="flex" alignItems="center" gap={1}>
+              {getSideIcon(position.side)}
+              <Typography variant="subtitle1" fontWeight="bold">
+                {position.name}
+              </Typography>
+              <Chip
+                label={`${position.leverage}x`}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+            </Box>
+          }
+          secondary={
+            <Box>
+              <Typography variant="body2" color="textSecondary">
+                资金：{formatCapital(position.capital)} | 委托单：{position.positionCount} 个
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                创建：{formatDate(position.createdAt)} | 更新：{formatDate(position.updatedAt)}
+              </Typography>
+            </Box>
+          }
+        />
+        <ListItemSecondaryAction>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="恢复仓位">
+              <IconButton
+                onClick={() => handleRestorePosition(position.id)}
+                disabled={loading}
+                color="primary"
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="导出为JSON文件">
+              <IconButton
+                onClick={() => handleExportPosition(position.id)}
+                disabled={loading}
+                color="info"
+              >
+                <FileDownloadIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="复制JSON到剪贴板">
+              <IconButton
+                onClick={() => handleCopyPositionJson(position.id)}
+                disabled={loading}
+                color="info"
+              >
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="复制文本到剪贴板">
+              <IconButton
+                onClick={() => handleCopyPositionText(position.id)}
+                disabled={loading}
+                color="secondary"
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="删除仓位">
+              <IconButton
+                onClick={() => handleDeletePosition(position.id)}
+                disabled={loading}
+                color="error"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </ListItemSecondaryAction>
+      </ListItem>
+    );
+  };
 
   // 保存当前仓位
   const handleSavePosition = async () => {
@@ -148,6 +350,39 @@ export default function PositionManager({
       onSaveSuccess?.();
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : '保存仓位失败';
+      setError(errorMsg);
+      onError?.(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 直接更新仓位（无需对话框）
+  const handleDirectUpdatePosition = async () => {
+    if (!editingPosition) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const saveParams: SavePositionParams = {
+        name: editingPosition.name, // 使用现有名称
+        side,
+        capital,
+        leverage,
+        positions,
+        inputValues,
+      };
+
+      // 更新现有仓位
+      await SavedPositionStorage.updatePosition(editingPosition.id, saveParams);
+      await loadSavedPositions();
+      onSaveSuccess?.();
+      // 注意：不调用 onClearEditing，保持编辑模式
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '更新仓位失败';
       setError(errorMsg);
       onError?.(errorMsg);
     } finally {
@@ -373,7 +608,7 @@ export default function PositionManager({
         <Button
           variant="contained"
           startIcon={<SaveIcon />}
-          onClick={() => setSaveDialogOpen(true)}
+          onClick={editingPosition ? handleDirectUpdatePosition : () => setSaveDialogOpen(true)}
           disabled={loading}
         >
           {editingPosition ? `更新仓位 ${editingPosition.name}` : '保存仓位'}
@@ -481,101 +716,65 @@ export default function PositionManager({
           </Box>
         </DialogTitle>
         <DialogContent>
+          {/* 搜索框 */}
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="搜索仓位名称..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchQuery('')}
+                      edge="end"
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
           {loading ? (
             <Box display="flex" justifyContent="center" p={3}>
               <CircularProgress />
             </Box>
-          ) : savedPositions.length === 0 ? (
+          ) : filteredPositions.length === 0 ? (
             <Box textAlign="center" p={3}>
               <Typography variant="body1" color="textSecondary">
-                暂无保存的仓位
+                {searchQuery ? '未找到匹配的仓位' : '暂无保存的仓位'}
               </Typography>
             </Box>
           ) : (
-            <List>
-              {savedPositions.map((position, index) => (
-                <React.Fragment key={position.id}>
-                  <ListItem>
-                    <ListItemText
-                      primary={
-                        <Box display="flex" alignItems="center" gap={1}>
-                          {getSideIcon(position.side)}
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            {position.name}
-                          </Typography>
-                          <Chip
-                            label={`${position.leverage}x`}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                          />
-                        </Box>
-                      }
-                      secondary={
-                        <Box>
-                          <Typography variant="body2" color="textSecondary">
-                            资金：{formatCapital(position.capital)} | 委托单：{position.positionCount} 个
-                          </Typography>
-                          <Typography variant="caption" color="textSecondary">
-                            创建：{formatDate(position.createdAt)} | 更新：{formatDate(position.updatedAt)}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <Stack direction="row" spacing={1}>
-                        <Tooltip title="恢复仓位">
-                          <IconButton
-                            onClick={() => handleRestorePosition(position.id)}
-                            disabled={loading}
-                            color="primary"
-                          >
-                            <RefreshIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="导出为JSON文件">
-                          <IconButton
-                            onClick={() => handleExportPosition(position.id)}
-                            disabled={loading}
-                            color="info"
-                          >
-                            <FileDownloadIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="复制JSON到剪贴板">
-                          <IconButton
-                            onClick={() => handleCopyPositionJson(position.id)}
-                            disabled={loading}
-                            color="info"
-                          >
-                            <ContentCopyIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="复制文本到剪贴板">
-                          <IconButton
-                            onClick={() => handleCopyPositionText(position.id)}
-                            disabled={loading}
-                            color="secondary"
-                          >
-                            <DownloadIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="删除仓位">
-                          <IconButton
-                            onClick={() => handleDeletePosition(position.id)}
-                            disabled={loading}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  {index < savedPositions.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </List>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={filteredPositions.map(p => p.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List>
+                  {filteredPositions.map((position, index) => (
+                    <React.Fragment key={position.id}>
+                      <SortablePositionItem position={position} index={index} />
+                      {index < filteredPositions.length - 1 && <Divider />}
+                    </React.Fragment>
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
           )}
         </DialogContent>
       </Dialog>

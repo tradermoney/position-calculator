@@ -14,6 +14,7 @@ export interface SavedPosition {
   inputValues: { [key: string]: string };
   createdAt: Date;
   updatedAt: Date;
+  sortOrder?: number; // 排序顺序，数字越小越靠前
 }
 
 /**
@@ -28,6 +29,7 @@ export interface PositionListItem {
   positionCount: number;
   createdAt: Date;
   updatedAt: Date;
+  sortOrder?: number; // 排序顺序，数字越小越靠前
 }
 
 /**

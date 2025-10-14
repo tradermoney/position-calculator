@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '../utils/titleManager';
 import {
   Box,
   Typography,
@@ -23,7 +24,6 @@ import {
   TrendingUp as BreakEvenIcon,
   Functions as FunctionsIcon,
 } from '@mui/icons-material';
-import { usePageTitle } from '../utils/titleManager';
 
 interface FeatureItem {
   id: string;
@@ -116,6 +116,7 @@ const featureItems: FeatureItem[] = [
 export default function Dashboard() {
   const navigate = useNavigate();
 
+  // 设置页面标题
   usePageTitle('dashboard');
 
   return (

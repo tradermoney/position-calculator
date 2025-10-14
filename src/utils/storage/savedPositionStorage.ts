@@ -23,6 +23,12 @@ export class SavedPositionStorage {
     const id = this.generateId();
     const now = new Date();
     
+    // 获取当前最大的排序顺序
+    const positions = await this.getPositionList();
+    const maxSortOrder = positions.length > 0 
+      ? Math.max(...positions.map(p => p.sortOrder || 0))
+      : 0;
+    
     const savedPosition: SavedPosition = {
       id,
       name: params.name,
@@ -33,6 +39,7 @@ export class SavedPositionStorage {
       inputValues: params.inputValues,
       createdAt: now,
       updatedAt: now,
+      sortOrder: maxSortOrder + 1, // 新仓位排在最后
     };
 
     try {
@@ -53,16 +60,19 @@ export class SavedPositionStorage {
       await waitForDatabaseInit();
       const positions = await IndexedDBUtil.getAll<SavedPosition>(STORE_NAME);
       
-      return positions.map(position => ({
-        id: position.id,
-        name: position.name,
-        side: position.side,
-        capital: position.capital,
-        leverage: position.leverage,
-        positionCount: position.positions.length,
-        createdAt: position.createdAt,
-        updatedAt: position.updatedAt,
-      }));
+      return positions
+        .map(position => ({
+          id: position.id,
+          name: position.name,
+          side: position.side,
+          capital: position.capital,
+          leverage: position.leverage,
+          positionCount: position.positions.length,
+          createdAt: position.createdAt,
+          updatedAt: position.updatedAt,
+          sortOrder: position.sortOrder || 0,
+        }))
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)); // 按排序顺序排序
     } catch (error) {
       console.error('获取仓位列表失败:', error);
       return [];
@@ -121,6 +131,33 @@ export class SavedPositionStorage {
     } catch (error) {
       console.error('更新仓位失败:', error);
       throw new Error('更新仓位失败');
+    }
+  }
+
+  /**
+   * 更新仓位排序
+   */
+  static async updatePositionOrder(positionIds: string[]): Promise<void> {
+    try {
+      await waitForDatabaseInit();
+      
+      // 批量更新排序顺序
+      const updatePromises = positionIds.map(async (id, index) => {
+        const position = await this.getPositionById(id);
+        if (position) {
+          const updatedPosition: SavedPosition = {
+            ...position,
+            sortOrder: index + 1,
+            updatedAt: new Date(),
+          };
+          await IndexedDBUtil.save(STORE_NAME, id, updatedPosition);
+        }
+      });
+      
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('更新仓位排序失败:', error);
+      throw new Error('更新仓位排序失败');
     }
   }
 

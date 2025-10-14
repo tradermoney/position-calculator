@@ -17,6 +17,7 @@ import KellyCalculatorPage from '../../pages/KellyCalculatorPage';
 import BreakEvenCalculatorPage from '../../pages/BreakEvenCalculatorPage';
 import FeeComparison from '../../pages/FeeComparison';
 import FundingRateCalculator from '../../pages/FundingRateCalculator';
+import { PromptTemplateList, PromptTemplateDetail, PromptTemplateEdit } from '../../pages/PromptTemplate';
 import { setPageTitle, PageKey } from '../../utils/titleManager';
 
 // 路由路径映射
@@ -37,11 +38,27 @@ const routePathMap = {
   '/fee-comparison': 'fee-comparison',
   '/funding-rate-calculator': 'funding-rate-calculator',
   '/calculator': 'calculator',
+  '/prompt-template': 'prompt-template',
+  '/prompt-template/new': 'prompt-template-new',
 } as const;
 
 // 根据路径获取页面键名
 function getPageKeyFromPath(pathname: string): PageKey {
-  return (routePathMap[pathname as keyof typeof routePathMap] || 'dashboard') as PageKey;
+  // 直接匹配
+  if (routePathMap[pathname as keyof typeof routePathMap]) {
+    return routePathMap[pathname as keyof typeof routePathMap] as PageKey;
+  }
+  
+  // 处理动态路由
+  if (pathname.startsWith('/prompt-template/')) {
+    if (pathname.endsWith('/edit')) {
+      return 'prompt-template-edit';
+    } else if (pathname !== '/prompt-template/new') {
+      return 'prompt-template-detail';
+    }
+  }
+  
+  return 'dashboard' as PageKey;
 }
 
 function AppContent() {
@@ -146,6 +163,10 @@ function AppContent() {
           <Route path="/fee-comparison" element={<FeeComparison />} />
           <Route path="/funding-rate-calculator" element={<FundingRateCalculator />} />
           <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/prompt-template" element={<PromptTemplateList />} />
+          <Route path="/prompt-template/new" element={<PromptTemplateEdit />} />
+          <Route path="/prompt-template/:id/edit" element={<PromptTemplateEdit />} />
+          <Route path="/prompt-template/:id" element={<PromptTemplateDetail />} />
 
           {/* 向后兼容性重定向 */}
           <Route path="/contract-calculator" element={<Navigate to="/pnl-calculator" replace />} />

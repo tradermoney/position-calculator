@@ -20,6 +20,10 @@ export const PAGE_TITLES = {
   'funding-rate-calculator': '资金费率计算器 - 合约计算器',
   'fee-comparison': 'Maker/Taker费率对比 - 合约计算器',
   'calculator': '计算器 - 合约计算器',
+  'prompt-template': '提示词模板 - 合约计算器',
+  'prompt-template-detail': '模板详情 - 提示词模板',
+  'prompt-template-edit': '编辑模板 - 提示词模板',
+  'prompt-template-new': '创建模板 - 提示词模板',
 } as const;
 
 // 页面类型
@@ -66,6 +70,10 @@ function updateMetaTags(title: string, pageKey: PageKey): void {
     'funding-rate-calculator': '资金费率计算器，基于币安API历史数据预估永续合约持仓成本，帮您合理规划持仓时间',
     'fee-comparison': 'Maker/Taker费率对比工具，对比不同交易所的手续费率，计算实际交易成本',
     'calculator': '科学计算器，支持基础运算和括号运算，自动保存计算历史记录',
+    'prompt-template': '提示词模板管理，创建和管理AI提示词模板，支持数据配置和内容复制',
+    'prompt-template-detail': '查看提示词模板详情，复制完整内容包含配置数据',
+    'prompt-template-edit': '编辑提示词模板，修改模板内容和数据配置',
+    'prompt-template-new': '创建新的提示词模板，设置模板内容和数据源配置',
   };
   
   updateMetaTag('description', descriptions[pageKey] || '专业的加密货币仓位管理和计算工具');
@@ -127,6 +135,28 @@ export function usePageTitle(pageKey: PageKey, customTitle?: string) {
       resetTitle();
     };
   }, [pageKey, customTitle]);
+}
+
+/**
+ * 动态页面标题Hook
+ * 用于根据数据动态设置页面标题（如模板名称）
+ */
+export function useDynamicPageTitle(pageKey: PageKey, dynamicPart?: string, suffix?: string) {
+  React.useEffect(() => {
+    if (dynamicPart) {
+      const customTitle = suffix 
+        ? `${dynamicPart} - ${suffix}` 
+        : `${dynamicPart} - ${PAGE_TITLES[pageKey] || DEFAULT_TITLE}`;
+      setPageTitle(pageKey, customTitle);
+    } else {
+      setPageTitle(pageKey);
+    }
+    
+    // 组件卸载时重置标题
+    return () => {
+      resetTitle();
+    };
+  }, [pageKey, dynamicPart, suffix]);
 }
 
 // 导入React用于useEffect

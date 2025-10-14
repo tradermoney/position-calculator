@@ -34,6 +34,7 @@ import {
   Brightness7 as LightModeIcon,
   GitHub as GitHubIcon,
   AttachMoney as FundingRateIcon,
+  Description as PromptTemplateIcon,
 } from '@mui/icons-material';
 import { useAppContext } from '../../contexts/appContextHooks';
 
@@ -57,6 +58,7 @@ const menuItems = [
   { id: 'funding-rate-calculator', label: '资金费率计算器', icon: <FundingRateIcon />, path: '/funding-rate-calculator' },
   { id: 'fee-comparison', label: 'Maker/Taker费率对比', icon: <CalculateIcon />, path: '/fee-comparison' },
   { id: 'calculator', label: '计算器', icon: <CalculatorIcon />, path: '/calculator' },
+  { id: 'prompt-template', label: '提示词模板', icon: <PromptTemplateIcon />, path: '/prompt-template' },
 ];
 
 export default function AppLayout({ children }: AppLayoutProps) {

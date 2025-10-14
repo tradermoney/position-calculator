@@ -139,6 +139,17 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
           });
           console.log('创建fundingRateCalculator对象存储');
         }
+
+        // 创建提示词模板表
+        if (!db.objectStoreNames.contains('promptTemplates')) {
+          const promptTemplatesStore = db.createObjectStore('promptTemplates', {
+            keyPath: 'id'
+          });
+          promptTemplatesStore.createIndex('by-created', 'createdAt');
+          promptTemplatesStore.createIndex('by-updated', 'updatedAt');
+          promptTemplatesStore.createIndex('by-name', 'name');
+          console.log('创建promptTemplates对象存储');
+        }
       },
     });
 
