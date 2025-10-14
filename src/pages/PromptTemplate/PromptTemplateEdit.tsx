@@ -286,7 +286,6 @@ export default function PromptTemplateEdit() {
             <Tabs
               value={previewMode}
               onChange={(_, newValue) => setPreviewMode(newValue)}
-              size="small"
             >
               <Tab
                 icon={<PreviewIcon />}
