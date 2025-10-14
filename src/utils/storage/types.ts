@@ -217,4 +217,4 @@ export interface PromptTemplate {
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 8; // 升级版本
+export const DB_VERSION = 9; // 升级版本（添加defaultTemplateSettings表）

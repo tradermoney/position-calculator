@@ -194,6 +194,17 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
         } else {
           console.log('[DB] promptTemplates对象存储已存在');
         }
+
+        // 创建默认模板设置表
+        if (!db.objectStoreNames.contains('defaultTemplateSettings')) {
+          console.log('[DB] 开始创建defaultTemplateSettings对象存储...');
+          db.createObjectStore('defaultTemplateSettings', {
+            keyPath: 'key'
+          });
+          console.log('[DB] ✓ 创建defaultTemplateSettings对象存储成功');
+        } else {
+          console.log('[DB] defaultTemplateSettings对象存储已存在');
+        }
         
         console.log('[DB] 数据库升级完成');
       },
@@ -240,5 +251,100 @@ export function closeDB(): void {
   if (dbInstance) {
     dbInstance.close();
     dbInstance = null;
+  }
+}
+
+/**
+ * 清空数据库（删除整个数据库）
+ * 谨慎使用！这将删除所有用户数据
+ */
+export async function clearDatabase(): Promise<void> {
+  console.log('[DB] 开始清空数据库...');
+  
+  try {
+    // 关闭现有连接
+    closeDB();
+    
+    // 删除数据库
+    if (isIndexedDBAvailable()) {
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.deleteDatabase(DB_NAME);
+        
+        request.onsuccess = () => {
+          console.log('[DB] ✓ 数据库已成功删除');
+          resolve();
+        };
+        
+        request.onerror = () => {
+          console.error('[DB] ✗ 删除数据库失败:', request.error);
+          reject(request.error);
+        };
+        
+        request.onblocked = () => {
+          console.warn('[DB] 删除数据库被阻塞，请关闭所有使用该数据库的标签页');
+        };
+      });
+    }
+  } catch (error) {
+    console.error('[DB] 清空数据库时发生错误:', error);
+    throw error;
+  }
+}
+
+/**
+ * 检查数据库健康状态
+ * 返回缺失的表列表
+ */
+export async function checkDatabaseHealth(): Promise<{
+  isHealthy: boolean;
+  missingStores: string[];
+  currentVersion: number;
+}> {
+  console.log('[DB] 开始检查数据库健康状态...');
+  
+  const requiredStores = [
+    'positions',
+    'settings',
+    'theme',
+    'volatilityRecords',
+    'volatilityInputs',
+    'binanceDataInputs',
+    'pnlCalculator',
+    'savedPositions',
+    'calculatorRecords',
+    'breakEvenCalculator',
+    'fundingRateCalculator',
+    'promptTemplates',
+    'defaultTemplateSettings',
+  ] as const;
+  
+  try {
+    const db = await getDB();
+    const existingStores = new Set(Array.from(db.objectStoreNames));
+    const missingStores: string[] = [];
+    
+    for (const store of requiredStores) {
+      if (!existingStores.has(store)) {
+        missingStores.push(store);
+      }
+    }
+    
+    const isHealthy = missingStores.length === 0;
+    
+    console.log('[DB] 数据库健康检查结果:', {
+      isHealthy,
+      currentVersion: db.version,
+      existingStores: Array.from(existingStores),
+      missingStores,
+    });
+    
+    return {
+      isHealthy,
+      missingStores,
+      currentVersion: db.version,
+    };
+  } catch (error) {
+    console.error('[DB] 健康检查失败:', error);
+    throw error;
   }
 }
