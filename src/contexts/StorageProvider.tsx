@@ -18,39 +18,48 @@ export function StorageProvider({ children }: StorageProviderProps) {
 
   React.useEffect(() => {
     const initStorage = async () => {
+      console.log('[StorageProvider] 开始存储系统初始化...');
+      const startTime = Date.now();
+      
       try {
         // 检查IndexedDB是否可用
+        console.log('[StorageProvider] 检查IndexedDB可用性...');
         const indexedDBAvailable = 'indexedDB' in window && 'IDBTransaction' in window;
         setIsIndexedDBAvailable(indexedDBAvailable);
+        console.log(`[StorageProvider] IndexedDB可用性: ${indexedDBAvailable}`);
 
         if (!indexedDBAvailable) {
-          console.warn('IndexedDB不可用，将使用localStorage作为存储方案');
+          console.warn('[StorageProvider] IndexedDB不可用，将使用localStorage作为存储方案');
           setIsStorageReady(true);
           return;
         }
 
         // 如果数据库已经初始化，直接标记为就绪
         if (isDatabaseInitialized()) {
+          console.log('[StorageProvider] 数据库已初始化，直接标记为就绪');
           setIsStorageReady(true);
           return;
         }
 
-        // 使用超时机制初始化数据库（最多等待10秒）
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => {
-            reject(new Error('数据库初始化超时（10秒），将跳过初始化'));
-          }, 10000);
-        });
-
-        await Promise.race([
-          initializeDatabase(),
-          timeoutPromise
-        ]);
+        // 直接初始化数据库，不使用超时机制
+        console.log('[StorageProvider] 开始初始化数据库...');
+        await initializeDatabase();
         
+        const duration = Date.now() - startTime;
         setIsStorageReady(true);
-        console.log('存储系统初始化完成');
+        console.log(`[StorageProvider] ✓ 存储系统初始化完成，总耗时: ${duration}ms`);
       } catch (err) {
-        console.error('存储系统初始化失败:', err);
+        const duration = Date.now() - startTime;
+        console.error(`[StorageProvider] ✗ 存储系统初始化失败 (耗时: ${duration}ms):`, err);
+        
+        if (err instanceof Error) {
+          console.error('[StorageProvider] 错误详情:', {
+            name: err.name,
+            message: err.message,
+            stack: err.stack
+          });
+        }
+        
         const errorMessage = err instanceof Error ? err.message : '存储系统初始化失败';
         setError(errorMessage);
         // 即使初始化失败，也标记为就绪，让应用继续运行
