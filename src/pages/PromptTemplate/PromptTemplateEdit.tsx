@@ -105,6 +105,34 @@ export default function PromptTemplateEdit() {
     try {
       const defaultContent = await getDefaultTemplateContent();
       setContent(defaultContent);
+      
+      // 设置默认数据配置：默认启用 K线数据、资金费率、订单薄
+      const defaultDataConfigs: PromptDataConfig[] = [
+        {
+          id: `config_${Date.now()}_kline`,
+          type: 'kline',
+          symbol: '',
+          interval: '3m',
+          limit: 500,
+        },
+        {
+          id: `config_${Date.now()}_funding`,
+          type: 'fundingRate',
+          symbol: '',
+          days: 3,
+        },
+        {
+          id: `config_${Date.now()}_orderbook`,
+          type: 'orderBook',
+          symbol: '',
+          orderBookMode: 'priceRange',
+          priceRangePercent: 10,
+          aggregationEnabled: true,
+          aggregationLevels: 20,
+          aggregationMode: 'equal-price',
+        },
+      ];
+      setDataConfigs(defaultDataConfigs);
     } catch (error) {
       console.error('加载默认模板内容失败:', error);
       // 不显示错误提示，使用空内容即可
