@@ -28,6 +28,7 @@ import {
   getPromptTemplateById,
 } from '../../utils/storage/promptTemplateStorage';
 import { fetchPromptData } from '../../services/promptDataService';
+import { PromptRenderer } from './components/PromptRenderer';
 
 export default function PromptTemplateDetail() {
   const { id } = useParams<{ id: string }>();
@@ -114,6 +115,17 @@ export default function PromptTemplateDetail() {
       showSnackbar('复制失败', 'error');
     } finally {
       setCopying(false);
+    }
+  };
+
+  // 处理渲染组件的复制
+  const handleRendererCopy = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      showSnackbar('已复制到剪贴板', 'success');
+    } catch (error) {
+      console.error('复制失败:', error);
+      showSnackbar('复制失败', 'error');
     }
   };
 
@@ -226,6 +238,14 @@ export default function PromptTemplateDetail() {
           {template.content || '暂无内容'}
         </Box>
       </Paper>
+
+      {/* 渲染结果 */}
+      <Box sx={{ mb: 3 }}>
+        <PromptRenderer 
+          template={template} 
+          onCopy={handleRendererCopy}
+        />
+      </Box>
 
       {/* 数据配置 */}
       <Paper sx={{ p: 3 }}>

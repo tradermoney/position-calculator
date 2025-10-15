@@ -6,17 +6,13 @@
 import type { BinanceClientConfig, BinanceAPIError } from '../../types/binance';
 
 /**
- * 币安API端点配置
+ * 币安API端点配置（仅期货）
  */
 export const BINANCE_ENDPOINTS = {
-  /** 现货API */
-  SPOT: 'https://api.binance.com',
   /** 合约API (USDT本位) */
   FUTURES: 'https://fapi.binance.com',
   /** 合约API (币本位) */
   DELIVERY: 'https://dapi.binance.com',
-  /** 现货测试网 */
-  SPOT_TESTNET: 'https://testnet.binance.vision',
   /** 合约测试网 (USDT本位) */
   FUTURES_TESTNET: 'https://testnet.binancefuture.com',
 } as const;

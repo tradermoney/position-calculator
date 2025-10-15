@@ -27,11 +27,9 @@ console.log('BTC价格:', price);
 ### 获取实时价格
 
 ```typescript
-// 现货价格
+// 获取永续合约价格
 const btcPrice = await client.getCurrentPrice('BTCUSDT');
-
-// 合约价格
-const ethPrice = await client.getCurrentPrice('ETHUSDT', 'perpetual');
+const ethPrice = await client.getCurrentPrice('ETHUSDT');
 ```
 
 ### 获取K线数据
@@ -148,9 +146,9 @@ npx tsx src/services/binance/examples/basic-usage.ts
 
 ## 支持的市场
 
-- ✅ 现货市场（Spot）
-- ✅ 永续合约（Perpetual Futures）
-- ✅ 交割合约（Delivery Futures）
+- ✅ 永续合约（USDT本位）
+- ✅ 期货合约（币本位）
+- ❌ 现货市场（本项目不支持）
 
 ## 支持的时间间隔
 

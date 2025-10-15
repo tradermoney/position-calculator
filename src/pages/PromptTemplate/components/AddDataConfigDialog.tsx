@@ -85,7 +85,8 @@ export function AddDataConfigDialog({ open, onClose, onAdd }: AddDataConfigDialo
     }
 
     if (type === 'orderBook') {
-      config.depth = depth;
+      config.priceRangePercent = 10;  // 默认±10%
+      config.aggregationLevels = 20;  // 默认20档
     }
 
     onAdd(config);

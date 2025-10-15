@@ -43,7 +43,14 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
     console.log(`[DB] 准备打开数据库: ${DB_NAME}, 版本: ${DB_VERSION}`);
     const startTime = Date.now();
     
-    dbInstance = await openDB<PositionCalculatorDB>(DB_NAME, DB_VERSION, {
+    // 添加超时机制
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('数据库打开超时（30秒）。可能原因：1) 其他标签页正在使用旧版本 2) 数据库升级失败。请关闭所有标签页后重试，或执行 window.__clearDatabase() 清空数据库'));
+      }, 30000); // 30秒超时
+    });
+    
+    const openPromise = openDB<PositionCalculatorDB>(DB_NAME, DB_VERSION, {
       upgrade(db, oldVersion) {
         console.log(`[DB] 数据库升级事件触发，版本: ${oldVersion} -> ${DB_VERSION}`);
         
@@ -210,6 +217,7 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
       },
       blocked() {
         console.warn('[DB] 数据库被阻塞，可能有其他标签页正在使用旧版本的数据库');
+        console.warn('[DB] 请关闭所有其他标签页，或执行 window.__clearDatabase() 清空数据库');
       },
       blocking() {
         console.warn('[DB] 当前数据库正在阻塞其他连接');
@@ -218,6 +226,9 @@ export async function initDB(): Promise<IDBPDatabase<PositionCalculatorDB>> {
         console.error('[DB] 数据库连接异常终止');
       },
     });
+    
+    // 使用 Promise.race 实现超时
+    dbInstance = await Promise.race([openPromise, timeoutPromise]);
 
     const duration = Date.now() - startTime;
     console.log(`[DB] ✓ IndexedDB数据库初始化成功，耗时: ${duration}ms`);

@@ -1,11 +1,11 @@
 # 币安API客户端SDK
 
-这是一个完整的币安API客户端SDK，支持现货和合约市场数据接口。
+这是一个完整的币安期货API客户端SDK，专注于永续合约市场数据接口。
 
 ## 特性
 
 - ✅ 完整的TypeScript类型支持
-- ✅ 支持现货和合约市场
+- ✅ 专注于永续合约市场（USDT本位）
 - ✅ 自动错误重试机制
 - ✅ 请求速率限制保护
 - ✅ 详细的错误处理
@@ -47,8 +47,8 @@ const client = new BinanceMarketDataAPI({
   // 是否使用测试网
   testnet: false,
   
-  // 自定义API端点（可选）
-  baseURL: 'https://api.binance.com',
+  // 自定义API端点（可选，默认使用期货API）
+  baseURL: 'https://fapi.binance.com',
   
   // API密钥（仅私有接口需要）
   apiKey: 'your-api-key',
@@ -70,28 +70,24 @@ console.log('服务器时间:', new Date(serverTime.serverTime));
 #### 获取交易规则和交易对信息
 
 ```typescript
-// 现货交易规则
-const spotInfo = await client.getExchangeInfo();
-
-// 合约交易规则
-const futuresInfo = await client.getExchangeInfo('perpetual');
+// 获取永续合约交易规则
+const exchangeInfo = await client.getExchangeInfo();
 
 // 查找特定交易对信息
-const btcInfo = spotInfo.symbols.find(s => s.symbol === 'BTCUSDT');
+const btcInfo = exchangeInfo.symbols.find(s => s.symbol === 'BTCUSDT');
 console.log('BTC交易规则:', btcInfo);
 ```
 
 #### 获取当前价格
 
 ```typescript
-// 现货价格
-const spotPrice = await client.getCurrentPrice('BTCUSDT');
+// 获取永续合约价格
+const price = await client.getCurrentPrice('BTCUSDT');
+console.log('BTC价格:', price);
 
-// 永续合约价格
-const futuresPrice = await client.getCurrentPrice('BTCUSDT', 'perpetual');
-
-// 交割合约价格
-const deliveryPrice = await client.getCurrentPrice('BTCUSD_PERP', 'delivery');
+// 批量获取价格
+const prices = await client.getAllPrices();
+console.log('所有交易对价格:', prices);
 ```
 
 #### 获取订单簿深度
@@ -99,11 +95,13 @@ const deliveryPrice = await client.getCurrentPrice('BTCUSD_PERP', 'delivery');
 ```typescript
 const orderBook = await client.getOrderBook({
   symbol: 'BTCUSDT',
-  limit: 20, // 可选: 5, 10, 20, 50, 100, 500, 1000
+  limit: 1000, // 期货API支持: 5, 10, 20, 50, 100, 500, 1000 (最大1000)
 });
 
 console.log('最优买价:', orderBook.bids[0][0]);
 console.log('最优卖价:', orderBook.asks[0][0]);
+console.log('获取到的买单档数:', orderBook.bids.length);
+console.log('获取到的卖单档数:', orderBook.asks.length);
 ```
 
 #### 获取最近成交
@@ -458,9 +456,9 @@ monitorFundingRate('BTCUSDT');
 
 ## 注意事项
 
-1. **速率限制**：币安API有严格的速率限制，请合理控制请求频率
-   - 现货API：每分钟1200次请求
-   - 合约API：每分钟2400次请求
+1. **速率限制**：币安期货API有严格的速率限制，请合理控制请求频率
+   - 期货API：每分钟2400次请求
+   - 订单薄深度：最大1000档（现货API支持5000档，但本项目仅使用期货API）
 
 2. **时间同步**：确保系统时间准确，避免时间戳错误
 
@@ -477,8 +475,8 @@ monitorFundingRate('BTCUSDT');
 ## 相关链接
 
 - [币安API文档](https://binance-docs.github.io/apidocs/)
-- [币安现货API](https://binance-docs.github.io/apidocs/spot/cn/)
-- [币安合约API](https://binance-docs.github.io/apidocs/futures/cn/)
+- [币安期货API](https://binance-docs.github.io/apidocs/futures/cn/)
+- [币安期货API (官方新版)](https://developers.binance.com/docs/derivatives/usds-margined-futures)
 - [币安错误码](https://developers.binance.com/docs/zh-CN/derivatives/error-code)
 
 ## 许可证

@@ -178,12 +178,6 @@ export interface PositionCalculatorDB extends DBSchema {
 // 提示词模板数据类型
 export type PromptDataType = 'symbol' | 'kline' | 'fundingRate' | 'orderBook';
 
-// 订单薄模式
-export type OrderBookMode = 'depth' | 'priceRange';
-
-// 订单薄聚合模式
-export type OrderBookAggregationMode = 'equal-price' | 'equal-quantity';
-
 // 提示词模板数据配置
 export interface PromptDataConfig {
   id: string;
@@ -195,14 +189,9 @@ export interface PromptDataConfig {
   limit?: number; // 获取多少个点，默认1000
   // 资金费率配置
   days?: number; // 获取最近多少天，默认3天
-  // 订单薄配置
-  depth?: number; // 档位，默认20
-  orderBookMode?: OrderBookMode; // 订单薄模式：depth(档位) 或 priceRange(价格区间)
-  priceRangePercent?: number; // 价格区间百分比，如1表示±1%，默认1
-  // 价格区间模式的聚合配置
-  aggregationEnabled?: boolean; // 是否启用聚合，默认false
-  aggregationLevels?: number; // 聚合后的档位数量，默认20
-  aggregationMode?: OrderBookAggregationMode; // 聚合模式，默认'equal-price'
+  // 订单薄配置（简化版）
+  priceRangePercent?: number; // 价格区间百分比，如10表示±10%，默认10
+  aggregationLevels?: number; // 聚合档位数量，默认20
 }
 
 // 提示词模板
@@ -217,4 +206,4 @@ export interface PromptTemplate {
 
 // 数据库配置常量
 export const DB_NAME = 'PositionCalculatorDB';
-export const DB_VERSION = 9; // 升级版本（添加defaultTemplateSettings表）
+export const DB_VERSION = 10; // 升级版本（添加超时机制和更好的错误提示）

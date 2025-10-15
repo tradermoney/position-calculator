@@ -42,7 +42,7 @@ export function DataConfigList({ configs, onDelete }: DataConfigListProps) {
         parts.push(`天数: ${config.days || 3}`);
         break;
       case 'orderBook':
-        parts.push(`档位: ${config.depth || 20}`);
+        parts.push(`区间: ±${config.priceRangePercent || 10}%, 档位: ${config.aggregationLevels || 20}`);
         break;
     }
 

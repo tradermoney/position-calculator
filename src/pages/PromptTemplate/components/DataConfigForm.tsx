@@ -17,7 +17,6 @@ import {
   Paper,
   Checkbox,
   FormControlLabel,
-  Switch,
 } from '@mui/material';
 import { PromptDataConfig } from '../../../utils/storage/types';
 import { BinanceMarketDataAPI } from '../../../services/binance';
@@ -103,11 +102,7 @@ export function DataConfigForm({ configs, onChange }: DataConfigFormProps) {
         case 'orderBook':
           updateConfig('orderBook', { 
             symbol, 
-            orderBookMode: 'priceRange',
-            priceRangePercent: 10,
-            aggregationEnabled: true,
-            aggregationLevels: 20,
-            aggregationMode: 'equal-price'
+            aggregationLevels: 20,  // 默认20档
           });
           break;
       }
@@ -125,26 +120,45 @@ export function DataConfigForm({ configs, onChange }: DataConfigFormProps) {
           交易对
         </Typography>
         <Autocomplete
-          value={symbolConfig?.symbol || ''}
-          onChange={(_, newValue) => {
+          value={symbolConfig?.symbol || null}
+          onChange={(event, newValue) => {
+            // 只在用户明确选择或清除时更新
+            // 注意：失去焦点时不应该触发清空操作
             if (newValue) {
-              updateConfig('symbol', { symbol: newValue });
-              // 同步更新其他数据源的交易对
-              if (klineConfig) {
-                updateConfig('kline', { symbol: newValue });
+              // 一次性更新所有相关配置
+              const newConfigs = [...configs];
+              
+              // 更新或创建 symbol 配置
+              const symbolIndex = newConfigs.findIndex(c => c.type === 'symbol');
+              if (symbolIndex >= 0) {
+                newConfigs[symbolIndex] = { ...newConfigs[symbolIndex], symbol: newValue };
+              } else {
+                newConfigs.push({
+                  id: `config_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  type: 'symbol',
+                  symbol: newValue,
+                });
               }
-              if (fundingRateConfig) {
-                updateConfig('fundingRate', { symbol: newValue });
+              
+              // 同步更新所有其他数据源的交易对
+              for (let i = 0; i < newConfigs.length; i++) {
+                const config = newConfigs[i];
+                if (config.type === 'kline' || config.type === 'fundingRate' || config.type === 'orderBook') {
+                  newConfigs[i] = { ...config, symbol: newValue };
+                }
               }
-              if (orderBookConfig) {
-                updateConfig('orderBook', { symbol: newValue });
-              }
-            } else {
-              removeConfig('symbol');
+              
+              onChange(newConfigs);
             }
+            // 移除了 else 分支，不再在 newValue 为 null 时删除配置
+            // 这样可以防止失去焦点时清空已选择的值
           }}
           options={symbols}
           loading={loadingSymbols}
+          isOptionEqualToValue={(option, value) => option === value}
+          freeSolo={false}
+          clearOnBlur={false}
+          selectOnFocus={true}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -248,7 +262,7 @@ export function DataConfigForm({ configs, onChange }: DataConfigFormProps) {
         )}
       </Paper>
 
-      {/* 订单薄配置 */}
+      {/* 订单薄配置（简化版）*/}
       <Paper sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <FormControlLabel
@@ -264,98 +278,19 @@ export function DataConfigForm({ configs, onChange }: DataConfigFormProps) {
         
         {orderBookConfig && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>显示模式</InputLabel>
-              <Select
-                value={orderBookConfig.orderBookMode || 'depth'}
-                label="显示模式"
-                onChange={(e) => updateConfig('orderBook', { orderBookMode: e.target.value as any })}
-              >
-                <MenuItem value="depth">按档位数量</MenuItem>
-                <MenuItem value="priceRange">按价格区间</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              fullWidth
+              type="number"
+              label="聚合档位数"
+              value={orderBookConfig.aggregationLevels ?? 20}
+              onChange={(e) => updateConfig('orderBook', { aggregationLevels: parseInt(e.target.value) || 20 })}
+              inputProps={{ min: 10, max: 100, step: 10 }}
+              helperText="将订单薄数据聚合为指定档位数量"
+            />
             
-            {orderBookConfig.orderBookMode === 'priceRange' ? (
-              <>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="价格区间百分比"
-                  value={orderBookConfig.priceRangePercent || 1}
-                  onChange={(e) => updateConfig('orderBook', { priceRangePercent: parseFloat(e.target.value) || 1 })}
-                  inputProps={{ min: 0.1, max: 50, step: 0.1 }}
-                  helperText="显示当前价格±N%范围内的订单，如1表示±1%"
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={orderBookConfig.aggregationEnabled || false}
-                      onChange={(e) => updateConfig('orderBook', { aggregationEnabled: e.target.checked })}
-                    />
-                  }
-                  label="启用价格聚合"
-                />
-                
-                {orderBookConfig.aggregationEnabled && (
-                  <>
-                    <TextField
-                      fullWidth
-                      type="number"
-                      label="聚合档位数量"
-                      value={orderBookConfig.aggregationLevels || 20}
-                      onChange={(e) => updateConfig('orderBook', { aggregationLevels: parseInt(e.target.value) || 20 })}
-                      inputProps={{ min: 5, max: 100, step: 5 }}
-                      helperText="将价格区间内的订单聚合为指定档位数量"
-                    />
-                    
-                    <FormControl fullWidth>
-                      <InputLabel>聚合模式</InputLabel>
-                      <Select
-                        value={orderBookConfig.aggregationMode || 'equal-price'}
-                        label="聚合模式"
-                        onChange={(e) => updateConfig('orderBook', { aggregationMode: e.target.value as any })}
-                      >
-                        <MenuItem value="equal-price">等价格间隔</MenuItem>
-                        <MenuItem value="equal-quantity">等数量分组</MenuItem>
-                      </Select>
-                    </FormControl>
-                    
-                    <Typography variant="caption" color="text.secondary">
-                      等价格间隔：按相等的价格区间进行聚合<br/>
-                      等数量分组：按相等的数量进行分组聚合
-                    </Typography>
-                  </>
-                )}
-                
-                <Typography variant="caption" color="text.secondary">
-                  根据当前最优买卖价的中间价计算区间。启用聚合可减少大区间时的数据量，提升可读性。
-                </Typography>
-              </>
-            ) : (
-              <>
-                <FormControl fullWidth>
-                  <InputLabel>档位深度</InputLabel>
-                  <Select
-                    value={orderBookConfig.depth || 20}
-                    label="档位深度"
-                    onChange={(e) => updateConfig('orderBook', { depth: parseInt(e.target.value as string) })}
-                  >
-                    <MenuItem value={5}>5档</MenuItem>
-                    <MenuItem value={10}>10档</MenuItem>
-                    <MenuItem value={20}>20档</MenuItem>
-                    <MenuItem value={50}>50档</MenuItem>
-                    <MenuItem value={100}>100档</MenuItem>
-                    <MenuItem value={500}>500档</MenuItem>
-                    <MenuItem value={1000}>1000档</MenuItem>
-                  </Select>
-                </FormControl>
-                <Typography variant="caption" color="text.secondary">
-                  订单薄显示的买卖档位数量
-                </Typography>
-              </>
-            )}
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              ℹ️ 注意：由于期货API限制，最多获取1000档订单数据（价格范围约±0.5%），本工具会将这些数据聚合为指定的档位数量。
+            </Typography>
           </Box>
         )}
       </Paper>

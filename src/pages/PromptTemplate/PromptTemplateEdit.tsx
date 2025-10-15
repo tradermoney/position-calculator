@@ -125,11 +125,8 @@ export default function PromptTemplateEdit() {
           id: `config_${Date.now()}_orderbook`,
           type: 'orderBook',
           symbol: '',
-          orderBookMode: 'priceRange',
-          priceRangePercent: 10,
-          aggregationEnabled: true,
-          aggregationLevels: 20,
-          aggregationMode: 'equal-price',
+          priceRangePercent: 10,  // 默认±10%
+          aggregationLevels: 20,  // 默认20档
         },
       ];
       setDataConfigs(defaultDataConfigs);

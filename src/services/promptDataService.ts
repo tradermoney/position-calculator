@@ -5,7 +5,7 @@
 
 import { BinanceMarketDataAPI } from './binance';
 import { PromptDataConfig } from '../utils/storage/types';
-import { aggregateOrderBook, getRecommendedLevels, type AggregationConfig } from '../utils/orderBookAggregator';
+import { getFormattedOrderBook } from './orderBookFormatter';
 
 /**
  * 格式化K线数据为markdown表格
@@ -29,7 +29,7 @@ function formatKlineData(klines: any[]): string {
     markdown += `| ${time} | ${open} | ${high} | ${low} | ${close} | ${volume.toFixed(2)} |\n`;
   });
 
-  return markdown;
+  return markdown.trim();
 }
 
 /**
@@ -51,103 +51,10 @@ function formatFundingRateData(fundingRates: any[]): string {
     markdown += `| ${time} | ${fundingRate}% | ${markPrice} |\n`;
   });
 
-  return markdown;
+  return markdown.trim();
 }
 
-/**
- * 格式化订单薄数据为markdown表格
- */
-function formatOrderBookData(orderBook: any, config?: { 
-  depth?: number; 
-  mode?: string; 
-  priceRangePercent?: number;
-  aggregationEnabled?: boolean;
-  aggregationLevels?: number;
-  aggregationMode?: 'equal-price' | 'equal-quantity';
-}): string {
-  if (!orderBook || !orderBook.bids || !orderBook.asks) {
-    return '暂无订单薄数据';
-  }
-
-  let filteredBids = orderBook.bids;
-  let filteredAsks = orderBook.asks;
-  let displayInfo = '';
-
-  if (config?.mode === 'priceRange' && config.priceRangePercent) {
-    // 价格区间模式
-    const bestBid = parseFloat(orderBook.bids[0][0]);
-    const bestAsk = parseFloat(orderBook.asks[0][0]);
-    const midPrice = (bestBid + bestAsk) / 2;
-    
-    const rangePercent = config.priceRangePercent / 100;
-    const lowerBound = midPrice * (1 - rangePercent);
-    const upperBound = midPrice * (1 + rangePercent);
-    
-    // 过滤买单：价格在区间内的
-    const rawFilteredBids = orderBook.bids.filter((bid: any[]) => {
-      const price = parseFloat(bid[0]);
-      return price >= lowerBound;
-    });
-    
-    // 过滤卖单：价格在区间内的
-    const rawFilteredAsks = orderBook.asks.filter((ask: any[]) => {
-      const price = parseFloat(ask[0]);
-      return price <= upperBound;
-    });
-
-    // 检查是否需要聚合
-    if (config.aggregationEnabled && (rawFilteredBids.length > 20 || rawFilteredAsks.length > 20)) {
-      const targetLevels = config.aggregationLevels || getRecommendedLevels(
-        Math.max(rawFilteredBids.length, rawFilteredAsks.length), 
-        config.priceRangePercent
-      );
-      
-      const aggregationConfig: AggregationConfig = {
-        targetLevels,
-        mode: config.aggregationMode || 'equal-price'
-      };
-
-      const aggregated = aggregateOrderBook(rawFilteredBids, rawFilteredAsks, aggregationConfig);
-      
-      filteredBids = aggregated.bids.map(entry => [entry.price.toString(), entry.quantity.toString()]);
-      filteredAsks = aggregated.asks.map(entry => [entry.price.toString(), entry.quantity.toString()]);
-      
-      displayInfo = `±${config.priceRangePercent}% 聚合为${targetLevels}档 (${lowerBound.toFixed(4)} - ${upperBound.toFixed(4)})`;
-    } else {
-      filteredBids = rawFilteredBids;
-      filteredAsks = rawFilteredAsks;
-      displayInfo = `±${config.priceRangePercent}% (${lowerBound.toFixed(4)} - ${upperBound.toFixed(4)})`;
-    }
-  } else {
-    // 档位模式
-    const actualDepth = config?.depth || Math.min(orderBook.bids.length, orderBook.asks.length);
-    filteredBids = orderBook.bids.slice(0, actualDepth);
-    filteredAsks = orderBook.asks.slice(0, actualDepth);
-    displayInfo = `${config?.depth || actualDepth}档`;
-  }
-
-  let markdown = `### 买单 (Bids) - ${displayInfo}\n\n`;
-  markdown += '| 价格 | 数量 |\n';
-  markdown += '|------|------|\n';
-
-  filteredBids.forEach((bid: any[]) => {
-    const price = parseFloat(bid[0]);
-    const quantity = parseFloat(bid[1]);
-    markdown += `| ${price} | ${quantity.toFixed(2)} |\n`;
-  });
-
-  markdown += `\n### 卖单 (Asks) - ${displayInfo}\n\n`;
-  markdown += '| 价格 | 数量 |\n';
-  markdown += '|------|------|\n';
-
-  filteredAsks.forEach((ask: any[]) => {
-    const price = parseFloat(ask[0]);
-    const quantity = parseFloat(ask[1]);
-    markdown += `| ${price} | ${quantity.toFixed(2)} |\n`;
-  });
-
-  return markdown;
-}
+// 订单薄格式化已移至 orderBookFormatter.ts 模块
 
 /**
  * 获取单个数据配置的数据
@@ -160,7 +67,7 @@ async function fetchDataForConfig(config: PromptDataConfig, api: BinanceMarketDa
           return '交易对未配置';
         }
         const price = await api.getCurrentPrice(config.symbol);
-        return `**交易对**: ${config.symbol}\n**当前价格**: ${price}\n`;
+        return `**交易对**: ${config.symbol}\n\n**当前价格**: ${price}`;
       }
 
       case 'kline': {
@@ -194,32 +101,8 @@ async function fetchDataForConfig(config: PromptDataConfig, api: BinanceMarketDa
       }
 
       case 'orderBook': {
-        if (!config.symbol) {
-          return '订单薄数据: 交易对未配置';
-        }
-        
-        const mode = config.orderBookMode || 'depth';
-        const depth = config.depth || 20;
-        const priceRangePercent = config.priceRangePercent || 1;
-        
-        // 对于价格区间模式，我们需要获取更多数据以便过滤
-        const limit = mode === 'priceRange' ? 1000 : depth;
-        
-        const orderBook = await api.getOrderBook({
-          symbol: config.symbol,
-          limit,
-        });
-        
-        const modeText = mode === 'priceRange' ? `±${priceRangePercent}%区间` : `${depth}档`;
-        
-        return `### 订单薄数据 (${config.symbol}, ${modeText})\n\n${formatOrderBookData(orderBook, {
-          depth,
-          mode,
-          priceRangePercent,
-          aggregationEnabled: config.aggregationEnabled,
-          aggregationLevels: config.aggregationLevels,
-          aggregationMode: config.aggregationMode
-        })}`;
+        // 使用独立的订单薄格式化模块
+        return await getFormattedOrderBook(api, config);
       }
 
       default:
@@ -235,11 +118,35 @@ async function fetchDataForConfig(config: PromptDataConfig, api: BinanceMarketDa
  * 获取所有数据配置的数据并拼接
  */
 export async function fetchPromptData(dataConfigs: PromptDataConfig[]): Promise<string> {
+  console.log('[PromptData] ========== 开始获取提示词数据 ==========');
+  console.log('[PromptData] 数据配置数量:', dataConfigs.length);
+  console.log('[PromptData] 数据配置详情:', JSON.stringify(dataConfigs, null, 2));
+  
+  if (!dataConfigs || dataConfigs.length === 0) {
+    console.log('[PromptData] 没有数据配置，返回空字符串');
+    return '';
+  }
+  
   const api = new BinanceMarketDataAPI();
-  const dataPromises = dataConfigs.map(config => fetchDataForConfig(config, api));
+  const dataPromises = dataConfigs.map((config, index) => {
+    console.log(`[PromptData] 准备获取配置 ${index + 1}/${dataConfigs.length}:`, config.type);
+    return fetchDataForConfig(config, api);
+  });
+  
+  console.log('[PromptData] 等待所有数据获取完成...');
   const dataResults = await Promise.all(dataPromises);
-
-  return dataResults.join('\n\n---\n\n');
+  
+  console.log('[PromptData] 数据获取完成，结果数量:', dataResults.length);
+  dataResults.forEach((result, index) => {
+    console.log(`[PromptData] 结果 ${index + 1} 长度:`, result.length, '字符');
+    console.log(`[PromptData] 结果 ${index + 1} 前100字符:`, result.substring(0, 100));
+  });
+  
+  const finalResult = dataResults.join('\n\n---\n\n');
+  console.log('[PromptData] ========== 提示词数据获取完成 ==========');
+  console.log('[PromptData] 最终结果长度:', finalResult.length, '字符');
+  
+  return finalResult;
 }
 
 
